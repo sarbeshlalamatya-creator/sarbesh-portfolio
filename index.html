@@ -414,6 +414,28 @@
     50%{transform:translateY(-10px) rotate(1.5deg)}
   }
 
+  /* ── MOBILE HERO CHIPS ──
+     On narrow screens the absolutely-positioned float-badges above (which are
+     placed using -6%/-8%/-10% offsets relative to the huge desktop title)
+     have nowhere sane to go — they either fly off-screen or sit on top of the
+     wrapped title text. Below 768px we hide them entirely and show this
+     plain, flex-wrapped chip row underneath the title instead. Same colours,
+     same labels, laid out for a phone rather than force-fit into a desktop
+     layout. */
+  .hero-badges-mobile {
+    display: none;
+    flex-wrap: wrap; justify-content: center; align-items: center;
+    gap: 10px; margin-top: 22px; position: relative; z-index: 2;
+  }
+  .hbm-chip {
+    font-family: var(--font-body); font-size: .72rem; font-weight: 600;
+    padding: 8px 16px; border-radius: 100px; white-space: nowrap;
+  }
+  .hbm-ui  { background: #19d4c8; color: #000; }
+  .hbm-pm  { background: #b6f02a; color: #000; }
+  .hbm-ux  { background: #e040fb; color: #fff; }
+  .hbm-web { background: #ff5722; color: #fff; }
+
   /* ── HERO STATS BAR ── */
   .hero-stats-bar {
     display: flex; align-items: center; gap: 0;
@@ -1146,8 +1168,12 @@
     .about-inner,.exp-inner,.edu-inner{grid-template-columns:1fr;gap:40px}
     .work-grid{grid-template-columns:1fr}
     #scroll-line-wrap{display:none}
-    .fb-pm,.fb-ux,.fb-web,.fb-figma,.fb-cu,.fb-vsc,.fb-px{display:none}
-    .fb-ui{left:2%}
+    /* All desktop floating badges are absolutely positioned relative to the
+       (huge) desktop title using negative percentage offsets — there is no
+       safe way to keep them on a phone-sized title, so they're replaced
+       wholesale by the .hero-badges-mobile chip row below. */
+    .float-badge{display:none}
+    .hero-badges-mobile{display:flex}
     #nav-shell { top: 18px; }
     /* Two-column sticky headline only makes sense next to a taller list —
        once the grid collapses to one column, let it scroll normally. */
@@ -1196,6 +1222,7 @@
   @media(max-width:400px){
     .fc-social { padding: 10px 14px; gap: 10px; }
     .fc-social a span, .fc-social a svg { width: 30px !important; height: 30px !important; }
+    .hbm-chip { font-size: .66rem; padding: 7px 13px; }
   }
 </style>
 </head>
@@ -1286,6 +1313,15 @@
     <h1 class="hero-title">
       Welcome to<span class="line2">Sarbesh -OS.</span>
     </h1>
+  </div>
+
+  <!-- Mobile-only skill chips — desktop shows the floating badges above;
+       below 768px those are hidden and this clean wrapped row takes over. -->
+  <div class="hero-badges-mobile">
+    <span class="hbm-chip hbm-ui">UI Design</span>
+    <span class="hbm-chip hbm-pm">Project Management</span>
+    <span class="hbm-chip hbm-ux">UX Design</span>
+    <span class="hbm-chip hbm-web">Package Design</span>
   </div>
 
   <!-- Stats bar -->
