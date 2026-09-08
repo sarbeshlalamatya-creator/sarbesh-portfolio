@@ -738,6 +738,7 @@
   .work-card-overlay {
     position: absolute; inset: 0; background: rgba(200,241,53,.03);
     opacity: 0; transition: opacity .3s;
+    pointer-events: none; /* let clicks pass through to the link/body underneath */
   }
   .work-card:hover .work-card-overlay { opacity: 1; }
 
