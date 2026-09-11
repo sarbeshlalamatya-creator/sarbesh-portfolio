@@ -10,8 +10,8 @@
 <style>
   :root{
     --bg:#05070a;
-    --gold:#e6b455;
-    --teal:#5ad4c8;
+    --neon:#c8f135;
+    --teal:#4af0c4;
     --text-faint:#565f72;
     --border:#1c2330;
     --font-mono:'JetBrains Mono', monospace;
@@ -23,7 +23,7 @@
   html,body{height:100%;}
   body{
     background:var(--bg);
-    color:var(--gold);
+    color:var(--neon);
     font-family:var(--font-mono);
     display:flex;
     align-items:center;
@@ -53,7 +53,7 @@
   #boot-lines div.show{opacity:1;}
   #boot-lines .cursor{
     display:inline-block;width:8px;height:14px;
-    background:var(--gold);vertical-align:middle;
+    background:var(--neon);vertical-align:middle;
     animation:blink 1s steps(1) infinite;
     margin-left:2px;
   }
@@ -65,7 +65,7 @@
   }
   .boot-bar-fill{
     height:100%;width:0%;
-    background:linear-gradient(90deg,var(--teal),var(--gold));
+    background:linear-gradient(90deg,var(--teal),var(--neon));
     transition:width 1.4s cubic-bezier(.16,.84,.32,1);
   }
   .boot-pct{
@@ -83,7 +83,7 @@
     transition:opacity .5s ease, color .25s, border-color .25s;
   }
   #replay.show{opacity:1;pointer-events:auto;}
-  #replay:hover{color:var(--gold);border-color:var(--gold);}
+  #replay:hover{color:var(--neon);border-color:var(--neon);}
 </style>
 </head>
 <body>
