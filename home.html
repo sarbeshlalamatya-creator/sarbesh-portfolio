@@ -605,7 +605,10 @@
     border: 1px solid var(--border);
   }
   .about-photo-wrap img {
-    width: 100%; height: 100%; object-fit: cover;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center; /* Focuses on the upper half/face */
     filter: grayscale(20%);
     transition: filter .5s, transform .5s;
   }
