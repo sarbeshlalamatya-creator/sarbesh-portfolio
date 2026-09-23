@@ -2171,18 +2171,63 @@ checkCounters();
   // Show after 1s
   setTimeout(() => wrap.classList.add('visible'), 1200);
 
-  function updateLine() {
+// 1. Core scroll updating logic
+function updateLine() {
   const scrolled = window.scrollY;
   const total = document.documentElement.scrollHeight - window.innerHeight;
-  
-  // Added safe guard: outputs 0 if page is completely unscrollable
   const pct = total > 0 ? Math.min(scrolled / total, 1) * 100 : 0;
   
   fill.style.height = pct + '%';
   glow.style.top = pct + '%';
-  }
-  window.addEventListener('scroll', updateLine, { passive: true });
-  updateLine();
+}
+
+window.addEventListener('scroll', updateLine, { passive: true });
+updateLine();
+
+// 2. Drag-to-scroll implementation
+const trackWrap = document.getElementById('scroll-line-wrap');
+let isDragging = false;
+
+if (trackWrap) {
+  // Allow clicking anywhere on the track to jump instantly to that scroll position
+  trackWrap.style.pointerEvents = 'auto'; // CRITICAL: Changes pointer-events from 'none' to 'auto'
+
+  const handleDrag = (e) => {
+    const rect = trackWrap.getBoundingClientRect();
+    // Calculate vertical click ratio relative to the track's height
+    let relativeY = (e.clientY - rect.top) / rect.height;
+    relativeY = Math.max(0, Math.min(1, relativeY)); // Clamp value between 0 and 1
+
+    const totalScrollable = document.documentElement.scrollHeight - window.innerHeight;
+    
+    // Smoothly scroll the window to the target position
+    window.scrollTo({
+      top: relativeY * totalScrollable,
+      behavior: 'auto' // Must be 'auto' for responsive live-dragging
+    });
+  };
+
+  // Trigger scroll calculation immediately when clicking down
+  trackWrap.addEventListener('mousedown', (e) => {
+    isDragging = true;
+    handleDrag(e);
+    document.body.style.userSelect = 'none'; // Prevents accidental text selection while dragging
+  });
+
+  // Track movement across the entire document window while holding down click
+  window.addEventListener('mousemove', (e) => {
+    if (!isDragging) return;
+    handleDrag(e);
+  });
+
+  // Stop dragging routines on mouse release
+  window.addEventListener('mouseup', () => {
+    if (!isDragging) return;
+    isDragging = false;
+    document.body.style.userSelect = '';
+  });
+}
+
 
 
 // ── SCROLL REVEAL ──
