@@ -16,19 +16,8 @@
 <meta property="og:type" content="website"/>
 <meta property="og:url" content="https://sarbeshamatya.com.np/"/>
 <meta property="og:site_name" content="Sarbesh Lal Amatya"/>
-<meta property="og:image" content="https://sarbeshamatya.com.np/social-share.png"/>
-<meta property="og:image:width" content="1200"/>
-<meta property="og:image:height" content="630"/>
 <meta property="og:image:alt" content="Sarbesh Lal Amatya — UI/UX Designer"/>
 <meta property="og:locale" content="en_US"/>
-
-<!-- Twitter -->
-<meta name="twitter:card" content="summary_large_image"/>
-<meta name="twitter:title" content="Sarbesh Lal Amatya — UI/UX Designer in Kathmandu, Nepal"/>
-<meta name="twitter:description" content="UI/UX Designer based in Kathmandu, Nepal. 6+ years experience across HR, Attendance, Admission, Lead, and Task management systems for higher education and software clients."/>
-<meta name="twitter:image" content="https://sarbeshamatya.com.np/social-share.png"/>
-
-<meta name="theme-color" content="#0e0e0e"/>
 
 <!-- Favicons -->
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230e0e0e'/%3E%3Ctext x='50' y='68' font-family='Georgia,serif' font-size='58' font-weight='700' fill='%23c8f135' text-anchor='middle'%3ES%3C/text%3E%3C/svg%3E"/>
@@ -208,7 +197,7 @@
     pointer-events: none; z-index: 9990; opacity: .25;
   }
 
-  /* ── NAV — EXPANDABLE BOTTOM BAR ── */
+  /* ── NAV — EXPANDABLE TOP BAR ── */
   #nav-shell {
     position: fixed; top: 24px; left: 50%; transform: translateX(-50%);
     z-index: 9997;
@@ -350,7 +339,7 @@
     background-size: 120px 120px;
     background-position: -1px -1px;
   }
-  /* MERAKURUH watermark rows */
+  /* MIRAKURUH watermark rows */
   .grid-watermark {
     position: absolute; inset: 0; pointer-events: none; overflow: hidden;
     display: flex; flex-direction: column; justify-content: space-around;
@@ -415,13 +404,8 @@
   }
 
   /* ── MOBILE HERO CHIPS ──
-     On narrow screens the absolutely-positioned float-badges above (which are
-     placed using -6%/-8%/-10% offsets relative to the huge desktop title)
-     have nowhere sane to go — they either fly off-screen or sit on top of the
-     wrapped title text. Below 768px we hide them entirely and show this
-     plain, flex-wrapped chip row underneath the title instead. Same colours,
-     same labels, laid out for a phone rather than force-fit into a desktop
-     layout. */
+     On narrow screens the absolutely-positioned float-badges above (which are placed using -6%/-8%/-10% offsets relative to the huge desktop title) have nowhere sane to go — they either fly off-screen or sit on top of the wrapped title text. Below 768px we hide them entirely and show this plain, flex-wrapped chip row underneath the title instead. Same colours, same labels, laid out for a phone rather than force-fit into a desktop layout.
+  */
   .hero-badges-mobile {
     display: none;
     flex-wrap: wrap; justify-content: center; align-items: center;
@@ -1172,18 +1156,13 @@
     .about-inner,.exp-inner,.edu-inner{grid-template-columns:1fr;gap:40px}
     .work-grid{grid-template-columns:1fr}
     #scroll-line-wrap{display:none}
-    /* All desktop floating badges are absolutely positioned relative to the
-       (huge) desktop title using negative percentage offsets — there is no
-       safe way to keep them on a phone-sized title, so they're replaced
-       wholesale by the .hero-badges-mobile chip row below. */
+    /* All desktop floating badges are absolutely positioned relative to the (huge) desktop title using negative percentage offsets — there is no safe way to keep them on a phone-sized title, so they're replaced wholesale by the .hero-badges-mobile chip row below. */
     .float-badge{display:none}
     .hero-badges-mobile{display:flex}
     #nav-shell { top: 18px; }
-    /* Two-column sticky headline only makes sense next to a taller list —
-       once the grid collapses to one column, let it scroll normally. */
+    /* Two-column sticky headline only makes sense next to a taller list — once the grid collapses to one column, let it scroll normally. */
     .exp-headline { position: static; top: auto; }
-    /* Fixed 380px height was sized for the desktop two-column layout;
-       let it size to content when stacked above the timeline. */
+    /* Fixed 380px height was sized for the desktop two-column layout; let it size to content when stacked above the timeline. */
     .edu-visual { height: auto; padding: 32px 0; }
     .about-exp-box { flex-direction: column; text-align: center; gap: 12px; }
     .about-exp-num { font-size: 2.6rem; }
@@ -1194,11 +1173,6 @@
     .filter-bar::-webkit-scrollbar { display: none; }
     .filter-tab { padding: 12px 18px; }
     #nav-hamburger { display: flex; flex-shrink: 0; }
-    /* The old fixed 210px was narrower than the desktop pill (260px) while
-       ALSO adding the hamburger icon on top — guaranteed overflow, which is
-       why the hamburger looked stuck to the edge with no gap. Sizing to
-       content instead means it always fits whatever's inside it, with a
-       94vw safety cap for very narrow phones. */
     #nav-pill {
       width: max-content !important; max-width: 94vw !important;
       overflow: visible; position: relative;
@@ -1319,8 +1293,7 @@
     </h1>
   </div>
 
-  <!-- Mobile-only skill chips — desktop shows the floating badges above;
-       below 768px those are hidden and this clean wrapped row takes over. -->
+  <!-- Mobile-only skill chips — desktop shows the floating badges above; below 768px those are hidden and this clean wrapped row takes over. -->
   <div class="hero-badges-mobile">
     <span class="hbm-chip hbm-ui">UI Design</span>
     <span class="hbm-chip hbm-pm">Project Management</span>
@@ -1350,7 +1323,8 @@
 <!-- CTA BUTTONS (below hero in a strip) -->
 <div style="display:flex;justify-content:center;gap:16px;padding:0 40px 80px;position:relative;z-index:2;margin-top:-200px;">
   <button class="btn-primary" onclick="document.getElementById('work').scrollIntoView({behavior:'smooth'})">View Work</button>
-  <button class="btn-secondary" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">Get in Touch</button>
+  <a class="btn-secondary" href="./get-creative" style="text-decoration:none;display:inline-flex;align-items:center;">Get Creative</a>
+  <a class="btn-secondary" href="./arcade.html" style="text-decoration:none;display:inline-flex;align-items:center;">Arcade</a>
 </div>
 
 <!-- MARQUEE -->
