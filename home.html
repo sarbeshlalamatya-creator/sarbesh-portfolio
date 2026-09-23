@@ -121,7 +121,6 @@
   img, svg { max-width: 100%; }
   .about-inner > *, .exp-inner > *, .edu-inner > *, .fc-grid > *, .work-grid > * { min-width: 0; }
 
-  /* Removes the ~300ms tap delay on touch browsers for anything clickable */
   a, button, .filter-tab, .work-card, .process-card, .exp-item, .edu-item, .about-badge {
     touch-action: manipulation;
   }
@@ -152,7 +151,6 @@
   body.cursor-hover #cursor-dot { width: 14px; height: 14px; background: var(--accent2); }
   body.cursor-hover #cursor-ring { width: 56px; height: 56px; border-color: var(--accent2); opacity: .4; }
 
-  /* Touch devices have no real cursor to replace — restore default pointer & hide the custom dot/ring */
   @media (pointer: coarse) {
     body, .btn-primary, .btn-secondary, .float-badge, .hstat, .process-card,
     .work-card, .exp-item, .skill-tag, .social-link, .filter-tab, #nav-pill, a {
@@ -161,12 +159,10 @@
     #cursor-dot, #cursor-ring { display: none; }
   }
 
-  /* Keyboard navigation needs a visible focus indicator regardless of cursor:none */
   a:focus-visible, button:focus-visible, .filter-tab:focus-visible {
     outline: 2px solid var(--accent); outline-offset: 3px;
   }
 
-  /* Skip-to-content link — invisible until focused, for keyboard/screen-reader users */
   .skip-link {
     position: absolute; top: -60px; left: 12px; z-index: 10001;
     background: var(--accent); color: #000; font-family: var(--font-mono);
@@ -178,13 +174,13 @@
   .footer-back-to-top {
     color: var(--muted); text-decoration: none; font-family: var(--font-mono);
     font-size: .7rem; letter-spacing: .08em; transition: color .2s;
+    position: sticky;
+    bottom: 40px;
+    right: 40px;
+    z-index: 1000;
   }
   .footer-back-to-top:hover { 
     color: var(--accent);
-    position: fixed;
-    bottom: 20px; /* Distance from bottom of screen */
-    right: 20px;  /* Distance from right of screen */
-    z-index: 1000; /* Keeps it layered above other page content */
   }
 
 
@@ -268,7 +264,6 @@
   #nav-shell.expanded #nav-hamburger span:nth-child(1) { transform: translateY(2.75px) rotate(45deg); }
   #nav-shell.expanded #nav-hamburger span:nth-child(2) { transform: translateY(-2.75px) rotate(-45deg); }
 
-  /* Links — hidden until expanded */
   #nav-links-inner {
     display: flex; align-items: center; gap: 0;
     padding: 0 8px;
@@ -291,7 +286,6 @@
   }
   #nav-links-inner a:hover::after { transform: scaleX(1); }
 
-  /* right dot in expanded state */
   #nav-right-dot {
     width: 9px; height: 9px; border-radius: 50%; background: #22c55e;
     flex-shrink: 0; margin: 0 20px 0 8px;
@@ -317,11 +311,10 @@
     opacity: 1; transform: scale(1);
   }
   #nav-shell.expanded #nav-dot {
-    opacity: 0; /* hide left dot when right dot shows */
+    opacity: 0;
     transition: opacity .2s;
   }
 
-  /* active link highlight */
   #nav-links-inner a.active { font-weight: 700; }
   #nav-links-inner a.active::after { transform: scaleX(1); }
 
@@ -454,6 +447,19 @@
     padding: 0 8px;
   }
 
+
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  html::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* Hide scrollbar for IE, Edge and Firefox */
+  html {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+
+  
   /* ── SCROLL FLOWING LINE ── */
   #scroll-line-wrap {
     position: fixed; right: 32px; top: 0; bottom: 0;
@@ -1250,11 +1256,11 @@
 <main id="main-content">
 
 <!-- SCROLL FLOWING LINE (fixed, full page) -->
-<div id="scroll-line-wrap">
+<div id="scroll-line-wrap" class="visible">
   <div id="scroll-track"></div>
   <div id="scroll-fill"></div>
   <div id="scroll-glow"></div>
-  <div id="scroll-label">Scroll</div>
+  <div id="scroll-label">SCROLL</div>
 </div>
 
 <!-- HERO -->
