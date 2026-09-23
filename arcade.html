@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<title>Arcade — Sarbesh Lal Amatya</title>
+<meta name="description" content="A small arcade of UI games and interactive experiments by Sarbesh Lal Amatya."/>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230e0e0e'/%3E%3Ctext x='50' y='68' font-family='Georgia,serif' font-size='58' font-weight='700' fill='%23c8f135' text-anchor='middle'%3ES%3C/text%3E%3C/svg%3E"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #0e0e0e; --bg2: #141414; --surface: #1a1a1a; --border: #2a2a2a;
+    --accent: #c8f135; --text: #e8e8e8; --muted: #6b6b6b; --white: #ffffff;
+    --font-display: 'Bebas Neue', sans-serif;
+    --font-mono: 'Space Mono', monospace;
+    --font-body: 'DM Sans', sans-serif;
+    --font-head: 'Plus Jakarta Sans', var(--font-body);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; overflow-x: hidden; }
+  body {
+    background: var(--bg); color: var(--text); font-family: var(--font-body);
+    min-height: 100vh; overflow-x: hidden;
+  }
+  a { color: inherit; }
+  ::selection { background: var(--accent); color: #000; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: .001ms !important;
+      transition-duration: .001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  .skip-link {
+    position: absolute; top: -60px; left: 12px; z-index: 100;
+    background: var(--accent); color: #000; font-family: var(--font-mono);
+    font-size: .8rem; font-weight: 700; padding: 10px 18px; border-radius: 6px;
+    text-decoration: none; transition: top .2s ease;
+  }
+  .skip-link:focus { top: 12px; }
+  a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+  .grid-bg {
+    position: fixed; inset: 0; pointer-events: none; opacity: .5; z-index: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px);
+    background-size: 90px 90px;
+  }
+
+  header {
+    position: relative; z-index: 1;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 28px 40px; border-bottom: 1px solid var(--border);
+  }
+  .back-link {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: var(--font-mono); font-size: .72rem; letter-spacing: .1em;
+    text-transform: uppercase; text-decoration: none; color: var(--muted);
+    transition: color .2s;
+  }
+  .back-link:hover { color: var(--accent); }
+  .header-tag {
+    font-family: var(--font-mono); font-size: .68rem; letter-spacing: .15em;
+    color: var(--muted); text-transform: uppercase;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .header-dot {
+    width: 7px; height: 7px; border-radius: 50%; background: #22c55e;
+    box-shadow: 0 0 0 0 rgba(34,197,94,.5); animation: pulse 2.2s ease infinite;
+  }
+  @keyframes pulse {
+    0%   { box-shadow: 0 0 0 0   rgba(34,197,94,.5); }
+    70%  { box-shadow: 0 0 0 7px rgba(34,197,94,0); }
+    100% { box-shadow: 0 0 0 0   rgba(34,197,94,0); }
+  }
+
+  main { position: relative; z-index: 1; padding: 80px 40px 120px; max-width: 1180px; margin: 0 auto; }
+
+  .arcade-label {
+    font-family: var(--font-mono); font-size: .72rem; color: var(--accent);
+    letter-spacing: .22em; text-transform: uppercase; margin-bottom: 18px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .arcade-label::before { content: ''; width: 20px; height: 1px; background: var(--accent); }
+
+  .arcade-title {
+    font-family: var(--font-head); font-weight: 800; letter-spacing: -.02em;
+    font-size: clamp(40px, 7vw, 84px); line-height: .98; color: var(--white);
+    max-width: 780px;
+  }
+  .arcade-title .dim { color: var(--muted); }
+
+  .arcade-sub {
+    margin-top: 22px; max-width: 520px; color: var(--muted);
+    font-size: .95rem; line-height: 1.75; font-weight: 300;
+  }
+
+  .game-grid {
+    margin-top: 64px;
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px;
+    border: 2px solid var(--border);
+  }
+
+  .game-card {
+    background: var(--surface); border: 1px solid var(--border);
+    padding: 0; position: relative; overflow: hidden;
+    text-decoration: none; color: inherit; display: block;
+    transition: background .3s, transform .3s, border-color .3s;
+  }
+  .game-card:hover { background: #1f1f1f; transform: translateY(-2px); }
+
+  .game-card-art {
+    aspect-ratio: 16/10; position: relative; overflow: hidden;
+    background: linear-gradient(135deg, #16281c 0%, #0e0e0e 65%);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .game-card-art svg { transition: transform .5s cubic-bezier(.22,1,.36,1); }
+  .game-card:hover .game-card-art svg { transform: scale(1.08) rotate(-3deg); }
+
+  .game-card-body { padding: 24px 26px 28px; }
+  .game-card-meta {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 8px;
+  }
+  .game-card-tag {
+    font-family: var(--font-mono); font-size: .6rem; color: var(--accent);
+    letter-spacing: .12em; text-transform: uppercase;
+  }
+  .game-card-status {
+    font-family: var(--font-mono); font-size: .6rem; color: var(--muted);
+    letter-spacing: .08em; text-transform: uppercase;
+  }
+  .game-card-title {
+    font-family: var(--font-display); font-size: 1.7rem; letter-spacing: .01em;
+    color: var(--white); margin-bottom: 8px;
+  }
+  .game-card-desc {
+    font-size: .82rem; color: var(--muted); line-height: 1.65; font-weight: 300;
+  }
+  .game-card-link {
+    display: inline-flex; align-items: center; gap: 6px; margin-top: 18px;
+    font-family: var(--font-mono); font-size: .65rem; color: var(--accent);
+    letter-spacing: .08em; transition: gap .2s;
+  }
+  .game-card:hover .game-card-link { gap: 12px; }
+
+  .game-card.placeholder {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; gap: 10px; padding: 40px 24px; cursor: default;
+  }
+  .game-card.placeholder:hover { background: var(--surface); transform: none; }
+  .placeholder-icon { font-size: 1.6rem; opacity: .25; }
+  .placeholder-text {
+    font-family: var(--font-mono); font-size: .68rem; color: var(--muted);
+    letter-spacing: .1em; text-transform: uppercase;
+  }
+
+  @media(max-width:900px){
+    .game-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media(max-width:640px){
+    header, main { padding-left: 20px; padding-right: 20px; }
+    main { padding-top: 56px; }
+    .game-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<div class="grid-bg"></div>
+
+<header>
+  <a href="./index.html#hero" class="back-link">← Back to Portfolio</a>
+  <div class="header-tag"><span class="header-dot"></span>Playable Prototypes</div>
+</header>
+
+<main id="main-content">
+  <div class="arcade-label">// Side Projects</div>
+  <h1 class="arcade-title">A small <span class="dim">arcade</span> of interface games.</h1>
+  <p class="arcade-sub">
+    Quick, playable UI experiments — built to test interaction ideas, logic puzzles,
+    and small mechanics outside of client work. New games get added here as I make them.
+  </p>
+
+  <div class="game-grid">
+    <a class="game-card" href="./boolean-game.html">
+      <div class="game-card-art">
+        <svg width="120" height="120" viewBox="0 0 120 120" fill="none" aria-hidden="true">
+          <rect x="14" y="14" width="38" height="38" rx="8" fill="rgba(200,241,53,.14)" stroke="#c8f135" stroke-width="1.5"/>
+          <rect x="68" y="14" width="38" height="38" rx="8" fill="rgba(255,255,255,.05)" stroke="rgba(255,255,255,.2)" stroke-width="1.5"/>
+          <rect x="14" y="68" width="38" height="38" rx="8" fill="rgba(255,255,255,.05)" stroke="rgba(255,255,255,.2)" stroke-width="1.5"/>
+          <rect x="68" y="68" width="38" height="38" rx="8" fill="rgba(200,241,53,.14)" stroke="#c8f135" stroke-width="1.5"/>
+          <path d="M27 33h12M33 27v12" stroke="#c8f135" stroke-width="2.2" stroke-linecap="round"/>
+          <path d="M81 33h12" stroke="rgba(255,255,255,.4)" stroke-width="2.2" stroke-linecap="round"/>
+          <path d="M27 87h12" stroke="rgba(255,255,255,.4)" stroke-width="2.2" stroke-linecap="round"/>
+          <path d="M81 81h12M87 75v12" stroke="#c8f135" stroke-width="2.2" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="game-card-body">
+        <div class="game-card-meta">
+          <span class="game-card-tag">Logic Puzzle</span>
+          <span class="game-card-status">Play now</span>
+        </div>
+        <div class="game-card-title">Boolean Shaper</div>
+        <div class="game-card-desc">A shape-and-logic puzzle where you bend AND / OR / NOT gates into place to hit a target truth pattern.</div>
+        <div class="game-card-link">Play Game <span aria-hidden="true">↗</span></div>
+      </div>
+    </a>
+
+    <div class="game-card placeholder" aria-hidden="true">
+      <div class="placeholder-icon">＋</div>
+      <div class="placeholder-text">Next game in progress</div>
+    </div>
+
+    <div class="game-card placeholder" aria-hidden="true">
+      <div class="placeholder-icon">＋</div>
+      <div class="placeholder-text">More coming soon</div>
+    </div>
+  </div>
+</main>
+</body>
+</html>
