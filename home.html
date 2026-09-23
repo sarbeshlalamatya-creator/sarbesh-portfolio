@@ -2172,15 +2172,18 @@ checkCounters();
   setTimeout(() => wrap.classList.add('visible'), 1200);
 
   function updateLine() {
-    const scrolled = window.scrollY;
-    const total = document.documentElement.scrollHeight - window.innerHeight;
-    const pct = Math.min(scrolled / total, 1) * 100;
-    fill.style.height = pct + '%';
-    glow.style.top = pct + '%';
+  const scrolled = window.scrollY;
+  const total = document.documentElement.scrollHeight - window.innerHeight;
+  
+  // Added safe guard: outputs 0 if page is completely unscrollable
+  const pct = total > 0 ? Math.min(scrolled / total, 1) * 100 : 0;
+  
+  fill.style.height = pct + '%';
+  glow.style.top = pct + '%';
   }
   window.addEventListener('scroll', updateLine, { passive: true });
   updateLine();
-})();
+
 
 // ── SCROLL REVEAL ──
 const revealEls = document.querySelectorAll('.reveal,.reveal-left,.reveal-right');
