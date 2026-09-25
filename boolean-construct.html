@@ -1,0 +1,1596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Boolean Construct · Sarbesh-OS</title>
+<meta name="theme-color" content="#0B0C10">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230B0C10'/%3E%3Ccircle cx='12.5' cy='16' r='7.5' fill='%23CCFF00' fill-opacity='.85'/%3E%3Ccircle cx='19.5' cy='16' r='7.5' fill='%2300E5FF' fill-opacity='.7'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=DM+Sans:opsz,wght@9..40,200..800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    color-scheme: dark;
+    --bg:#0B0C10; --bg2:#111319; --surface:#171A22; --border:rgba(255,255,255,0.10);
+    --accent:#CCFF00; --accent2:#FFB020; --accent3:#00E5FF;
+    --text:#E8EAF0; --muted:#8B90A0; --white:#ffffff;
+    --ease:cubic-bezier(.22,1,.36,1);
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0; color:var(--text);
+    background-color:var(--bg);
+    background-image:
+      radial-gradient(rgba(255,255,255,0.07) 1px, transparent 1.2px),
+      linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size:18px 18px, 90px 90px, 90px 90px;
+    background-attachment:fixed;
+    font-family:'DM Sans',system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    overflow:hidden; position:relative;
+    padding:28px 16px;
+    cursor:none;
+  }
+  @media (pointer:coarse){ body{ cursor:auto; } .cursor-dot,.cursor-ring{ display:none !important; } }
+
+  /* ---------- Sarbesh-OS window chrome (shared across every game) ---------- */
+  .os-window{
+    border:1px solid rgba(255,255,255,0.10); border-radius:16px; overflow:hidden;
+    box-shadow:0 25px 60px rgba(0,0,0,0.85), 0 0 0 1px rgba(0,0,0,0.6);
+    background:linear-gradient(180deg, #12141B 0%, #0E1015 100%);
+  }
+  .os-titlebar{
+    display:flex; flex-wrap:nowrap; align-items:center; gap:10px; container-type:inline-size; flex:0 0 auto;
+    padding:10px 16px; background:#0D0F14; border-bottom:1px solid rgba(255,255,255,0.10);
+  }
+  .os-lights{ display:flex; gap:6px; }
+  .os-lights span{ width:12px; height:12px; border-radius:50%; }
+  .os-path{ font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--muted); }
+  .os-path b{ color:var(--text); font-weight:400; }
+  .os-lights{ flex-shrink:0; }
+  .os-path{ flex:1 1 auto; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .os-pill{ flex-shrink:0; }
+  @media (max-width: 480px){ .os-titlebar{ gap:8px; } }
+  /* phones: show just the file name and tighten type so the bar stays on one line */
+  @container (max-width: 440px){ .os-path-dir, .os-path-ext{ display:none; } .os-lights{ gap:5px; } .os-lights span{ width:10px; height:10px; } .os-path{ font-size:11.5px; } .os-pill{ font-size:10.5px; padding:4px 10px; } }
+  .os-pill{
+    margin-left:auto; white-space:nowrap; font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--accent);
+    padding:4px 12px; border-radius:999px; border:1px solid rgba(204,255,0,0.3); background:rgba(204,255,0,0.07);
+  }
+
+  /* ---------- custom cursor ---------- */
+  .cursor-dot,.cursor-ring{ position:fixed; top:0; left:0; border-radius:50%; pointer-events:none; z-index:9999; transform:translate(-50%,-50%); transition:background .15s ease, border-color .15s ease, width .18s var(--ease), height .18s var(--ease); }
+  .cursor-dot{ width:8px; height:8px; background:var(--accent); }
+  .cursor-ring{ width:36px; height:36px; border:1.5px solid var(--accent); }
+  body.cursor-hover .cursor-dot{ background:var(--accent2); }
+  body.cursor-hover .cursor-ring{ border-color:var(--accent2); width:46px; height:46px; }
+
+  /* ---------- layout shell ---------- */
+  .app{ position:relative; z-index:1; height:100%; max-width:1180px; margin:0 auto; display:flex; flex-direction:column; }
+
+  header.hud{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:12px 18px; border-bottom:1px solid var(--border);
+    flex:0 0 auto;
+  }
+  .hud-left{ display:flex; align-items:center; gap:10px; }
+  .hud-left .icon-btn{ opacity:.7; }
+  .stage-label{ font-size:14px; font-weight:600; letter-spacing:.2px; }
+  .stage-label .cat{ color:var(--muted); font-weight:400; margin-left:4px; }
+  .hud-right{ display:flex; align-items:center; gap:6px; }
+  .icon-btn{
+    width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    background:transparent; border:1px solid transparent; color:var(--text); cursor:none;
+  }
+  .icon-btn:hover{ background:var(--surface); border-color:var(--border); }
+  .icon-btn svg{ width:17px; height:17px; }
+  .icon-btn:disabled{ opacity:.25; pointer-events:none; }
+
+  main.stage{ flex:1 1 auto; position:relative; display:flex; overflow:hidden; }
+
+  /* ---------- bank ---------- */
+  .bank{
+    width:300px; flex:0 0 auto; padding:36px 24px; display:grid; grid-template-columns:repeat(2, 110px); gap:20px;
+    align-content:flex-start; border-right:1px solid var(--border);
+  }
+  .bank-cell{ width:110px; height:110px; display:flex; align-items:center; justify-content:center; }
+  .bank-piece{
+    background:var(--white); position:relative; touch-action:none;
+    transition:opacity .3s var(--ease), background .3s ease;
+  }
+  .bank-piece.dragging{ z-index:50; position:fixed; pointer-events:none; transition:box-shadow .15s ease, filter .15s ease; }
+  .bank-piece.dragging.drag-valid{
+    box-shadow:0 0 0 3px var(--accent2), 0 18px 30px -10px rgba(255,176,32,.4);
+    filter:brightness(1.04);
+  }
+  .bank-piece.used{ opacity:.14; background:var(--surface) !important; box-shadow:none !important; }
+  .bank-piece[data-type="rect"]{ border-radius:2px; }
+  .bank-piece[data-type="roundrect"]{ border-radius:22px; }
+  .bank-piece[data-type="circle"]{ border-radius:50%; }
+
+  /* ---------- workspace ---------- */
+  .workspace-wrap{ flex:1 1 auto; position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:20px; gap:18px; }
+
+  .op-row{ display:flex; gap:10px; min-height:40px; }
+  .op-btn{
+    font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.4px;
+    padding:9px 18px; border-radius:100px; background:var(--surface); border:1px solid var(--border); color:var(--text);
+    cursor:none; opacity:0; transform:translateY(6px); pointer-events:none;
+    transition:opacity .25s var(--ease), transform .25s var(--ease), border-color .2s ease, background .2s ease;
+  }
+  .op-btn.show{ opacity:1; transform:translateY(0); pointer-events:auto; }
+  .op-btn:hover{ border-color:var(--accent); background:#1D2029; }
+  .op-btn:active{ transform:scale(.95); }
+
+  .canvas-panel{
+    position:relative; width:340px; height:340px; border:1px solid var(--border); background:var(--bg2);
+    border-radius:6px;
+    perspective:2200px;
+    transition:box-shadow .3s var(--ease), border-color .3s var(--ease), transform .3s var(--ease);
+  }
+  .canvas-panel .tilt-inner{
+    width:100%; height:100%; transform-style:preserve-3d; transform-origin:50% 85%;
+    transition:transform .55s var(--ease);
+  }
+  .canvas-panel.tilted .tilt-inner{ transform:rotateX(9deg); }
+  .canvas-panel.tilted{ box-shadow:0 30px 60px -24px rgba(0,0,0,.55); }
+  canvas#work{ display:block; width:100%; height:100%; }
+
+  .peek-overlay{
+    position:absolute; inset:0; background:var(--bg2); display:flex; align-items:center; justify-content:center;
+    opacity:0; pointer-events:none; transition:opacity .18s ease;
+  }
+  .peek-overlay.show{ opacity:1; }
+  .peek-overlay canvas{ width:100%; height:100%; }
+
+  .drop-target{ position:absolute; }
+
+  /* ---------- footer controller ---------- */
+  footer.controller{
+    display:flex; justify-content:center; gap:34px; padding:16px 0 26px; flex:0 0 auto;
+    opacity:0; transform:translateY(8px); pointer-events:none; transition:opacity .3s var(--ease), transform .3s var(--ease);
+  }
+  footer.controller.show{ opacity:1; transform:translateY(0); pointer-events:auto; }
+  .ctl-btn{ display:flex; flex-direction:column; align-items:center; gap:6px; background:none; border:none; color:var(--accent2); cursor:none; }
+  .ctl-btn svg{ width:22px; height:22px; }
+  .ctl-btn span{ font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--muted); }
+  .ctl-btn:hover span{ color:var(--text); }
+
+  /* ---------- intro / preview stage ---------- */
+  .intro-overlay{
+    position:absolute; inset:0; background:var(--bg); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:22px;
+    z-index:20; opacity:1; transition:opacity .4s ease;
+  }
+  .intro-overlay.hide{ opacity:0; pointer-events:none; }
+  .intro-eyebrow{ font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:1px; color:var(--muted); }
+  .intro-canvas-box{ width:280px; height:280px; }
+  .intro-timer{ font-family:'JetBrains Mono',monospace; font-size:34px; color:var(--accent); }
+
+  /* ---------- toasts ---------- */
+  .toast{
+    position:absolute; top:0; left:0; right:0; background:#0D0F14; border-bottom:1px solid var(--border);
+    padding:16px 22px; display:flex; align-items:center; justify-content:space-between; gap:16px;
+    transform:translateY(-100%); transition:transform .35s var(--ease); z-index:30;
+  }
+  .toast.show{ transform:translateY(0); }
+  .toast p{ margin:0; font-size:14px; color:var(--text); }
+  .toast b{ color:var(--accent2); font-weight:600; cursor:none; }
+  .toast .ok-btn{ font-family:'DM Sans',system-ui,sans-serif; font-weight:600; font-size:13px; background:none; border:none; color:var(--accent); cursor:none; }
+
+  /* ---------- stage clear ---------- */
+  .clear-overlay{
+    position:absolute; inset:0; z-index:40; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:18px;
+    background:rgba(11,12,16,.92); backdrop-filter:blur(3px);
+    opacity:0; pointer-events:none; transition:opacity .4s var(--ease);
+  }
+  .clear-overlay.show{ opacity:1; pointer-events:auto; }
+  .clear-title{ font-family:'Chakra Petch',sans-serif; font-weight:700; font-size:56px; letter-spacing:1px; color:var(--accent); text-shadow:0 0 40px rgba(204,255,0,.35); }
+  .stars{ display:flex; gap:10px; }
+  .stars svg{ width:34px; height:34px; fill:var(--accent2); opacity:0; transform:scale(.4) rotate(-25deg); transition:opacity .3s var(--ease), transform .4s var(--ease); }
+  .clear-overlay.show .stars svg{ opacity:1; transform:scale(1) rotate(0); }
+  .clear-overlay.show .stars svg:nth-child(1){ transition-delay:.1s; }
+  .clear-overlay.show .stars svg:nth-child(2){ transition-delay:.25s; }
+  .clear-overlay.show .stars svg:nth-child(3){ transition-delay:.4s; }
+  .clear-actions{ display:flex; gap:12px; margin-top:6px; }
+  .pill-btn{
+    font-family:'DM Sans',system-ui,sans-serif; font-weight:600; font-size:13px; padding:11px 20px; border-radius:100px;
+    border:1px solid var(--border); background:var(--surface); color:var(--text); cursor:none;
+    transition:border-color .2s ease, background .2s ease, transform .15s ease;
+  }
+  .pill-btn:hover{ border-color:var(--accent); transform:translateY(-1px); }
+  .pill-btn.primary{ background:var(--accent); color:#0B0C10; border-color:var(--accent); }
+  .pill-btn.primary:hover{ background:#DBFF4D; }
+
+  .badge{ font-family:'JetBrains Mono',monospace; font-size:11px; padding:5px 12px; border-radius:100px; border:1px solid var(--border); color:var(--muted); }
+
+  /* ---------- onboarding ---------- */
+  .onboard-overlay{
+    position:fixed; inset:0; z-index:100; display:flex; align-items:center; justify-content:center;
+    background:rgba(11,12,16,.86); backdrop-filter:blur(4px);
+    opacity:0; pointer-events:none; transition:opacity .35s var(--ease);
+  }
+  .onboard-overlay.show{ opacity:1; pointer-events:auto; }
+  .onboard-card{
+    width:380px; max-width:88vw; background:var(--bg2); border:1px solid var(--border); border-radius:14px;
+    padding:32px 30px 26px; display:flex; flex-direction:column; align-items:center; text-align:center; gap:6px;
+    transform:translateY(10px) scale(.98); transition:transform .35s var(--ease);
+  }
+  .onboard-overlay.show .onboard-card{ transform:translateY(0) scale(1); }
+  .onboard-eyebrow{ font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:1.5px; color:var(--muted); margin-bottom:4px; }
+  .onboard-art{ width:100%; height:120px; display:flex; align-items:center; justify-content:center; margin:6px 0 10px; }
+  .onboard-art svg{ width:110px; height:110px; }
+  .onboard-title{ font-family:'Chakra Petch',sans-serif; font-weight:700; font-size:24px; letter-spacing:0; color:var(--text); }
+  .onboard-body{ font-size:13.5px; line-height:1.55; color:var(--muted); margin:8px 0 4px; max-width:300px; }
+  .onboard-dots{ display:flex; gap:6px; margin:10px 0 18px; }
+  .onboard-dots span{ width:6px; height:6px; border-radius:50%; background:var(--border); transition:background .2s ease, transform .2s ease; }
+  .onboard-dots span.active{ background:var(--accent); transform:scale(1.3); }
+  .onboard-actions{ width:100%; display:flex; align-items:center; justify-content:space-between; }
+  .onboard-actions-right{ display:flex; gap:8px; }
+  .onboard-skip{ font-family:'DM Sans',system-ui,sans-serif; font-size:12.5px; color:var(--muted); background:none; border:none; cursor:none; }
+  .onboard-skip:hover{ color:var(--text); }
+
+  @media (max-width:480px){ .onboard-card{ padding:26px 20px 20px; } }
+
+  @media (max-width: 780px){
+    body{ padding:12px 10px; }
+    main.stage{ flex-direction:column; overflow:auto; }
+    .bank{ width:100%; border-right:none; border-bottom:1px solid var(--border); padding:20px; }
+    .canvas-panel{ width:280px; height:280px; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{ transition-duration:.01ms !important; animation-duration:.01ms !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor-dot"></div>
+<div class="cursor-ring"></div>
+
+<div class="app os-window">
+
+  <div class="os-titlebar">
+    <div class="os-lights" aria-hidden="true"><span style="background:#FF3366"></span><span style="background:#FFB020"></span><span style="background:#CCFF00"></span></div>
+    <span class="os-path"><span class="os-path-dir">~/sarbesh-os/apps/</span><b>boolean_construct</b><span class="os-path-ext">.exe</span></span>
+    <span class="os-pill">Sarbesh Lal Amatya</span>
+  </div>
+
+  <header class="hud">
+    <div class="hud-left">
+      <button class="icon-btn" title="Levels" id="btnMenu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="14" y2="17"/></svg>
+      </button>
+      <div class="stage-label"><span id="stageTitle">—</span><span class="cat" id="stageCat"> in Boolean Studies</span></div>
+    </div>
+    <div class="hud-right">
+      <button class="icon-btn" id="btnHelp" title="How to play">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 1.5-2 2-2.5 3.2"/><line x1="12" y1="16.5" x2="12" y2="16.6"/></svg>
+      </button>
+      <button class="icon-btn" id="btnPeek" title="Peek at the target">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+      </button>
+      <button class="icon-btn" id="btnReset" title="Restart stage">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M20.49 15A9 9 0 1 1 22 12"/></svg>
+      </button>
+      <button class="icon-btn" id="btnPrev" title="Previous stage">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <button class="icon-btn" id="btnNext" title="Next stage">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="stage">
+
+    <div class="bank" id="bank"></div>
+
+    <div class="workspace-wrap">
+      <div class="op-row" id="opRow">
+        <button class="op-btn" data-op="union">UNION</button>
+        <button class="op-btn" data-op="subtract">SUBTRACT</button>
+        <button class="op-btn" data-op="intersect">INTERSECT</button>
+        <button class="op-btn" data-op="difference">DIFFERENCE</button>
+      </div>
+
+      <div class="canvas-panel" id="canvasPanel">
+        <div class="tilt-inner">
+          <canvas id="work" width="340" height="340"></canvas>
+        </div>
+        <div class="peek-overlay" id="peekOverlay"><canvas id="peekCanvas" width="340" height="340"></canvas></div>
+      </div>
+
+      <div class="badge" id="matchBadge">MATCH · 0%</div>
+    </div>
+
+    <div class="toast" id="toastOops">
+      <p>Oops, that was wrong. <b id="toastStartOver">Start Over</b> or <b id="toastUndo">Undo</b></p>
+      <button class="ok-btn" id="toastOk">OK</button>
+    </div>
+
+    <div class="clear-overlay" id="clearOverlay">
+      <div class="clear-title">STELLAR</div>
+      <div class="stars">
+        <svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.9L6 21l1.7-7L2.3 9.2l7.1-.6z"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.9L6 21l1.7-7L2.3 9.2l7.1-.6z"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.9L6 21l1.7-7L2.3 9.2l7.1-.6z"/></svg>
+      </div>
+      <div class="clear-actions">
+        <button class="pill-btn" id="btnPlayAgain">Play again</button>
+        <button class="pill-btn" id="btnShare">Share stage</button>
+        <button class="pill-btn primary" id="btnContinue">Continue</button>
+      </div>
+    </div>
+
+    <div class="intro-overlay" id="introOverlay">
+      <div class="intro-eyebrow">STAGE PREVIEW</div>
+      <div class="intro-canvas-box"><canvas id="introCanvas" width="280" height="280"></canvas></div>
+      <div class="intro-timer" id="introTimer">3</div>
+    </div>
+
+  </main>
+
+  <div class="onboard-overlay" id="onboardOverlay">
+    <div class="onboard-card">
+      <div class="onboard-eyebrow">HOW TO PLAY</div>
+      <div class="onboard-art" id="onboardArt"></div>
+      <div class="onboard-title" id="onboardTitle"></div>
+      <p class="onboard-body" id="onboardBody"></p>
+      <div class="onboard-dots" id="onboardDots"></div>
+      <div class="onboard-actions">
+        <button class="onboard-skip" id="onboardSkip">Skip</button>
+        <div class="onboard-actions-right">
+          <button class="pill-btn" id="onboardBack">Back</button>
+          <button class="pill-btn primary" id="onboardNext">Next</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="controller" id="controller">
+    <button class="ctl-btn" id="btnStartOver">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M20.49 15A9 9 0 1 1 22 12"/></svg>
+      <span>Start Over</span>
+    </button>
+    <button class="ctl-btn" id="btnUndo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-1"/></svg>
+      <span>Undo</span>
+    </button>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============ CURSOR ============ */
+  const dot = document.querySelector('.cursor-dot');
+  const ring = document.querySelector('.cursor-ring');
+  window.addEventListener('pointermove', e=>{
+    dot.style.left = e.clientX+'px'; dot.style.top = e.clientY+'px';
+    ring.style.left = e.clientX+'px'; ring.style.top = e.clientY+'px';
+    const el = document.elementFromPoint(e.clientX,e.clientY);
+    const interactive = el && el.closest('button, .bank-piece, [data-interactive]');
+    document.body.classList.toggle('cursor-hover', !!interactive);
+  });
+
+  /* ============ SHAPE / MASK HELPERS ============ */
+  const W = 340, H = 340;
+
+  function polygonVertices(shape){
+    const n = shape.sides, rot = shape.rotation||0;
+    const pts = [];
+    const starMode = shape.type === 'star';
+    const count = starMode ? n*2 : n;
+    for(let i=0;i<count;i++){
+      const ang = rot - Math.PI/2 + i*(Math.PI*2/count);
+      const rad = starMode ? (i%2===0 ? shape.r : shape.r*(shape.innerRatio||0.5)) : shape.r;
+      pts.push([shape.cx + rad*Math.cos(ang), shape.cy + rad*Math.sin(ang)]);
+    }
+    return pts;
+  }
+
+  function pathFor(ctx, shape){
+    ctx.beginPath();
+    if(shape.type === 'circle'){
+      ctx.arc(shape.cx, shape.cy, shape.r, 0, Math.PI*2);
+    } else if(shape.type === 'roundrect'){
+      ctx.roundRect(shape.x, shape.y, shape.w, shape.h, shape.r||0);
+    } else if(shape.type === 'polygon' || shape.type === 'star'){
+      const pts = polygonVertices(shape);
+      pts.forEach(([x,y], i)=> i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y));
+      ctx.closePath();
+    } else { // rect
+      ctx.rect(shape.x, shape.y, shape.w, shape.h);
+    }
+  }
+
+  // exact bounding box of a shape, in real canvas coordinates — used to size
+  // bank icons proportionally for polygon/star types (whose bbox isn't simply w/h)
+  function shapeBBox(shape){
+    if(shape.type === 'circle') return { minX:shape.cx-shape.r, maxX:shape.cx+shape.r, minY:shape.cy-shape.r, maxY:shape.cy+shape.r };
+    if(shape.type === 'polygon' || shape.type === 'star'){
+      const pts = polygonVertices(shape);
+      const xs = pts.map(p=>p[0]), ys = pts.map(p=>p[1]);
+      return { minX:Math.min(...xs), maxX:Math.max(...xs), minY:Math.min(...ys), maxY:Math.max(...ys) };
+    }
+    return { minX:shape.x, maxX:shape.x+shape.w, minY:shape.y, maxY:shape.y+shape.h };
+  }
+
+  function maskCanvasFromShape(shape){
+    const c = document.createElement('canvas'); c.width=W; c.height=H;
+    const ctx = c.getContext('2d');
+    ctx.fillStyle = '#000';
+    pathFor(ctx, shape); ctx.fill();
+    return c;
+  }
+
+  const OP_GCO = { union:'source-over', subtract:'destination-out', intersect:'source-in', difference:'xor' };
+
+  function combineMasks(op, canvases){
+    const acc = document.createElement('canvas'); acc.width=W; acc.height=H;
+    const ctx = acc.getContext('2d');
+    canvases.forEach((cv, i)=>{
+      ctx.globalCompositeOperation = i===0 ? 'source-over' : OP_GCO[op];
+      ctx.drawImage(cv, 0, 0);
+    });
+    ctx.globalCompositeOperation = 'source-over';
+    return acc;
+  }
+
+  function tintMask(maskCanvas, colorA, colorB){
+    const c = document.createElement('canvas'); c.width=W; c.height=H;
+    const ctx = c.getContext('2d');
+    ctx.drawImage(maskCanvas,0,0);
+    ctx.globalCompositeOperation = 'source-in';
+    const g = ctx.createLinearGradient(0,0,W,H);
+    g.addColorStop(0, colorA); g.addColorStop(1, colorB);
+    ctx.fillStyle = g;
+    ctx.fillRect(0,0,W,H);
+    ctx.globalCompositeOperation = 'source-over';
+    return c;
+  }
+
+  function matchScore(a, b){
+    const ca = a.getContext('2d').getImageData(0,0,W,H).data;
+    const cb = b.getContext('2d').getImageData(0,0,W,H).data;
+    let same=0, total=W*H;
+    for(let i=0;i<total;i++){
+      const av = ca[i*4+3] > 127;
+      const bv = cb[i*4+3] > 127;
+      if(av===bv) same++;
+    }
+    return same/total;
+  }
+
+  function filledArea(canvas){
+    const data = canvas.getContext('2d').getImageData(0,0,W,H).data;
+    let n = 0;
+    for(let i=0;i<data.length;i+=4) if(data[i+3] > 127) n++;
+    return n;
+  }
+
+  /* ============ LEVEL DEFINITIONS ============ */
+  const BANK_SIZE = 100; // max width/height a bank icon is scaled to fit within, preserving its true aspect ratio
+
+const HALLMARK_LEVELS = [
+    { id:'stage1', title:'Halo Mark', category:'Foundational Stages',
+      shapes:{ base:{ id:'base', type:'roundrect', x:70,y:70,w:200,h:200,r:44, bankType:'roundrect' }, hole:{ id:'hole', type:'circle', cx:170,cy:170,r:66, bankType:'circle' } },
+      recipe:[ {op:'subtract', ids:['base','hole']} ],
+      requiredIds:['base','hole'] },
+    { id:'stage2', title:'Vesica Field', category:'Foundational Stages',
+      shapes:{ left:{ id:'left', type:'roundrect', x:46,y:90,w:170,h:170,r:34, bankType:'roundrect' }, right:{ id:'right', type:'roundrect', x:126,y:90,w:170,h:170,r:34, bankType:'roundrect' } },
+      recipe:[ {op:'intersect', ids:['left','right']} ],
+      requiredIds:['left','right'] },
+    { id:'stage3', title:'Signal Key', category:'Intermediate Stages',
+      shapes:{ plate:{ id:'plate', type:'roundrect', x:60,y:46,w:222,h:222,r:50, bankType:'roundrect' }, slot:{ id:'slot', type:'rect', x:150,y:46,w:42,h:126, bankType:'rect' }, dot:{ id:'dot', type:'circle', cx:171,cy:290,r:40, bankType:'circle' } },
+      recipe:[ {op:'subtract', ids:['plate','slot']}, {op:'union', ids:['dot']} ],
+      requiredIds:['plate','slot','dot'] }
+  ];
+
+  /* =====================================================================
+     PROCEDURAL STAGE GENERATOR — runs once per page visit, using the
+     browser's own Math.random() (never seeded), so stages 4-100 are
+     genuinely different every time someone opens the game. Stages 1-3
+     above are the only fixed/repeatable ones.
+
+     It reuses the SAME rendering + compositing primitives the live game
+     uses (pathFor / mask compositing) at a small validation resolution,
+     so what gets validated here is mechanically identical to what the
+     player will actually see and solve — just checked before it ships
+     to the board rather than after.
+     ===================================================================== */
+  (function(){
+    const CX = 170, CY = 170;
+    const VS = 48; // small validation-only raster resolution (fast, independent of live 340x340 canvas)
+
+    const rf = (a,b) => Math.random()*(b-a)+a;
+    const ri = (a,b) => Math.floor(Math.random()*(b-a+1))+a;
+    const pick = (arr) => arr[Math.floor(Math.random()*arr.length)];
+    function shuffle(arr){ for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; } return arr; }
+
+    function mkRect(x,y,w,h){ return { type:'rect', x,y,w,h }; }
+    function mkRR(x,y,w,h,r){ return { type:'roundrect', x,y,w,h,r }; }
+    function mkCircle(cx,cy,r){ return { type:'circle', cx,cy,r }; }
+    function mkPoly(cx,cy,r,sides,rotation){ return { type:'polygon', cx,cy,r,sides, rotation:rotation||0 }; }
+    function mkStar(cx,cy,r,points,innerRatio,rotation){ return { type:'star', cx,cy,r, sides:points, innerRatio: innerRatio||0.5, rotation: rotation||0 }; }
+
+    // ---- small, fast validation-only mask helpers (mirror the live engine's math) ----
+    function smallMask(shape){
+      const c = document.createElement('canvas'); c.width=VS; c.height=VS;
+      const ctx = c.getContext('2d');
+      ctx.scale(VS/W, VS/H);
+      ctx.fillStyle = '#000';
+      pathFor(ctx, shape); ctx.fill();
+      return c;
+    }
+    function smallCombine(op, canvases){
+      const acc = document.createElement('canvas'); acc.width=VS; acc.height=VS;
+      const ctx = acc.getContext('2d');
+      canvases.forEach((cv,i)=>{ ctx.globalCompositeOperation = i===0 ? 'source-over' : OP_GCO[op]; ctx.drawImage(cv,0,0); });
+      ctx.globalCompositeOperation = 'source-over';
+      return acc;
+    }
+    function alphaBits(canvas){
+      const data = canvas.getContext('2d').getImageData(0,0,VS,VS).data;
+      const out = new Uint8Array(VS*VS);
+      for(let i=0;i<VS*VS;i++) out[i] = data[i*4+3] > 127 ? 1 : 0;
+      return out;
+    }
+    function bitArea(bits){ let n=0; for(let i=0;i<bits.length;i++) n+=bits[i]; return n; }
+    function jaccard(a,b){
+      let inter=0, uni=0;
+      for(let i=0;i<a.length;i++){ const av=a[i], bv=b[i]; if(av||bv){ uni++; if(av&&bv) inter++; } }
+      return uni===0 ? 1 : inter/uni;
+    }
+    function buildSmallMask(shapesById, recipe){
+      let acc = null;
+      for(const step of recipe){
+        const parts = [];
+        if(acc) parts.push(acc);
+        for(const id of step.ids) parts.push(smallMask(shapesById[id]));
+        acc = smallCombine(step.op, parts);
+      }
+      return acc;
+    }
+
+    // ---- geometry sanity ----
+    const MARGIN = 8;
+    function inBounds(s){
+      if(s.type==='circle') return (s.cx-s.r)>=MARGIN && (s.cx+s.r)<=W-MARGIN && (s.cy-s.r)>=MARGIN && (s.cy+s.r)<=H-MARGIN && s.r>=16;
+      if(s.type==='polygon' || s.type==='star'){
+        const bb = shapeBBox(s);
+        return bb.minX>=MARGIN && bb.maxX<=W-MARGIN && bb.minY>=MARGIN && bb.maxY<=H-MARGIN && s.r>=20;
+      }
+      const okSize = s.w>=26 && s.h>=26;
+      const okBounds = s.x>=MARGIN && s.y>=MARGIN && (s.x+s.w)<=W-MARGIN && (s.y+s.h)<=H-MARGIN;
+      const okRadius = s.type!=='roundrect' || (s.r>=0 && s.r<=Math.min(s.w,s.h)/2);
+      return okSize && okBounds && okRadius;
+    }
+
+    // ---- "every piece must matter" check, generalized to N sequential steps ----
+    function everyPieceMatters(shapesById, recipe){
+      let acc = null;
+      for(const step of recipe){
+        if(!acc){
+          const [idA, idB] = step.ids;
+          const gA = smallMask(shapesById[idA]), gB = smallMask(shapesById[idB]);
+          const bitsA = alphaBits(gA), bitsB = alphaBits(gB);
+          const result = smallCombine(step.op, [gA, gB]);
+          const bitsR = alphaBits(result);
+          if(jaccard(bitsR, bitsA) > 0.995 || jaccard(bitsR, bitsB) > 0.995) return false;
+          acc = result;
+        } else {
+          const gNew = smallMask(shapesById[step.ids[0]]);
+          const bitsPrior = alphaBits(acc);
+          const result = smallCombine(step.op, [acc, gNew]);
+          const bitsR = alphaBits(result);
+          if(jaccard(bitsR, bitsPrior) > 0.995) return false;
+          acc = result;
+        }
+      }
+      return true;
+    }
+
+    // =====================================================================
+    // TEMPLATE LIBRARY
+    // =====================================================================
+    const POLY_SIDES = [3,4,5,6,7,8,9,10]; // triangle..decagon (4 = diamond orientation)
+
+    function T_starMinusOrPlusCircle(){ return () => {
+      const points = ri(4,7);
+      const r = ri(85,115);
+      const star = mkStar(CX,CY,r,points, rf(0.38,0.55));
+      const bump = mkCircle(CX,CY, ri(Math.round(r*0.22),Math.round(r*0.4)));
+      const op = pick(['subtract','union']);
+      return { shapes:{star,bump}, recipe:[{op, ids:['star','bump']}] };
+    };}
+
+    function T_arrowSign(){ return () => {
+      const shaftW = ri(60,90), shaftH = ri(150,200);
+      const dir = pick(['up','down','left','right']);
+      let shaft, tri, triR = ri(60,80);
+      if(dir==='up' || dir==='down'){
+        shaft = mkRect(CX-shaftW/2, dir==='up' ? CY-20 : CY-shaftH+20, shaftW, shaftH);
+        const tipY = dir==='up' ? shaft.y : shaft.y+shaftH;
+        tri = mkPoly(CX, tipY, triR, 3, dir==='up' ? 0 : Math.PI);
+      } else {
+        shaft = mkRect(dir==='left' ? CX-shaftH+20 : CX-20, CY-shaftW/2, shaftH, shaftW);
+        const tipX = dir==='left' ? shaft.x : shaft.x+shaftH;
+        tri = mkPoly(tipX, CY, triR, 3, dir==='left' ? -Math.PI/2 : Math.PI/2);
+      }
+      return { shapes:{shaft,tri}, recipe:[{op:'union', ids:['shaft','tri']}] };
+    };}
+
+    /* ---------- new creative/thematic templates ---------- */
+
+    // -- tier 2 (2 shapes) --
+    function T_iceCreamCone(){ return () => {
+      const scoopR = ri(65,90);
+      const scoop = mkCircle(CX, CY-40, scoopR);
+      const coneH = ri(110,150), coneW = ri(80,110);
+      const cone = mkPoly(CX, CY-40+scoopR*0.55, coneH*0.62, 3, Math.PI); // point-down triangle
+      return { shapes:{ scoop, cone }, recipe:[{op:'union', ids:['scoop','cone']}] };
+    };}
+    function T_tulip(){ return () => {
+      const bulbW = ri(120,150), bulbH = ri(90,120);
+      const bulb = mkRR(CX-bulbW/2, CY-70, bulbW, bulbH, bulbH*0.5);
+      const stemW = ri(16,24), stemH = ri(110,150);
+      const stem = mkRect(CX-stemW/2, CY-70+bulbH-10, stemW, stemH);
+      return { shapes:{ bulb, stem }, recipe:[{op:'union', ids:['bulb','stem']}] };
+    };}
+    function T_crescentMoon(){ return () => {
+      const r = ri(85,108);
+      const base = mkCircle(CX-20, CY, r);
+      const rB = r*rf(0.8,0.92);
+      const dx = r*rf(0.55,0.72);
+      const cut = mkCircle(base.cx+dx, base.cy, rB);
+      return { shapes:{ base, cut }, recipe:[{op:'subtract', ids:['base','cut']}] };
+    };}
+    function T_keyhole(){ return () => {
+      const r = ri(38,52);
+      const top = mkCircle(CX, CY-40, r);
+      const bodyR = r*rf(1.3,1.7);
+      const body = mkPoly(CX, CY-40+r*0.3, bodyR, 3, Math.PI);
+      return { shapes:{ top, body }, recipe:[{op:'union', ids:['top','body']}] };
+    };}
+    function T_house(){ return () => {
+      const w = ri(150,190), h = ri(110,140);
+      const body = mkRect(CX-w/2, CY-20, w, h);
+      const roofR = w*0.62;
+      const roof = mkPoly(CX, CY-20-roofR*0.35, roofR, 3);
+      return { shapes:{ body, roof }, recipe:[{op:'union', ids:['body','roof']}] };
+    };}
+    function T_treeLollipop(){ return () => {
+      const canopyR = ri(75,100);
+      const canopy = mkCircle(CX, CY-40, canopyR);
+      const trunkW = ri(22,32), trunkH = ri(100,130);
+      const trunk = mkRect(CX-trunkW/2, CY-40+canopyR*0.6, trunkW, trunkH);
+      return { shapes:{ canopy, trunk }, recipe:[{op:'union', ids:['canopy','trunk']}] };
+    };}
+    function T_mushroom(){ return () => {
+      const capW = ri(160,200), capH = ri(80,105);
+      const cap = mkRR(CX-capW/2, CY-70, capW, capH, capH);
+      const stemW = ri(50,70), stemH = ri(90,120);
+      const stem = mkRR(CX-stemW/2, CY-70+capH-14, stemW, stemH, 14);
+      return { shapes:{ cap, stem }, recipe:[{op:'union', ids:['cap','stem']}] };
+    };}
+    function T_mountainPeak(){ return () => {
+      const r1 = ri(90,120);
+      const p1 = mkPoly(CX-40, CY+20, r1, 3);
+      const r2 = r1*rf(0.65,0.85);
+      const p2 = mkPoly(CX+ri(50,80), CY+20+ (r1-r2)*0.5, r2, 3);
+      return { shapes:{ p1, p2 }, recipe:[{op:'union', ids:['p1','p2']}] };
+    };}
+    function T_shieldEmblem(){ return () => {
+      const r = ri(95,120);
+      const body = mkPoly(CX, CY-10, r, 5, Math.PI); // point-down pentagon
+      const embR = ri(24,36);
+      const emblem = mkCircle(CX, CY-10-r*0.15, embR);
+      const op = pick(['union','subtract']);
+      return { shapes:{ body, emblem }, recipe:[{op, ids:['body','emblem']}] };
+    };}
+    function T_grainOfRice(){ return () => {
+      const r = ri(105,135);
+      const dx = r*rf(1.55,1.75);
+      const a = mkCircle(CX-dx/2, CY, r);
+      const b = mkCircle(CX+dx/2, CY, r);
+      return { shapes:{ a, b }, recipe:[{op:'intersect', ids:['a','b']}] };
+    };}
+    function T_pacman(){ return () => {
+      const r = ri(90,115);
+      const body = mkCircle(CX, CY, r);
+      const ang = rf(0, Math.PI*2);
+      const mouthR = r*rf(0.8,1.0);
+      const mx = CX + Math.cos(ang)*r*0.5, my = CY + Math.sin(ang)*r*0.5;
+      const mouth = mkPoly(mx, my, mouthR, 3, ang + Math.PI/3);
+      return { shapes:{ body, mouth }, recipe:[{op:'subtract', ids:['body','mouth']}] };
+    };}
+    function T_seatbeltBuckle(){ return () => {
+      const w = ri(160,200), h = ri(200,240);
+      const body = mkRR(CX-w/2, CY-h/2, w, h, 30);
+      const slotW = w*rf(0.4,0.55), slotH = h*rf(0.32,0.42);
+      const slot = mkRR(CX-slotW/2, CY-slotH/2, slotW, slotH, 14);
+      return { shapes:{ body, slot }, recipe:[{op:'subtract', ids:['body','slot']}] };
+    };}
+    function T_infinitySymbol(){ return () => {
+      const r = ri(55,72);
+      const overlap = rf(0.02,0.16)*r*2;
+      const dx = r*2 - overlap;
+      const a = mkCircle(CX-dx/2, CY, r);
+      const b = mkCircle(CX+dx/2, CY, r);
+      return { shapes:{ a, b }, recipe:[{op:'union', ids:['a','b']}] };
+    };}
+    function T_mandalaBadge(){ return () => {
+      const points = ri(5,8);
+      const r = ri(90,118);
+      const star = mkStar(CX,CY,r,points, rf(0.42,0.58));
+      const round = mkCircle(CX,CY, r*rf(0.82,0.92));
+      return { shapes:{ star, round }, recipe:[{op:'intersect', ids:['star','round']}] };
+    };}
+    function T_gearCog(){ return () => {
+      const teeth = ri(7,11);
+      const r = ri(95,120);
+      const gear = mkStar(CX,CY,r,teeth, rf(0.78,0.88));
+      const hole = mkCircle(CX,CY, r*rf(0.28,0.4));
+      return { shapes:{ gear, hole }, recipe:[{op:'subtract', ids:['gear','hole']}] };
+    };}
+    function T_carRim(){ return () => {
+      const r = ri(95,120);
+      const outer = mkCircle(CX,CY,r);
+      const sides = pick([5,6,7,8,9,10]);
+      const hub = mkPoly(CX,CY, r*rf(0.5,0.62), sides, rf(0,Math.PI*2/sides));
+      return { shapes:{ outer, hub }, recipe:[{op:'subtract', ids:['outer','hub']}] };
+    };}
+    function T_donut(){ return () => {
+      const r = ri(92,118);
+      const outer = mkCircle(CX,CY,r);
+      const hole = mkCircle(CX,CY, r*rf(0.3,0.45));
+      return { shapes:{ outer, hole }, recipe:[{op:'subtract', ids:['outer','hole']}] };
+    };}
+    function T_chainLinkSingle(){ return () => {
+      const w = ri(150,190), h = ri(90,120);
+      const outer = mkRR(CX-w/2,CY-h/2,w,h, h/2);
+      const shrink = rf(0.45,0.6);
+      const w2=w*shrink, h2=h*shrink;
+      const inner = mkRR(CX-w2/2,CY-h2/2,w2,h2, h2/2);
+      return { shapes:{ outer, inner }, recipe:[{op:'subtract', ids:['outer','inner']}] };
+    };}
+
+    // -- tier 3 (3 shapes) --
+    function T_leaf(){ return () => {
+      const r = ri(85,110);
+      const dx = r*rf(0.45,0.62);
+      const a = mkCircle(CX,CY-dx,r), b = mkCircle(CX,CY+dx,r);
+      const stemW = ri(10,16), stemH = ri(40,60);
+      const stem = mkRect(CX-stemW/2, CY+dx+r*0.55, stemW, stemH);
+      return { shapes:{a,b,stem}, recipe:[{op:'intersect',ids:['a','b']},{op:'union',ids:['stem']}] };
+    };}
+    function T_eyeShape(){ return () => {
+      const r = ri(95,120);
+      const dx = r*rf(0.5,0.68);
+      const a = mkCircle(CX-dx,CY,r), b = mkCircle(CX+dx,CY,r);
+      const pupilR = ri(20,32);
+      const pupil = mkCircle(CX,CY,pupilR);
+      return { shapes:{a,b,pupil}, recipe:[{op:'intersect',ids:['a','b']},{op:'subtract',ids:['pupil']}] };
+    };}
+    function T_fishBody(){ return () => {
+      const r = ri(80,102);
+      const dx = r*rf(0.5,0.65);
+      const a = mkCircle(CX-dx,CY,r), b = mkCircle(CX+dx,CY,r);
+      const tailR = ri(50,70);
+      const tail = mkPoly(a.cx-r*0.85, CY, tailR, 3, -Math.PI/2);
+      return { shapes:{a,b,tail}, recipe:[{op:'intersect',ids:['a','b']},{op:'union',ids:['tail']}] };
+    };}
+    function T_appleLogo(){ return () => {
+      const r = ri(85,108);
+      const body = mkCircle(CX, CY+10, r);
+      const biteR = r*rf(0.4,0.52);
+      const bite = mkCircle(CX+r*0.72, CY-r*0.15, biteR);
+      const leafR = ri(22,32);
+      const leaf = mkPoly(CX-r*0.15, CY+10-r-leafR*0.5, leafR, 3, rf(-0.5,0.5));
+      return { shapes:{ body, bite, leaf }, recipe:[{op:'subtract',ids:['body','bite']},{op:'union',ids:['leaf']}] };
+    };}
+    function T_catHead(){ return () => {
+      const r = ri(90,112);
+      const head = mkCircle(CX,CY+10,r);
+      const earR = ri(38,52);
+      const ear1 = mkPoly(CX-r*0.62, CY-r*0.55, earR, 3);
+      const ear2 = mkPoly(CX+r*0.62, CY-r*0.55, earR, 3);
+      return { shapes:{ head, ear1, ear2 }, recipe:[{op:'union',ids:['head','ear1']},{op:'union',ids:['ear2']}] };
+    };}
+    function T_snowman(){ return () => {
+      const rBot = ri(78,95);
+      const bot = mkCircle(CX, CY+70, rBot);
+      const rMid = rBot*rf(0.68,0.78);
+      const mid = mkCircle(CX, bot.cy-rBot-rMid+rMid*0.55, rMid);
+      const rTop = rMid*rf(0.65,0.78);
+      const top = mkCircle(CX, mid.cy-rMid-rTop+rTop*0.55, rTop);
+      return { shapes:{ bot, mid, top }, recipe:[{op:'union',ids:['bot','mid']},{op:'union',ids:['top']}] };
+    };}
+    function T_guitarPick(){ return () => {
+      const side = ri(120,150);
+      const cAng = -Math.PI/2;
+      const cx1 = CX + side*0.577*Math.cos(cAng), cy1 = CY + side*0.577*Math.sin(cAng)+20;
+      const cx2 = CX + side*0.577*Math.cos(cAng+2.094), cy2 = CY + side*0.577*Math.sin(cAng+2.094)+20;
+      const cx3 = CX + side*0.577*Math.cos(cAng+4.189), cy3 = CY + side*0.577*Math.sin(cAng+4.189)+20;
+      const c1 = mkCircle(cx1,cy1,side), c2 = mkCircle(cx2,cy2,side), c3 = mkCircle(cx3,cy3,side);
+      return { shapes:{c1,c2,c3}, recipe:[{op:'intersect',ids:['c1','c2']},{op:'intersect',ids:['c3']}] };
+    };}
+    function T_ribbonBanner(){ return () => {
+      const w = ri(220,260), h = ri(90,120);
+      const band = mkRect(CX-w/2, CY-h/2, w, h);
+      const notchR = h*0.62;
+      const notchL = mkPoly(CX-w/2+notchR*0.55, CY, notchR, 3, Math.PI/2);
+      const notchRt = mkPoly(CX+w/2-notchR*0.55, CY, notchR, 3, -Math.PI/2);
+      return { shapes:{ band, notchL, notchRt }, recipe:[{op:'subtract',ids:['band','notchL']},{op:'subtract',ids:['notchRt']}] };
+    };}
+    function T_button2Hole(){ return () => {
+      const r = ri(95,120);
+      const body = mkCircle(CX,CY,r);
+      const holeR = ri(12,18);
+      const dx = r*rf(0.25,0.38);
+      const h1 = mkCircle(CX-dx,CY,holeR), h2 = mkCircle(CX+dx,CY,holeR);
+      return { shapes:{ body, h1, h2 }, recipe:[{op:'subtract',ids:['body','h1']},{op:'subtract',ids:['h2']}] };
+    };}
+    function T_clockHands(){ return () => {
+      const r = ri(95,120);
+      const face = mkCircle(CX,CY,r);
+      const vW = ri(12,18), vH = r*rf(0.55,0.72);
+      const vHand = mkRect(CX-vW/2, CY-vH, vW, vH);
+      const hW = r*rf(0.4,0.55), hH = ri(12,18);
+      const hHand = mkRect(CX, CY-hH/2, hW, hH);
+      return { shapes:{ face, vHand, hHand }, recipe:[{op:'union',ids:['face','vHand']},{op:'union',ids:['hHand']}] };
+    };}
+    function T_clawScratch(){ return () => {
+      const baseX = CX-60, len = ri(180,220), w = ri(16,24);
+      const s1 = mkRR(baseX, CY-len/2, w, len, w/2);
+      const s2 = mkRR(baseX+w+ri(20,30), CY-len/2+ri(-20,20), w, len*rf(0.85,1), w/2);
+      const s3 = mkRR(baseX+(w+ri(20,30))*2, CY-len/2+ri(-30,30), w, len*rf(0.7,0.95), w/2);
+      return { shapes:{s1,s2,s3}, recipe:[{op:'union',ids:['s1','s2']},{op:'union',ids:['s3']}] };
+    };}
+
+    // -- tier 4 (4 shapes) --
+    function T_biohazardCenter(){ return () => {
+      const r = ri(75,95);
+      const center = mkCircle(CX,CY,r);
+      const cutR = r*rf(0.62,0.78);
+      const dist = r*rf(0.85,1.05);
+      const baseAng = rf(0,Math.PI*2);
+      const cut1 = mkCircle(CX+Math.cos(baseAng)*dist, CY+Math.sin(baseAng)*dist, cutR);
+      const cut2 = mkCircle(CX+Math.cos(baseAng+2.094)*dist, CY+Math.sin(baseAng+2.094)*dist, cutR);
+      const cut3 = mkCircle(CX+Math.cos(baseAng+4.189)*dist, CY+Math.sin(baseAng+4.189)*dist, cutR);
+      return {
+        shapes:{ center, cut1, cut2, cut3 },
+        recipe:[ {op:'subtract',ids:['center','cut1']}, {op:'subtract',ids:['cut2']}, {op:'subtract',ids:['cut3']} ]
+      };
+    };}
+    function T_filmReel(){ return () => {
+      const r = ri(105,130);
+      const outer = mkCircle(CX,CY,r);
+      const holeR = r*rf(0.16,0.22);
+      const dist = r*rf(0.55,0.68);
+      const baseAng = rf(0,Math.PI*2);
+      const h1 = mkCircle(CX+Math.cos(baseAng)*dist, CY+Math.sin(baseAng)*dist, holeR);
+      const h2 = mkCircle(CX+Math.cos(baseAng+2.094)*dist, CY+Math.sin(baseAng+2.094)*dist, holeR);
+      const h3 = mkCircle(CX+Math.cos(baseAng+4.189)*dist, CY+Math.sin(baseAng+4.189)*dist, holeR);
+      return {
+        shapes:{ outer, h1, h2, h3 },
+        recipe:[ {op:'subtract',ids:['outer','h1']}, {op:'subtract',ids:['h2']}, {op:'subtract',ids:['h3']} ]
+      };
+    };}
+
+    // -- completing the requested list: Envelope --
+    function T_envelope(){ return () => {
+      const w = ri(190,230), h = ri(130,160);
+      const body = mkRect(CX-w/2, CY-h/2, w, h);
+      const notchR = w*rf(0.42,0.52);
+      const notch = mkPoly(CX, CY-h/2, notchR, 3, Math.PI); // apex dips down into the body from the top edge
+      return { shapes:{ body, notch }, recipe:[{op:'subtract', ids:['body','notch']}] };
+    };}
+
+    /* ---------- additional original creative templates (own ideas) ---------- */
+
+    // -- tier 2 --
+    function T_speechBubble(){ return () => {
+      const w = ri(180,220), h = ri(130,160);
+      const bubble = mkRR(CX-w/2, CY-h/2-10, w, h, 24);
+      const tailR = ri(40,55);
+      const tail = mkPoly(CX-w*0.28, CY-h/2-10+h, tailR, 3, Math.PI*0.85);
+      return { shapes:{ bubble, tail }, recipe:[{op:'union', ids:['bubble','tail']}] };
+    };}
+    function T_bowtie(){ return () => {
+      const r = ri(70,95);
+      const off = r*rf(0.3,0.5);
+      const left = mkPoly(CX-off, CY, r, 3, Math.PI/2);
+      const right = mkPoly(CX+off, CY, r, 3, -Math.PI/2);
+      return { shapes:{ left, right }, recipe:[{op:'union', ids:['left','right']}] };
+    };}
+    function T_lightbulb(){ return () => {
+      const bulbR = ri(75,100);
+      const bulb = mkCircle(CX, CY-30, bulbR);
+      const baseW = ri(40,56), baseH = ri(50,70);
+      const base = mkRect(CX-baseW/2, CY-30+bulbR*0.65, baseW, baseH);
+      return { shapes:{ bulb, base }, recipe:[{op:'union', ids:['bulb','base']}] };
+    };}
+    function T_flagPennant(){ return () => {
+      const poleH = ri(180,220), poleW = ri(12,18);
+      const pole = mkRect(CX-90, CY-poleH/2, poleW, poleH);
+      const flagR = ri(65,85);
+      const flag = mkPoly(CX-90+poleW+flagR*0.6, CY-poleH/2+flagR*0.5, flagR, 3, Math.PI/2);
+      return { shapes:{ pole, flag }, recipe:[{op:'union', ids:['pole','flag']}] };
+    };}
+
+    // -- tier 3 --
+    function T_heartShape(){ return () => {
+      const r = ri(55,72);
+      const dx = r*rf(0.85,1.05);
+      const c1 = mkCircle(CX-dx/2, CY-25, r), c2 = mkCircle(CX+dx/2, CY-25, r);
+      const triR = r*rf(1.6,1.9);
+      const tri = mkPoly(CX, CY-25+r*0.55, triR, 3, Math.PI);
+      return { shapes:{c1,c2,tri}, recipe:[{op:'union',ids:['c1','c2']},{op:'union',ids:['tri']}] };
+    };}
+    function T_thoughtBubble(){ return () => {
+      const mainR = ri(85,105);
+      const main = mkCircle(CX, CY-30, mainR);
+      const midR = ri(24,34);
+      const mid = mkCircle(CX-mainR*0.55, CY-30+mainR*0.85, midR);
+      const smallR = ri(12,18);
+      const small = mkCircle(mid.cx-midR*0.9, mid.cy+midR*0.85, smallR);
+      return { shapes:{main,mid,small}, recipe:[{op:'union',ids:['main','mid']},{op:'union',ids:['small']}] };
+    };}
+    function T_crownSimple(){ return () => {
+      const w = ri(180,220), h = ri(60,80);
+      const band = mkRect(CX-w/2, CY+20, w, h);
+      const tri1R = ri(60,80);
+      const tri1 = mkPoly(CX, CY+20-tri1R*0.5, tri1R, 3);
+      const tri2R = tri1R*rf(0.6,0.75);
+      const tri2 = mkPoly(CX-w*0.32, CY+20-tri2R*0.35, tri2R, 3);
+      return { shapes:{band,tri1,tri2}, recipe:[{op:'union',ids:['band','tri1']},{op:'union',ids:['tri2']}] };
+    };}
+    function T_paperAirplane(){ return () => {
+      const r1 = ri(80,105);
+      const tri1 = mkPoly(CX, CY, r1, 3, Math.PI/2);
+      const r2 = r1*rf(0.6,0.75);
+      const tri2 = mkPoly(CX-r1*0.3, CY-r2*0.5, r2, 3, Math.PI*0.75);
+      const r3 = r2*rf(0.7,0.9);
+      const tri3 = mkPoly(CX-r1*0.3, CY+r3*0.5, r3, 3, -Math.PI*0.75);
+      return { shapes:{tri1,tri2,tri3}, recipe:[{op:'union',ids:['tri1','tri2']},{op:'union',ids:['tri3']}] };
+    };}
+    function T_diamondRing(){ return () => {
+      const r = ri(85,105);
+      const band = mkCircle(CX,CY+15,r);
+      const holeR = r*rf(0.62,0.75);
+      const hole = mkCircle(CX,CY+15,holeR);
+      const gemR = ri(26,36);
+      const gem = mkPoly(CX, CY+15-r-gemR*0.4, gemR, 4);
+      return { shapes:{band,hole,gem}, recipe:[{op:'subtract',ids:['band','hole']},{op:'union',ids:['gem']}] };
+    };}
+    function T_puzzlePieceTab(){ return () => {
+      const w = ri(160,200), h = ri(140,180);
+      const base = mkRect(CX-w/2, CY-h/2, w, h);
+      const knobR = ri(24,34);
+      const knob = mkCircle(CX+w/2, CY, knobR);
+      const notchR = ri(20,28);
+      const notch = mkCircle(CX-w/2, CY-h*0.25, notchR);
+      return { shapes:{base,knob,notch}, recipe:[{op:'union',ids:['base','knob']},{op:'subtract',ids:['notch']}] };
+    };}
+    function T_umbrella(){ return () => {
+      const canopyR = ri(95,120);
+      const canopy = mkCircle(CX, CY-40, canopyR);
+      const handleW = ri(12,18), handleH = ri(110,135);
+      const handle = mkRect(CX-handleW/2, CY-40+canopyR*0.5, handleW, handleH);
+      const hookR = ri(20,28);
+      const hook = mkCircle(CX-handleW/2-hookR*0.6, CY-40+canopyR*0.5+handleH-hookR*0.3, hookR);
+      return { shapes:{canopy,handle,hook}, recipe:[{op:'union',ids:['canopy','handle']},{op:'union',ids:['hook']}] };
+    };}
+    function T_medal(){ return () => {
+      const r = ri(75,95);
+      const medal = mkCircle(CX, CY+30, r);
+      const ribR = ri(45,60);
+      const ribbon1 = mkPoly(CX-r*0.5, CY+30-r-ribR*0.5, ribR, 3, Math.PI*1.1);
+      const ribbon2 = mkPoly(CX+r*0.5, CY+30-r-ribR*0.5, ribR, 3, -Math.PI*1.1);
+      return { shapes:{medal,ribbon1,ribbon2}, recipe:[{op:'union',ids:['medal','ribbon1']},{op:'union',ids:['ribbon2']}] };
+    };}
+    function T_diamondGemFacets(){ return () => {
+      const r = ri(95,120);
+      const gem = mkPoly(CX,CY,r,4);
+      const notchR = r*rf(0.22,0.32);
+      const notch1 = mkPoly(CX-r*0.55, CY-r*0.55, notchR, 3, rf(0,Math.PI*2));
+      const notch2 = mkPoly(CX+r*0.55, CY-r*0.55, notchR, 3, rf(0,Math.PI*2));
+      return { shapes:{gem,notch1,notch2}, recipe:[{op:'subtract',ids:['gem','notch1']},{op:'subtract',ids:['notch2']}] };
+    };}
+    function T_crescentBadge(){ return () => {
+      const r = ri(85,108);
+      const base = mkCircle(CX-15, CY, r);
+      const rB = r*rf(0.8,0.9);
+      const dx = r*rf(0.55,0.7);
+      const cut = mkCircle(base.cx+dx, base.cy, rB);
+      const starR = ri(24,34);
+      const star = mkStar(CX+r*0.55, CY-r*0.45, starR, 5, rf(0.42,0.55));
+      return { shapes:{base,cut,star}, recipe:[{op:'subtract',ids:['base','cut']},{op:'union',ids:['star']}] };
+    };}
+
+    // -- tier 4 --
+    function T_anchorSimple(){ return () => {
+      const ringR = ri(32,42);
+      const ringOuter = mkCircle(CX, CY-110, ringR);
+      const ringInner = mkCircle(CX, CY-110, ringR*rf(0.55,0.68));
+      const shaftW = ri(14,20), shaftH = ri(110,140);
+      const shaft = mkRect(CX-shaftW/2, CY-110+ringR*0.6, shaftW, shaftH);
+      const flukeR = ri(55,72);
+      const flukes = mkPoly(CX, CY-110+ringR*0.6+shaftH, flukeR, 3, 0);
+      return {
+        shapes:{ringOuter,ringInner,shaft,flukes},
+        recipe:[ {op:'subtract',ids:['ringOuter','ringInner']}, {op:'union',ids:['shaft']}, {op:'union',ids:['flukes']} ]
+      };
+    };}
+    function T_windmillBlades(){ return () => {
+      const centerR = ri(18,26);
+      const bladeR = ri(50,65);
+      const dist = centerR + bladeR*0.55;
+      const baseAng = rf(0,Math.PI*2);
+      const blade1 = mkPoly(CX+Math.cos(baseAng)*dist, CY+Math.sin(baseAng)*dist, bladeR, 3, baseAng+Math.PI/2);
+      const blade2 = mkPoly(CX+Math.cos(baseAng+2.094)*dist, CY+Math.sin(baseAng+2.094)*dist, bladeR, 3, baseAng+2.094+Math.PI/2);
+      const blade3 = mkPoly(CX+Math.cos(baseAng+4.189)*dist, CY+Math.sin(baseAng+4.189)*dist, bladeR, 3, baseAng+4.189+Math.PI/2);
+      const center = mkCircle(CX,CY,centerR);
+      return {
+        shapes:{center,blade1,blade2,blade3},
+        recipe:[ {op:'union',ids:['center','blade1']}, {op:'union',ids:['blade2']}, {op:'union',ids:['blade3']} ]
+      };
+    };}
+    function T_clover(){ return () => {
+      const r = ri(55,72);
+      const dist = r*rf(0.85,1.05);
+      const c1 = mkCircle(CX, CY-dist, r), c2 = mkCircle(CX, CY+dist, r);
+      const c3 = mkCircle(CX-dist, CY, r), c4 = mkCircle(CX+dist, CY, r);
+      return {
+        shapes:{c1,c2,c3,c4},
+        recipe:[ {op:'union',ids:['c1','c2']}, {op:'union',ids:['c3']}, {op:'union',ids:['c4']} ]
+      };
+    };}
+
+    const TEMPLATES_2 = [
+      T_starMinusOrPlusCircle(), T_arrowSign(),
+      T_iceCreamCone(), T_tulip(), T_crescentMoon(), T_keyhole(), T_house(), T_treeLollipop(),
+      T_mushroom(), T_mountainPeak(), T_shieldEmblem(), T_grainOfRice(), T_pacman(),
+      T_seatbeltBuckle(), T_infinitySymbol(), T_mandalaBadge(), T_gearCog(), T_carRim(),
+      T_donut(), T_chainLinkSingle(), T_envelope(),
+      T_speechBubble(), T_bowtie(), T_lightbulb(), T_flagPennant(),
+    ];
+    const TEMPLATES_3 = [
+      T_leaf(), T_eyeShape(), T_fishBody(), T_appleLogo(), T_catHead(), T_snowman(),
+      T_guitarPick(), T_ribbonBanner(), T_button2Hole(), T_clockHands(), T_clawScratch(),
+      T_heartShape(), T_thoughtBubble(), T_crownSimple(), T_paperAirplane(), T_diamondRing(),
+      T_puzzlePieceTab(), T_umbrella(), T_medal(), T_diamondGemFacets(), T_crescentBadge(),
+    ];
+    const TEMPLATES_4 = [
+      T_biohazardCenter(), T_filmReel(),
+      T_anchorSimple(), T_windmillBlades(), T_clover(),
+    ];
+    const TIER_CATEGORY = { 2:'Foundational Stages', 3:'Intermediate Stages', 4:'Advanced Stages' };
+
+    const WORDS_A = ['Halo','Vesica','Signal','Aperture','Lattice','Prism','Echo','Drift','Nova','Fold','Orbit','Glyph','Cipher','Beacon','Relay','Anchor','Pulse','Frame','Vault','Grid','Shard','Axis','Loop','Node','Rune','Spire','Wave','Crest','Tide','Arc','Bloom','Ember','Flux','Zenith','Delta','Sigma','Vertex','Quartz','Onyx','Lumen','Vector','Cinder','Talon','Ridge','Helix','Cobalt','Marrow','Ion','Solace','Tether','Cascade','Umbra','Aurora','Meridian','Compass','Fathom','Monolith','Obsidian','Paragon','Sable','Wraith','Zephyr','Cairn','Ferro','Nimbus','Quill','Rift','Strand','Thorn','Vesper'];
+    const WORDS_B = ['Mark','Field','Key','Loop','Frame','Ring','Cell','Node','Gate','Core','Seal','Sign','Relay','Vault','Tab','Slot','Notch','Path','Mesh','Trace','Fold','Bend','Curve','Point','Edge','Line','Cut','Bridge','Disc','Band','Wedge','Lens','Token','Emblem','Sigil','Module','Circuit','Channel','Conduit','Pivot','Hinge','Latch','Clasp','Brace','Flange','Chamber','Cavity','Beam','Crown','Well','Basin','Yoke','Crest','Spool','Girder','Plate','Coil','Spar','Flag','Harbor'];
+
+    function makeTitle(usedTitles){
+      for(let tries=0; tries<400; tries++){
+        const t = pick(WORDS_A)+' '+pick(WORDS_B);
+        if(!usedTitles.has(t)){ usedTitles.add(t); return t; }
+      }
+      let n=1; const base = pick(WORDS_A)+' '+pick(WORDS_B);
+      while(usedTitles.has(base+' '+n)) n++;
+      const t = base+' '+n; usedTitles.add(t); return t;
+    }
+
+    function tryGenerateOne(templateList, acceptedBits, usedTitles){
+      for(let attempt=0; attempt<50; attempt++){
+        const candidate = pick(templateList)();
+        const shapes = candidate.shapes;
+        for(const key of Object.keys(shapes)){ shapes[key].id = key; shapes[key].bankType = shapes[key].type; }
+        let boundsOk = true;
+        for(const key of Object.keys(shapes)){ if(!inBounds(shapes[key])){ boundsOk=false; break; } }
+        if(!boundsOk) continue;
+        if(!everyPieceMatters(shapes, candidate.recipe)) continue;
+        const mask = buildSmallMask(shapes, candidate.recipe);
+        const bits = alphaBits(mask);
+        const frac = bitArea(bits)/(VS*VS);
+        if(frac<0.05 || frac>0.62) continue;
+        let dupe = false;
+        for(const b of acceptedBits){ if(jaccard(bits,b) > 0.88){ dupe=true; break; } }
+        if(dupe) continue;
+        acceptedBits.push(bits);
+        const requiredIds = shuffle(Object.keys(shapes)); // vary bank ordering so it never feels indexed/sequential
+        const title = makeTitle(usedTitles);
+        const category = TIER_CATEGORY[requiredIds.length] || 'Intermediate Stages';
+        return { title, category, shapes, recipe: candidate.recipe, requiredIds };
+      }
+      return null;
+    }
+
+    function generateTier(count, templateList, acceptedBits, usedTitles){
+      const out = [];
+      let guard = 0;
+      while(out.length < count && guard < count*80){
+        guard++;
+        const lvl = tryGenerateOne(templateList, acceptedBits, usedTitles);
+        if(lvl) out.push(lvl);
+      }
+      return out;
+    }
+
+    // seed dedup pools with the fixed hallmark levels so procedural stages can never echo them
+    const acceptedBits = HALLMARK_LEVELS.map(lvl => alphaBits(buildSmallMask(lvl.shapes, lvl.recipe)));
+    const usedTitles = new Set(HALLMARK_LEVELS.map(l => l.title));
+
+    const foundational = generateTier(38, TEMPLATES_2, acceptedBits, usedTitles);
+    const intermediate = generateTier(44, TEMPLATES_3, acceptedBits, usedTitles);
+    const advanced = generateTier(15, TEMPLATES_4, acceptedBits, usedTitles);
+
+    const procedural = shuffle([...foundational, ...intermediate, ...advanced]);
+    procedural.forEach((lvl, i) => { lvl.id = 'stage'+(i+4); });
+
+    window.__BOOLEAN_LEVELS__ = [...HALLMARK_LEVELS, ...procedural];
+  })();
+
+
+  const LEVELS = window.__BOOLEAN_LEVELS__;
+
+  function buildTargetMask(level){
+    let acc = null;
+    level.recipe.forEach(step=>{
+      const parts = [];
+      if(acc) parts.push(acc);
+      step.ids.forEach(id=> parts.push(maskCanvasFromShape(level.shapes[id])) );
+      acc = combineMasks(step.op, parts);
+    });
+    level.targetMaskCanvas = acc;
+  }
+  LEVELS.forEach(buildTargetMask);
+
+  /* ============ GAME STATE ============ */
+  let levelIndex = 0;
+  let level = null;
+  let pieces = [];              // workspace pieces {kind:'raw'|'mask', shapeId?, canvas?, sourceIds:[]}
+  let bankUsed = new Set();
+  let history = [];
+  let solved = false;
+
+  const workCanvas = document.getElementById('work');
+  const workCtx = workCanvas.getContext('2d');
+  const bankEl = document.getElementById('bank');
+  const opRow = document.getElementById('opRow');
+  const controller = document.getElementById('controller');
+  const canvasPanel = document.getElementById('canvasPanel');
+  const matchBadge = document.getElementById('matchBadge');
+  const toastOops = document.getElementById('toastOops');
+  const clearOverlay = document.getElementById('clearOverlay');
+  const introOverlay = document.getElementById('introOverlay');
+  const introTimer = document.getElementById('introTimer');
+  const introCanvas = document.getElementById('introCanvas');
+  const peekOverlay = document.getElementById('peekOverlay');
+  const peekCanvas = document.getElementById('peekCanvas');
+
+  /* ============ ONBOARDING TUTORIAL ============ */
+  const ONBOARD_KEY = 'boolean-construct-onboarded-v1';
+  const onboardOverlay = document.getElementById('onboardOverlay');
+  const onboardArt = document.getElementById('onboardArt');
+  const onboardTitle = document.getElementById('onboardTitle');
+  const onboardBody = document.getElementById('onboardBody');
+  const onboardDots = document.getElementById('onboardDots');
+  const onboardBack = document.getElementById('onboardBack');
+  const onboardNext = document.getElementById('onboardNext');
+
+  const ONBOARD_STEPS = [
+    {
+      title:'Memorize the target',
+      body:'Every stage opens with a 3-second look at the final shape. Study it — you can peek again anytime with the eye icon in the header.',
+      art:'<svg viewBox="0 0 24 24" fill="none" stroke="#CCFF00" stroke-width="1.6"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3.4" fill="#CCFF00" fill-opacity=".15"/></svg>'
+    },
+    {
+      title:'Drag pieces into the frame',
+      body:'The bank on the left holds exactly the shapes you need. Drag each one into the dashed frame on the right to place it.',
+      art:'<svg viewBox="0 0 24 24" fill="none"><rect x="2" y="2" width="8" height="8" rx="2" fill="#E8EAF0"/><rect x="13" y="13" width="9" height="9" rx="2" fill="none" stroke="#8B90A0" stroke-width="1.2" stroke-dasharray="2 2"/><path d="M9 9l6 6" stroke="#FFB020" stroke-width="1.6" stroke-linecap="round"/></svg>'
+    },
+    {
+      title:'Combine with boolean ops',
+      body:'Once two or more shapes are in the frame, Union, Subtract, Intersect and Difference appear. Pick the op that fuses them the right way.',
+      art:'<svg viewBox="0 0 24 24" fill="none"><circle cx="9" cy="12" r="6.5" fill="#CCFF00" fill-opacity=".55"/><circle cx="15" cy="12" r="6.5" fill="#00E5FF" fill-opacity=".55"/></svg>'
+    },
+    {
+      title:'Undo, restart, and match',
+      body:'Made a wrong combine? Undo or Start Over from the bottom bar. Land an exact 100% match to the target and the stage clears — Stellar.',
+      art:'<svg viewBox="0 0 24 24" fill="none" stroke="#FFB020" stroke-width="1.8"><path d="M23 4v6h-6"/><path d="M20.49 15A9 9 0 1 1 22 12"/></svg>'
+    }
+  ];
+
+  let onboardStep = 0;
+  let gameStarted = false;
+
+  function safeLocalStorageGet(key){
+    try{ return localStorage.getItem(key); }catch(_){ return null; }
+  }
+  function safeLocalStorageSet(key, val){
+    try{ localStorage.setItem(key, val); }catch(_){ /* private mode / blocked — tutorial just replays each visit */ }
+  }
+
+  function renderOnboardStep(){
+    const step = ONBOARD_STEPS[onboardStep];
+    onboardArt.innerHTML = step.art;
+    onboardTitle.textContent = step.title;
+    onboardBody.textContent = step.body;
+    onboardDots.innerHTML = ONBOARD_STEPS.map((_,i)=> `<span class="${i===onboardStep?'active':''}"></span>`).join('');
+    onboardBack.style.visibility = onboardStep===0 ? 'hidden' : 'visible';
+    onboardNext.textContent = onboardStep === ONBOARD_STEPS.length-1 ? "Let's build" : 'Next';
+  }
+
+  function openOnboarding(){
+    onboardStep = 0;
+    renderOnboardStep();
+    onboardOverlay.classList.add('show');
+  }
+  function closeOnboarding(){
+    onboardOverlay.classList.remove('show');
+    safeLocalStorageSet(ONBOARD_KEY, '1');
+    if(!gameStarted){ gameStarted = true; loadLevel(0); }
+  }
+
+  onboardNext.addEventListener('click', ()=>{
+    if(onboardStep < ONBOARD_STEPS.length-1){ onboardStep++; renderOnboardStep(); }
+    else closeOnboarding();
+  });
+  onboardBack.addEventListener('click', ()=>{
+    if(onboardStep > 0){ onboardStep--; renderOnboardStep(); }
+  });
+  document.getElementById('onboardSkip').addEventListener('click', closeOnboarding);
+  document.getElementById('btnHelp').addEventListener('click', openOnboarding);
+
+  function snapshot(){
+    return { pieces: pieces.slice(), bankUsed: new Set(bankUsed) };
+  }
+  function pushHistory(){ history.push(snapshot()); }
+  function restore(snap){ pieces = snap.pieces.slice(); bankUsed = new Set(snap.bankUsed); refreshAll(); }
+
+  function recoverFromError(){
+    // Last-resort safety net: if something throws mid-interaction, don't leave
+    // the board in a half-updated/tangled state — cleanly reload the current stage.
+    try{ cancelActiveDrag(); }catch(_){}
+    loadLevel(levelIndex, { skipIntro:true });
+  }
+  window.addEventListener('error', recoverFromError);
+
+  function loadLevel(idx, {skipIntro=false} = {}){
+    cancelActiveDrag();
+    levelIndex = (idx + LEVELS.length) % LEVELS.length;
+    level = LEVELS[levelIndex];
+    pieces = []; bankUsed = new Set(); history = []; solved = false;
+    document.getElementById('stageTitle').textContent = level.title;
+    document.getElementById('stageCat').textContent = ' in ' + level.category;
+    document.getElementById('btnPeek').disabled = false;
+    clearOverlay.classList.remove('show');
+    toastOops.classList.remove('show');
+    buildBank();
+    refreshAll();
+    if(skipIntro){ dismissIntro(true); } else { runIntro(); }
+  }
+
+  /* ---------- intro / 3s preview ---------- */
+  let introHandle = null;
+  function runIntro(){
+    introOverlay.classList.remove('hide');
+    const ctx = introCanvas.getContext('2d');
+    ctx.clearRect(0,0,280,280);
+    ctx.save(); ctx.scale(280/W, 280/H);
+    ctx.drawImage(tintMask(level.targetMaskCanvas, '#CCFF00', '#00E5FF'), 0, 0);
+    ctx.restore();
+    let t = 3;
+    introTimer.textContent = t;
+    clearInterval(introHandle);
+    introHandle = setInterval(()=>{
+      t -= 1;
+      if(t <= 0){ clearInterval(introHandle); dismissIntro(); }
+      else introTimer.textContent = t;
+    }, 1000);
+  }
+  function dismissIntro(){
+    clearInterval(introHandle);
+    introOverlay.classList.add('hide');
+  }
+  introOverlay.addEventListener('click', dismissIntro);
+
+  /* ---------- bank ---------- */
+  function allShapeDefs(){
+    // Only the shapes actually required to construct the target output are ever shown.
+    return level.requiredIds.map(id => level.shapes[id]);
+  }
+
+  // Compute this shape's true footprint (from its actual target geometry) so the
+  // bank icon reflects its real proportions — a tall rectangle should look tall,
+  // not be squashed into a square, and an N-gon keeps its real silhouette.
+  function shapeFootprint(def){
+    const bb = shapeBBox(def);
+    return { w: bb.maxX-bb.minX, h: bb.maxY-bb.minY, bb };
+  }
+
+  function clipPathFor(def, bb){
+    const pts = polygonVertices(def);
+    const w = bb.maxX-bb.minX, h = bb.maxY-bb.minY;
+    const pct = pts.map(([x,y]) => `${((x-bb.minX)/w*100).toFixed(2)}% ${((y-bb.minY)/h*100).toFixed(2)}%`);
+    return `polygon(${pct.join(', ')})`;
+  }
+
+  function buildBank(){
+    cancelActiveDrag();
+    bankEl.innerHTML = '';
+    allShapeDefs().forEach(def=>{
+      const cell = document.createElement('div');
+      cell.className = 'bank-cell';
+      const el = document.createElement('div');
+      el.className = 'bank-piece';
+      el.dataset.type = def.bankType;
+      el.dataset.id = def.id;
+      const fp = shapeFootprint(def);
+      const scale = BANK_SIZE / Math.max(fp.w, fp.h);
+      const dispW = Math.round(fp.w * scale);
+      const dispH = Math.round(fp.h * scale);
+      el.style.width = dispW+'px'; el.style.height = dispH+'px';
+      if(def.bankType === 'roundrect'){
+        el.style.borderRadius = Math.round((def.r||0) * scale)+'px';
+      } else if(def.bankType === 'polygon' || def.bankType === 'star'){
+        el.style.clipPath = clipPathFor(def, fp.bb);
+      }
+      cell.appendChild(el);
+      bankEl.appendChild(cell);
+      attachDrag(el, def);
+    });
+  }
+
+  // ---- drag safety net: guarantees a level switch or reset can never leave a
+  // shape stuck mid-flight (position:fixed) overlapping the fresh bank layout.
+  let activeDrag = null;
+  function cancelActiveDrag(){
+    if(!activeDrag) return;
+    const { el, pointerId } = activeDrag;
+    try{ el.releasePointerCapture(pointerId); }catch(_){}
+    el.classList.remove('dragging', 'drag-valid');
+    el.style.left = ''; el.style.top = '';
+    activeDrag = null;
+    hoverTargetId = null;
+    draw();
+  }
+
+  function attachDrag(el, def){
+    let sx=0, sy=0, startRect=null, dragging=false;
+    el.addEventListener('pointerdown', (e)=>{
+      if(bankUsed.has(def.id) || solved) return;
+      cancelActiveDrag();
+      dragging = true;
+      activeDrag = { el, pointerId: e.pointerId };
+      startRect = el.getBoundingClientRect();
+      sx = e.clientX; sy = e.clientY;
+      el.setPointerCapture(e.pointerId);
+      el.classList.add('dragging');
+      el.style.width = startRect.width+'px';
+      el.style.height = startRect.height+'px';
+      el.style.left = startRect.left+'px';
+      el.style.top = startRect.top+'px';
+    });
+    el.addEventListener('pointermove', (e)=>{
+      if(!dragging) return;
+      const dx = e.clientX - sx, dy = e.clientY - sy;
+      el.style.left = (startRect.left+dx)+'px';
+      el.style.top = (startRect.top+dy)+'px';
+      const target = document.getElementById('work').getBoundingClientRect();
+      const inside = e.clientX>=target.left && e.clientX<=target.right && e.clientY>=target.top && e.clientY<=target.bottom;
+      el.classList.toggle('drag-valid', inside);
+      // Highlight only this piece's own target slot — not the whole frame.
+      const nextHover = inside ? def.id : null;
+      if(nextHover !== hoverTargetId){ hoverTargetId = nextHover; draw(); }
+    });
+    function endDrag(e){
+      if(!dragging) return;
+      dragging = false;
+      activeDrag = null;
+      el.classList.remove('dragging', 'drag-valid');
+      hoverTargetId = null;
+      const target = document.getElementById('work').getBoundingClientRect();
+      const inside = e.clientX>=target.left && e.clientX<=target.right && e.clientY>=target.top && e.clientY<=target.bottom;
+      el.style.left = ''; el.style.top = '';
+      if(inside){
+        try{ placeShape(def); }catch(err){ console.error('placeShape failed', err); recoverFromError(); }
+      }
+    }
+    el.addEventListener('pointerup', endDrag);
+    el.addEventListener('pointercancel', endDrag);
+  }
+
+  function placeShape(def){
+    if(bankUsed.has(def.id) || solved) return;
+    pushHistory();
+    bankUsed.add(def.id);
+    pieces.push({ kind:'raw', shapeId:def.id, sourceIds:[def.id] });
+    refreshAll();
+  }
+
+  /* ---------- rendering ---------- */
+  function maskForPiece(p){
+    if(p.kind==='mask') return p.canvas;
+    const def = level.shapes[p.shapeId];
+    return maskCanvasFromShape(def);
+  }
+
+  let hoverTargetId = null; // id of the required shape whose slot should be highlighted right now
+
+  function draw(){
+    workCtx.clearRect(0,0,W,H);
+    // dashed skeleton for required shapes not yet resolved into final mask
+    if(!solved){
+      level.requiredIds.forEach(id=>{
+        const isHover = id === hoverTargetId;
+        workCtx.save();
+        workCtx.setLineDash(isHover ? [] : [5,6]);
+        if(isHover){
+          pathFor(workCtx, level.shapes[id]);
+          workCtx.fillStyle = 'rgba(255,176,32,.16)';
+          workCtx.fill();
+        }
+        workCtx.strokeStyle = isHover ? '#FFB020' : 'rgba(255,255,255,.16)';
+        workCtx.lineWidth = isHover ? 2.25 : 1.5;
+        pathFor(workCtx, level.shapes[id]);
+        workCtx.stroke();
+        workCtx.restore();
+      });
+    }
+    pieces.forEach((p,i)=>{
+      if(p.kind==='mask'){
+        workCtx.drawImage(tintMask(p.canvas, '#CCFF00', '#00E5FF'), 0, 0);
+      } else {
+        const def = level.shapes[p.shapeId];
+        workCtx.fillStyle = i===0 ? 'rgba(232,232,232,.92)' : 'rgba(255,176,32,.5)';
+        pathFor(workCtx, def);
+        workCtx.fill();
+      }
+    });
+  }
+
+  function refreshAll(){
+    // self-heal: the bank should always have exactly level.requiredIds.length
+    // pieces in it. If it doesn't (any bug, anywhere), rebuild rather than
+    // leaving the player looking at an empty, stuck bank.
+    if(level && bankEl.children.length !== level.requiredIds.length){
+      buildBank();
+    }
+    // bank dim state — bankEl.children are the .bank-cell wrappers; the actual
+    // .bank-piece (which carries dataset.id and the 'used' styling) is nested inside.
+    [...bankEl.children].forEach(cell=>{
+      const el = cell.children[0];
+      if(el) el.classList.toggle('used', bankUsed.has(el.dataset.id));
+    });
+    draw();
+    // op buttons
+    const showOps = pieces.length >= 2 && !solved;
+    opRow.querySelectorAll('.op-btn').forEach(b=> b.classList.toggle('show', showOps));
+    // controller
+    controller.classList.toggle('show', pieces.length > 0 && !solved);
+    document.getElementById('btnUndo').style.opacity = history.length ? '1' : '.35';
+    // tilt — only once shapes are actually overlapping/combining, kept subtle so geometry stays legible
+    canvasPanel.classList.toggle('tilted', pieces.length >= 2 || (pieces.length===1 && pieces[0].kind==='mask'));
+    // match badge (best-effort continuous readout when reducible to single piece)
+    if(pieces.length===1){
+      const m = matchScore(maskForPiece(pieces[0]), level.targetMaskCanvas);
+      matchBadge.textContent = 'MATCH · ' + Math.round(m*100) + '%';
+    } else {
+      matchBadge.textContent = 'MATCH · —';
+    }
+  }
+
+  function applyOp(op){
+    if(pieces.length < 2 || solved) return;
+    pushHistory();
+    let ordered = pieces;
+    if(op === 'subtract' && pieces.length === 2 && pieces.every(p => p.kind === 'raw')){
+      // "Subtract" removes one shape from another, so which piece the player
+      // happened to drag in first shouldn't determine the outcome — every
+      // template in this game is designed as "cut the smaller feature out of
+      // the larger base", so that's the convention we apply here regardless
+      // of drag order. (Every later step already has a well-defined order:
+      // the accumulated result-so-far is always the base being modified.)
+      const areas = pieces.map(p => filledArea(maskForPiece(p)));
+      if(areas[0] < areas[1]) ordered = [pieces[1], pieces[0]];
+    }
+    const canvases = ordered.map(maskForPiece);
+    const resultCanvas = combineMasks(op, canvases);
+    const sourceIds = ordered.reduce((a,p)=>a.concat(p.sourceIds), []);
+    pieces = [{ kind:'mask', canvas:resultCanvas, sourceIds }];
+    refreshAll();
+    checkVictory();
+  }
+
+  function checkVictory(){
+    if(pieces.length !== 1 || pieces[0].kind !== 'mask') return;
+    const p = pieces[0];
+    const score = matchScore(p.canvas, level.targetMaskCanvas);
+    if(score >= 1){
+      stageClear();
+    } else {
+      const allRequiredUsed = level.requiredIds.every(id => p.sourceIds.includes(id));
+      if(allRequiredUsed) showOops();
+    }
+  }
+
+  function showOops(){ toastOops.classList.add('show'); }
+  function hideOops(){ toastOops.classList.remove('show'); }
+
+  function stageClear(){
+    solved = true;
+    refreshAll();
+    canvasPanel.classList.remove('tilted');
+    setTimeout(()=> clearOverlay.classList.add('show'), 250);
+  }
+
+  /* ---------- controls wiring ---------- */
+  opRow.querySelectorAll('.op-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=> applyOp(btn.dataset.op));
+  });
+
+  document.getElementById('btnUndo').addEventListener('click', doUndo);
+  document.getElementById('toastUndo').addEventListener('click', ()=>{ doUndo(); hideOops(); });
+  function doUndo(){
+    if(!history.length) return;
+    const snap = history.pop();
+    restore(snap);
+  }
+
+  document.getElementById('btnStartOver').addEventListener('click', doStartOver);
+  document.getElementById('toastStartOver').addEventListener('click', ()=>{ doStartOver(); hideOops(); });
+  function doStartOver(){
+    cancelActiveDrag();
+    pieces = []; bankUsed = new Set(); history = []; solved = false;
+    clearOverlay.classList.remove('show');
+    buildBank(); // full rebuild — guarantees the bank can never be left stuck/stale
+    refreshAll();
+  }
+
+  document.getElementById('toastOk').addEventListener('click', hideOops);
+
+  document.getElementById('btnReset').addEventListener('click', ()=> loadLevel(levelIndex, {skipIntro:true}));
+  document.getElementById('btnPrev').addEventListener('click', ()=> loadLevel(levelIndex-1));
+  document.getElementById('btnNext').addEventListener('click', ()=> loadLevel(levelIndex+1));
+  document.getElementById('btnMenu').addEventListener('click', ()=> loadLevel(levelIndex, {skipIntro:true}));
+
+  const btnPeek = document.getElementById('btnPeek');
+  function showPeek(){
+    const ctx = peekCanvas.getContext('2d');
+    ctx.clearRect(0,0,W,H);
+    ctx.drawImage(tintMask(level.targetMaskCanvas, '#CCFF00', '#00E5FF'), 0, 0);
+    peekOverlay.classList.add('show');
+  }
+  function hidePeek(){ peekOverlay.classList.remove('show'); }
+  btnPeek.addEventListener('pointerdown', showPeek);
+  btnPeek.addEventListener('pointerup', hidePeek);
+  btnPeek.addEventListener('pointerleave', hidePeek);
+
+  document.getElementById('btnPlayAgain').addEventListener('click', doStartOver);
+  document.getElementById('btnContinue').addEventListener('click', ()=> loadLevel(levelIndex+1));
+  document.getElementById('btnShare').addEventListener('click', ()=>{
+    const text = 'I just solved "'+level.title+'" in Boolean Studies \u2014 3/3.';
+    if(navigator.share){ navigator.share({ text }).catch(()=>{}); }
+    else if(navigator.clipboard){ navigator.clipboard.writeText(text); }
+  });
+
+  /* ---------- boot ---------- */
+  if(safeLocalStorageGet(ONBOARD_KEY)){
+    gameStarted = true;
+    loadLevel(0);
+  } else {
+    openOnboarding();
+  }
+
+})();
+</script>
+</body>
+</html>

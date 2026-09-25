@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Designer's Eye · Sarbesh-OS</title>
+<meta name="theme-color" content="#0B0C10">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230B0C10'/%3E%3Ccircle cx='16' cy='16' r='9' fill='none' stroke='%23CCFF00' stroke-width='2' opacity='.7'/%3E%3Ccircle cx='16' cy='16' r='3.2' fill='%23CCFF00'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=DM+Sans:opsz,wght@9..40,200..800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    color-scheme: dark;
+    --bg:#0B0C10;
+    --bg-card:#111319;
+    --bg-card-2:#171A22;
+    --hairline: rgba(255,255,255,0.14);
+    --hairline-soft: rgba(255,255,255,0.10);
+    --text-hi:#E8EAF0;
+    --text-mid:#8B90A0;
+    --text-lo:#5E6372;
+    --lime:#CCFF00;
+    --lime-ink:#0c1400;
+    --lime-dim: rgba(204,255,0,0.14);
+    --amber:#FFB020;
+    --amber-dim: rgba(255,176,32,0.14);
+    --coral:#FF3366;
+    --coral-dim: rgba(255,51,102,0.14);
+    --teal:#00E5FF;
+    --teal-dim: rgba(0,229,255,0.14);
+    --magenta:#e85de0;
+    --magenta-dim: rgba(232,93,224,0.14);
+    --radius-lg:14px;
+    --radius-chip:10px;
+    --radius-pill:999px;
+    --shadow-lift: 0 24px 60px -20px rgba(0,0,0,0.85);
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    min-height:100%;
+    overflow-x:hidden;
+    background-color: var(--bg);
+    background-image:
+      radial-gradient(rgba(255,255,255,0.07) 1px, transparent 1.2px),
+      linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 18px 18px, 90px 90px, 90px 90px;
+    background-attachment: fixed;
+    color:var(--text-hi);
+    font-family:'DM Sans', system-ui, sans-serif;
+    -webkit-font-smoothing:antialiased;
+    padding: max(20px, env(safe-area-inset-top,0px)) 16px max(20px, env(safe-area-inset-bottom,0px));
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  h1,h2,h3,.display{font-family:'Chakra Petch', 'DM Sans', sans-serif;}
+  .num{font-family:'Chakra Petch', sans-serif; font-variant-numeric: tabular-nums; font-weight:700;}
+  .mono{ font-family:'JetBrains Mono', ui-monospace, monospace; }
+
+  .stage{
+    width:100%;
+    max-width:520px;
+    display:flex;
+    flex-direction:column;
+  }
+
+  /* ---------- Sarbesh-OS window chrome (shared across every game) ---------- */
+  .os-window{
+    border:1px solid rgba(255,255,255,0.10);
+    border-radius:16px;
+    overflow:hidden;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.85), 0 0 0 1px rgba(0,0,0,0.6);
+    background: linear-gradient(180deg, #12141B 0%, #0E1015 100%);
+  }
+  .os-titlebar{
+    display:flex; flex-wrap:nowrap; align-items:center; gap:10px; container-type:inline-size;
+    padding:10px 16px; background:#0D0F14; border-bottom:1px solid rgba(255,255,255,0.10);
+  }
+  .os-lights{ display:flex; gap:6px; }
+  .os-lights span{ width:12px; height:12px; border-radius:50%; }
+  .os-path{ font-family:'JetBrains Mono', monospace; font-size:12px; color: var(--text-mid); }
+  .os-path b{ color: var(--text-hi); font-weight:400; }
+  .os-lights{ flex-shrink:0; }
+  .os-path{ flex:1 1 auto; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .os-pill{ flex-shrink:0; }
+  @media (max-width: 480px){ .os-titlebar{ gap:8px; } }
+  /* phones: show just the file name and tighten type so the bar stays on one line */
+  @container (max-width: 440px){ .os-path-dir, .os-path-ext{ display:none; } .os-lights{ gap:5px; } .os-lights span{ width:10px; height:10px; } .os-path{ font-size:11.5px; } .os-pill{ font-size:10.5px; padding:4px 10px; } }
+  .os-pill{
+    margin-left:auto; white-space:nowrap;
+    font-family:'JetBrains Mono', monospace; font-size:11px; color: var(--lime); text-decoration:none;
+    padding:4px 12px; border-radius:999px; border:1px solid rgba(204,255,0,0.3); background: rgba(204,255,0,0.07);
+  }
+  .os-pill:hover{ background: rgba(204,255,0,0.14); }
+
+  .card{
+    background: transparent;
+    padding: 30px 26px;
+    display:flex;
+    flex-direction:column;
+    gap:24px;
+    position:relative;
+  }
+
+  /* ---------- views ---------- */
+  .view{ display:none; }
+  .view.active{ display:flex; flex-direction:column; gap:16px; }
+
+  /* ---------- eyebrow / credit badge (site-wide motifs) ---------- */
+  .eyebrow{
+    display:flex; align-items:center; gap:8px;
+    font-family:'JetBrains Mono', monospace; font-size:11px; font-weight:600;
+    letter-spacing:0.14em; text-transform:uppercase; color: var(--lime);
+  }
+  .eyebrow .bar{ width:14px; height:1px; background: var(--lime); flex-shrink:0; }
+
+  .credit-badge{
+    justify-content:center; align-self:center;
+    display:inline-flex; align-items:center; gap:8px;
+    background: var(--bg-card); border:1px solid var(--hairline-soft);
+    border-radius: var(--radius-pill); padding:8px 16px 8px 12px;
+    font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:0.03em; color: var(--text-mid);
+  }
+  .credit-badge .live-dot{
+    width:7px; height:7px; border-radius:50%; background: var(--lime); flex-shrink:0;
+    box-shadow: 0 0 0 3px var(--lime-dim);
+  }
+  .credit-badge a{ color: var(--text-hi); text-decoration:none; }
+  .credit-badge a:hover{ color: var(--lime); }
+
+  /* ---------- start view ---------- */
+  .brand-row{
+    display:flex; align-items:center; gap:10px;
+  }
+  .brand-mark{
+    width:32px; height:32px; border-radius:8px;
+    background: transparent; border:1.5px solid var(--lime);
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+  }
+  .brand-mark svg{ width:16px; height:16px; }
+  .brand-name{ font-family:'JetBrains Mono', monospace; font-size:12.5px; color:var(--text-mid); font-weight:600; letter-spacing:0.08em; text-transform:uppercase;}
+
+  .intro{ display:flex; flex-direction:column; gap:10px; }
+  .headline{ font-size:32px; font-weight:700; line-height:1.12; margin:0; letter-spacing:-0.8px;}
+  .lede{ font-size:15px; line-height:1.55; color:var(--text-mid); margin:0; max-width:38ch;}
+
+  .mode-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .mode-opt{
+    appearance:none; -webkit-appearance:none;
+    text-align:left;
+    background: var(--bg-card-2);
+    border:1px solid var(--hairline-soft);
+    border-radius: var(--radius-chip);
+    padding:16px 15px 15px;
+    cursor:pointer;
+    color:var(--text-hi);
+    font-family:inherit;
+    font-size:inherit;
+    transition: border-color .18s ease, transform .12s ease, background .18s ease;
+  }
+  .mode-opt:hover{ transform: translateY(-1px); border-color: rgba(255,255,255,0.2); }
+  .mode-opt:active{ transform: translateY(0px) scale(0.99); }
+  .mode-opt:focus-visible{ outline: 2px solid var(--lime); outline-offset:2px; }
+  .mode-opt.selected{
+    border-color: var(--lime);
+    background: var(--lime-dim);
+  }
+  .mode-opt .mo-title{ font-family:'Chakra Petch',sans-serif; font-weight:700; font-size:14.5px; display:flex; align-items:center; gap:7px;}
+  .mode-opt .mo-title .dot{ width:6px; height:6px; border-radius:50%; background: var(--text-lo); flex-shrink:0;}
+  .mode-opt.selected .mo-title .dot{ background: var(--lime); box-shadow:0 0 0 3px var(--lime-dim);}
+  .mode-opt .mo-sub{ font-size:12.5px; color:var(--text-lo); line-height:1.5; margin-top:7px;}
+
+  .btn{
+    appearance:none; -webkit-appearance:none; border:none; cursor:pointer;
+    font-family:'Chakra Petch', sans-serif; font-weight:700; font-size:15px;
+    border-radius: var(--radius-pill);
+    padding:15px 18px;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    transition: transform .12s ease, box-shadow .18s ease, background .18s ease, filter .18s ease;
+    outline-offset:2px;
+  }
+  .btn:active{ transform: scale(0.97); }
+  .btn-primary{
+    background: var(--lime);
+    color: var(--lime-ink);
+    box-shadow: 0 10px 24px -10px rgba(204,255,0,0.45);
+  }
+  .btn-primary:hover{ filter: brightness(1.06); }
+  .btn-ghost{
+    background: var(--bg-card-2);
+    color: var(--text-hi);
+    border:1px solid var(--hairline);
+  }
+  .btn-ghost:hover{ border-color: rgba(255,255,255,0.3); }
+  .btn:focus-visible{ outline: 2px solid var(--lime); }
+  .btn[disabled]{ opacity:0.4; cursor:not-allowed; transform:none; }
+  .btn-full{ width:100%; }
+
+  /* ---------- game view ---------- */
+  .game-head{ display:flex; flex-direction:column; gap:12px; }
+  .top-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .round-label{ font-size:13.5px; color:var(--text-mid); font-weight:500; }
+  .round-label .num{ color:var(--text-hi); font-weight:700; font-size:13.5px; }
+  .score-pill{
+    font-family:'JetBrains Mono', monospace; font-size:11px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase;
+    color: var(--text-mid);
+    background: var(--bg-card-2); border:1px solid var(--hairline-soft);
+    padding:6px 12px; border-radius:999px; display:flex; align-items:center; gap:7px;
+  }
+  .score-pill .num{ color: var(--lime); font-size:12.5px; }
+
+  .segments{ display:flex; gap:4px; }
+  .seg{
+    flex:1; height:3px; border-radius:2px;
+    background: var(--hairline-soft);
+    overflow:hidden; position:relative;
+  }
+  .seg .fill{
+    position:absolute; inset:0; background: var(--lime);
+    transform-origin:left; transform:scaleX(0);
+    transition: transform .35s cubic-bezier(.4,0,.2,1);
+  }
+  .seg.done .fill{ transform:scaleX(1); }
+  .seg.current .fill{ transform:scaleX(1); }
+
+  .prompt{ font-size:15px; font-weight:500; color: var(--text-hi); text-align:center; margin:0; }
+
+  .canvas-wrap{
+    display:flex; align-items:center; justify-content:center;
+    padding: 4px 0;
+  }
+  .canvas-frame{
+    width:260px; height:260px;
+    border-radius:22px;
+    background: var(--bg-card-2);
+    border:1px solid var(--hairline-soft);
+    display:flex; align-items:center; justify-content:center;
+    position:relative;
+    transition: border-color .3s ease, box-shadow .3s ease;
+  }
+  .canvas-frame.flash-correct{ border-color: rgba(204,255,0,0.5); box-shadow: 0 0 0 3px var(--lime-dim); }
+  .canvas-frame.flash-wrong{ border-color: rgba(255,51,102,0.5); box-shadow: 0 0 0 3px var(--coral-dim); }
+
+  /* svg width/height always equal its viewBox number (set together in JS) so every
+     offset shown to the player ("off by Xpx") is a literal, true CSS pixel on any screen */
+  svg.shape-svg{ display:block; }
+  .shape-svg .shape-body{
+    fill: rgba(255,255,255,0.045);
+    stroke: rgba(255,255,255,0.42);
+    stroke-width:1.6;
+    transition: stroke .25s ease, fill .25s ease;
+  }
+  .shape-svg.reveal-correct .shape-body{ stroke: rgba(204,255,0,0.6); }
+  .shape-svg.reveal-wrong .shape-body{ stroke: rgba(255,51,102,0.55); }
+
+  .dot-marker{ fill:#f5f5f2; stroke: rgba(0,0,0,0.4); stroke-width:1; transition: stroke .25s ease, fill .25s ease; }
+  .dot-marker.correct{ fill: var(--lime); }
+  .dot-marker.wrong{ fill: var(--coral); }
+
+  .true-marker{ fill:none; stroke-width:2; opacity:0; transition: opacity .3s ease; }
+  .true-marker.show{ opacity:1; }
+  .true-marker.correct{ stroke: var(--lime); }
+  .true-marker.wrong{ stroke: var(--coral); }
+
+  .guide-line{ stroke-width:1; stroke-dasharray:3 4; opacity:0; transition: opacity .35s ease; }
+  .guide-line.show{ opacity:0.6; }
+  .guide-line.correct{ stroke: var(--lime); }
+  .guide-line.wrong{ stroke: var(--coral); }
+
+  .link-line{ stroke-width:1.4; stroke-dasharray:2 3; opacity:0; transition: opacity .35s ease .05s; }
+  .link-line.show{ opacity:0.9; }
+  .link-line.correct{ stroke: var(--lime); }
+  .link-line.wrong{ stroke: var(--coral); }
+
+  @keyframes popIn{
+    from{ opacity:0; transform: scale(.85); }
+    to{ opacity:1; transform: scale(1); }
+  }
+  .shape-enter{ animation: popIn .38s cubic-bezier(.2,.9,.25,1.1); }
+
+  .answer-group{ display:flex; flex-direction:column; gap:12px; }
+  .answers{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .btn-answer{
+    padding:16px 12px; font-size:14.5px;
+  }
+  .btn-no{ background: var(--bg-card-2); color: var(--text-hi); border:1px solid var(--hairline); }
+  .btn-no:hover{ border-color: rgba(255,51,102,0.5); }
+  .btn-yes{ background: var(--lime); color: var(--lime-ink); box-shadow: 0 10px 22px -10px rgba(204,255,0,0.45); }
+
+  .kbd-hint{ text-align:center; font-family:'JetBrains Mono', monospace; font-size:11px; color: var(--text-lo); margin:0; }
+  .kbd-hint kbd{
+    font-family:inherit; background: var(--bg-card-2); border:1px solid var(--hairline-soft);
+    padding:2px 6px; border-radius:5px; font-size:10.5px; color: var(--text-mid);
+  }
+
+  /* The card doesn't reserve space for feedback up front — this wrapper is 0-height
+     (grid-rows 0fr) until a round is answered, then smoothly grows open to fit the
+     toast + continue button, instead of leaving a permanent empty gap below the
+     answer buttons. */
+  .feedback-wrap{
+    display:grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows .4s cubic-bezier(.4,0,.2,1);
+  }
+  .feedback-wrap.show{ grid-template-rows: 1fr; }
+  .feedback-inner{
+    min-height:0;
+    overflow:hidden;
+    display:flex; flex-direction:column; gap:16px;
+    opacity:0; transform: translateY(-6px);
+    transition: opacity .3s ease, transform .3s ease;
+  }
+  .feedback-wrap.show .feedback-inner{ opacity:1; transform:translateY(0); transition-delay:.14s; }
+
+  .toast{
+    display:flex; align-items:center; gap:12px;
+    background: var(--bg-card-2);
+    border:1px solid var(--hairline-soft);
+    border-radius: var(--radius-chip);
+    padding:14px 16px;
+    font-size:13.5px; color: var(--text-hi);
+  }
+  .toast .icon{
+    width:22px; height:22px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:12px; font-weight:700; flex-shrink:0;
+  }
+  .toast.correct .icon{ background: var(--lime-dim); color: var(--lime); }
+  .toast.wrong .icon{ background: var(--coral-dim); color: var(--coral); }
+  .toast .msg strong{ color:#fff; }
+
+  .continue-row{ display:flex; justify-content:center; }
+  .continue-row .btn{ min-width:160px; }
+
+  /* ---------- end view ---------- */
+  .end-hero{ display:flex; flex-direction:column; align-items:center; gap:16px; text-align:center; }
+  .end-ring{ width:44px; height:44px; }
+  .end-ring circle.ring{ fill:none; stroke-width:1.6; opacity:0.55; }
+  .end-ring circle.dot{ }
+
+  .rank-title{
+    font-size:30px; font-weight:700; line-height:1.15; letter-spacing:-0.6px; margin:0; max-width:26ch;
+  }
+  .end-eliminated{ font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:0.06em; text-transform:uppercase; color: var(--coral); font-weight:600; }
+  .rank-blurb{ color: var(--text-mid); font-size:14px; line-height:1.6; margin:0; max-width:32ch; }
+
+  .stat-row{ display:flex; align-items:center; justify-content:center; gap:14px; }
+  .stat{ text-align:center; }
+  .stat .stat-num{ font-size:22px; font-weight:700; }
+  .stat .stat-label{ font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:0.08em; text-transform:uppercase; color: var(--text-lo); margin-top:4px; }
+  .stat-sep{ color: var(--hairline); font-size:14px; }
+
+  .end-actions{ display:flex; gap:10px; }
+  .end-actions .btn{ flex:1; }
+
+  .sr-only{
+    position:absolute; width:1px; height:1px; padding:0; margin:-1px;
+    overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
+  }
+
+  @media (max-width:380px){
+    /* canvas/svg size is intentionally NOT overridden here — it's computed once in JS
+       so the viewBox always equals the rendered pixel size exactly, on every screen */
+    .card{ padding:26px 18px; gap:22px; }
+    .headline{ font-size:27px; }
+    .rank-title{ font-size:26px; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .shape-enter{ animation:none; }
+    *{ transition-duration: 0.01ms !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="stage os-window">
+  <div class="os-titlebar">
+    <div class="os-lights" aria-hidden="true"><span style="background:#FF3366"></span><span style="background:#FFB020"></span><span style="background:#CCFF00"></span></div>
+    <span class="os-path"><span class="os-path-dir">~/sarbesh-os/apps/</span><b>designers_eye</b><span class="os-path-ext">.exe</span></span>
+    <a class="os-pill" href="https://sarbeshlalamatya.com.np" target="_blank" rel="noopener">Sarbesh Lal Amatya</a>
+  </div>
+
+  <!-- ============ START VIEW ============ -->
+  <section class="view active" id="view-start">
+    <div class="card">
+      <div class="brand-row">
+        <div class="brand-mark">
+          <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#CCFF00" stroke-width="1.6" opacity="0.7"/><circle cx="12" cy="12" r="2.6" fill="#CCFF00"/></svg>
+        </div>
+        <span class="brand-name">Designer&rsquo;s Eye</span>
+      </div>
+
+      <div class="intro">
+        <div class="eyebrow"><span class="bar"></span>// Calibration test</div>
+        <h1 class="headline">Find the true center.</h1>
+        <p class="lede">Ten shapes, one dot each. Decide if it sits exactly at the geometric center &mdash; the offsets get smaller every round.</p>
+      </div>
+
+      <div class="mode-grid" role="radiogroup" aria-label="Game mode">
+        <button type="button" class="mode-opt selected" id="mode-standard" role="radio" aria-checked="true" tabindex="0">
+          <div class="mo-title"><span class="dot"></span>Standard</div>
+          <div class="mo-sub">Play all 10 rounds. Every correct call counts toward your score.</div>
+        </button>
+        <button type="button" class="mode-opt" id="mode-sudden" role="radio" aria-checked="false" tabindex="-1">
+          <div class="mo-title"><span class="dot"></span>Sudden Death</div>
+          <div class="mo-sub">One miss ends the run. Same shapes, higher stakes.</div>
+        </button>
+      </div>
+
+      <button type="button" class="btn btn-primary btn-full" id="btn-start">Start Test</button>
+    </div>
+  </section>
+
+  <!-- ============ GAME VIEW ============ -->
+  <section class="view" id="view-game">
+    <div class="card">
+      <div class="game-head">
+        <div class="top-row">
+          <div class="round-label">Round <span class="num" id="round-current">01</span> of <span class="num">10</span></div>
+          <div class="score-pill">Score&nbsp;<span class="num" id="score-live">0</span></div>
+        </div>
+        <div class="segments" id="segments"></div>
+      </div>
+
+      <p class="prompt">Is the dot dead center?</p>
+
+      <div class="canvas-wrap">
+        <div class="canvas-frame" id="canvas-frame">
+          <svg class="shape-svg" id="shape-svg" aria-hidden="true"></svg>
+        </div>
+      </div>
+
+      <div class="answer-group">
+        <div class="answers">
+          <button type="button" class="btn btn-answer btn-no" id="btn-no">No, off&#8209;center</button>
+          <button type="button" class="btn btn-answer btn-yes" id="btn-yes">Yes, centered</button>
+        </div>
+        <p class="kbd-hint"><kbd>N</kbd>&nbsp;off-center &nbsp;&middot;&nbsp; <kbd>Y</kbd>&nbsp;centered</p>
+      </div>
+
+      <div class="feedback-wrap" id="feedback-wrap">
+        <div class="feedback-inner">
+          <div class="toast" id="toast" role="status" aria-live="polite">
+            <span class="icon" id="toast-icon">&#10003;</span>
+            <span class="msg" id="toast-msg"></span>
+          </div>
+
+          <div class="continue-row">
+            <button type="button" class="btn btn-ghost" id="btn-continue">Continue</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ END VIEW ============ -->
+  <section class="view" id="view-end">
+    <div class="card">
+      <div class="end-hero">
+        <svg class="end-ring" id="end-ring" viewBox="0 0 44 44">
+          <circle class="ring" cx="22" cy="22" r="16"/>
+          <circle class="dot" cx="22" cy="22" r="3"/>
+        </svg>
+        <div>
+          <h2 class="rank-title" id="rank-title">Pixel Amateur</h2>
+          <p class="end-eliminated" id="end-eliminated" style="display:none;"></p>
+        </div>
+        <p class="rank-blurb" id="rank-blurb"></p>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat">
+          <div class="stat-num num" id="stat-score">0/10</div>
+          <div class="stat-label">Score</div>
+        </div>
+        <span class="stat-sep">&mdash;</span>
+        <div class="stat">
+          <div class="stat-num num" id="stat-perfect">0</div>
+          <div class="stat-label">Exact calls</div>
+        </div>
+        <span class="stat-sep">&mdash;</span>
+        <div class="stat">
+          <div class="stat-num num" id="stat-streak">0</div>
+          <div class="stat-label">Best streak</div>
+        </div>
+      </div>
+
+      <div class="end-actions">
+        <button type="button" class="btn btn-ghost" id="btn-retry">Try again</button>
+        <button type="button" class="btn btn-primary" id="btn-share">Share result</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var SVG_NS = "http://www.w3.org/2000/svg";
+
+  // The canvas is sized ONCE at load, and the svg's viewBox is set to that exact same
+  // number of units as its rendered CSS pixel size. That equality is what makes every
+  // "off by Xpx" claim in this game literally true on screen, on any device — there is
+  // no independent breakpoint that can silently rescale one without the other.
+  var CANVAS_SIZE = computeCanvasSize();
+  var CENTER = CANVAS_SIZE / 2;
+  var S = CANVAS_SIZE / 232; // scale factor for shape geometry below (authored at 232px)
+
+  function computeCanvasSize(){
+    var available = window.innerWidth - 32 /* body padding */ - 48 /* card padding */ - 24 /* frame inset */;
+    var size = Math.floor(Math.min(232, Math.max(180, available)));
+    return size;
+  }
+
+  /* ---------- geometry helpers ---------- */
+  function regularPolygon(cx, cy, r, sides, rotationDeg){
+    var pts = [];
+    var rot = (rotationDeg || 0) * Math.PI/180;
+    for (var i=0;i<sides;i++){
+      var a = rot + i * (2*Math.PI/sides);
+      pts.push([cx + r*Math.cos(a), cy + r*Math.sin(a)]);
+    }
+    return pts;
+  }
+  function starPolygon(cx, cy, outerR, innerR, points, rotationDeg){
+    var pts = [];
+    var rot = (rotationDeg || 0) * Math.PI/180;
+    var step = Math.PI/points;
+    for (var i=0;i<points*2;i++){
+      var r = (i%2===0) ? outerR : innerR;
+      var a = rot + i*step;
+      pts.push([cx + r*Math.cos(a), cy + r*Math.sin(a)]);
+    }
+    return pts;
+  }
+  function polygonCentroid(points){
+    var x=0,y=0,area=0;
+    for (var i=0;i<points.length;i++){
+      var p0 = points[i], p1 = points[(i+1)%points.length];
+      var cross = p0[0]*p1[1] - p1[0]*p0[1];
+      area += cross;
+      x += (p0[0]+p1[0])*cross;
+      y += (p0[1]+p1[1])*cross;
+    }
+    area *= 0.5;
+    if (Math.abs(area) < 1e-6) return [cx_avg(points), cy_avg(points)];
+    return [x/(6*area), y/(6*area)];
+  }
+  function cx_avg(pts){ return pts.reduce(function(s,p){return s+p[0];},0)/pts.length; }
+  function cy_avg(pts){ return pts.reduce(function(s,p){return s+p[1];},0)/pts.length; }
+
+  function ptsAttr(points){
+    return points.map(function(p){ return p[0].toFixed(2)+","+p[1].toFixed(2); }).join(" ");
+  }
+
+  /* ---------- shape library ----------
+     All shapes are built from CENTER (the true midpoint of the actual rendered canvas)
+     so they stay pixel-accurate regardless of CANVAS_SIZE. */
+  var SHAPES = {
+    square: function(){
+      var half = 75*S;
+      return { kind:'rect', x:CENTER-half, y:CENTER-half, w:half*2, h:half*2, rx:2, centroid:[CENTER,CENTER] };
+    },
+    circle: function(){
+      return { kind:'circle', cx:CENTER, cy:CENTER, r:76*S, centroid:[CENTER,CENTER] };
+    },
+    triangle: function(){
+      var pts = regularPolygon(CENTER, CENTER, 84*S, 3, -90);
+      return { kind:'polygon', points:pts, centroid: polygonCentroid(pts) };
+    },
+    hexagon: function(){
+      var pts = regularPolygon(CENTER, CENTER, 79*S, 6, 0);
+      return { kind:'polygon', points:pts, centroid: polygonCentroid(pts) };
+    },
+    star: function(){
+      var pts = starPolygon(CENTER, CENTER, 83*S, 35*S, 5, -90);
+      return { kind:'polygon', points:pts, centroid: polygonCentroid(pts) };
+    },
+    roundedRect: function(){
+      var w=158*S, h=90*S;
+      return { kind:'rect', x:CENTER-w/2, y:CENTER-h/2, w:w, h:h, rx:18*S, centroid:[CENTER,CENTER] };
+    },
+    pentagon: function(){
+      var pts = regularPolygon(CENTER, CENTER, 80*S, 5, -90);
+      return { kind:'polygon', points:pts, centroid: polygonCentroid(pts) };
+    },
+    diamond: function(){
+      var pts = regularPolygon(CENTER, CENTER, 80*S, 4, 45);
+      return { kind:'polygon', points:pts, centroid: polygonCentroid(pts) };
+    },
+    blob: function(){
+      // authored at 232px, offsets are relative to that canvas's own center (116,116)
+      var raw = [[116,28],[177,65],[196,135],[146,199],[83,191],[45,116],[65,71]];
+      var pts = raw.map(function(p){ return [CENTER + (p[0]-116)*S, CENTER + (p[1]-116)*S]; });
+      return { kind:'polygon', points:pts, centroid: polygonCentroid(pts) };
+    }
+  };
+
+  /* ---------- round config ---------- */
+  var ROUNDS = [
+    { shape:'square',      offset:10 },
+    { shape:'circle',      offset:0  },
+    { shape:'triangle',    offset:8  },
+    { shape:'hexagon',     offset:0  },
+    { shape:'star',        offset:6  },
+    { shape:'roundedRect', offset:4  },
+    { shape:'pentagon',    offset:0  },
+    { shape:'diamond',     offset:3  },
+    { shape:'blob',        offset:2  },
+    { shape:'circle',      offset:1  }
+  ];
+
+  var RANKS = [
+    { min:0, max:3,  title:"Pixel Amateur",        color:"coral",    blurb:"Center reads as a vibe right now, not a measurement. That's fine \u2014 that's what rounds 1\u201310 are for." },
+    { min:4, max:7,  title:"Intermediate Eye",     color:"amber",    blurb:"You catch the obvious drift every time. The 1\u20132px shifts are still slipping past." },
+    { min:8, max:9,  title:"Sharp Eye",            color:"teal",     blurb:"Client work is safe in your hands. One more pixel and you're flawless." },
+    { min:10,max:10, title:"Pixel Perfect Master", color:"lime",     blurb:"You align by instinct. Ship it." }
+  ];
+
+  /* ---------- state ---------- */
+  var state = {
+    mode: 'standard',
+    index: 0,
+    score: 0,
+    roundsPlayed: 0,
+    streak: 0,
+    bestStreak: 0,
+    exactCount: 0,
+    tightestCaught: null, // smallest offset correctly identified as off-center
+    eliminated: false,
+    answered: false,
+    current: null // {shapeDef, offsetMag, axis, sign, dotPos, trueCenter}
+  };
+
+  /* ---------- dom refs ---------- */
+  var $ = function(id){ return document.getElementById(id); };
+  var viewStart = $('view-start'), viewGame = $('view-game'), viewEnd = $('view-end');
+  var modeStandard = $('mode-standard'), modeSudden = $('mode-sudden');
+  var btnStart = $('btn-start');
+  var svg = $('shape-svg'), canvasFrame = $('canvas-frame');
+  var roundCurrent = $('round-current'), scoreLive = $('score-live'), segmentsWrap = $('segments');
+  var btnNo = $('btn-no'), btnYes = $('btn-yes');
+  var feedbackWrap = $('feedback-wrap');
+  var toast = $('toast'), toastIcon = $('toast-icon'), toastMsg = $('toast-msg');
+  var btnContinue = $('btn-continue');
+  var endEliminated = $('end-eliminated'), endRing = $('end-ring');
+  var rankTitle = $('rank-title'), rankBlurb = $('rank-blurb');
+  var statScore = $('stat-score'), statPerfect = $('stat-perfect'), statStreak = $('stat-streak');
+  var btnRetry = $('btn-retry'), btnShare = $('btn-share');
+
+  /* ---------- view switching ---------- */
+  function showView(v){
+    [viewStart, viewGame, viewEnd].forEach(function(el){ el.classList.remove('active'); });
+    v.classList.add('active');
+  }
+
+  /* ---------- mode selection ---------- */
+  function selectMode(mode){
+    state.mode = mode;
+    var isStd = mode === 'standard';
+    modeStandard.classList.toggle('selected', isStd);
+    modeSudden.classList.toggle('selected', !isStd);
+    modeStandard.setAttribute('aria-checked', isStd ? 'true':'false');
+    modeSudden.setAttribute('aria-checked', !isStd ? 'true':'false');
+    modeStandard.tabIndex = isStd ? 0 : -1;
+    modeSudden.tabIndex = !isStd ? 0 : -1;
+  }
+  modeStandard.addEventListener('click', function(){ selectMode('standard'); });
+  modeSudden.addEventListener('click', function(){ selectMode('sudden'); });
+
+  /* ---------- segments ---------- */
+  function buildSegments(){
+    segmentsWrap.innerHTML = '';
+    for (var i=0;i<ROUNDS.length;i++){
+      var seg = document.createElement('div');
+      seg.className = 'seg';
+      seg.innerHTML = '<div class="fill"></div>';
+      segmentsWrap.appendChild(seg);
+    }
+  }
+  function updateSegments(){
+    var segs = segmentsWrap.children;
+    for (var i=0;i<segs.length;i++){
+      segs[i].classList.remove('done','current');
+      if (i < state.index) segs[i].classList.add('done');
+      else if (i === state.index) segs[i].classList.add('current');
+    }
+  }
+
+  /* ---------- game start ---------- */
+  btnStart.addEventListener('click', function(){
+    state = {
+      mode: state.mode, index:0, score:0, roundsPlayed:0, streak:0, bestStreak:0,
+      exactCount:0, tightestCaught:null, eliminated:false, answered:false, current:null
+    };
+    buildSegments();
+    showView(viewGame);
+    loadRound(0);
+  });
+
+  /* ---------- round loading ---------- */
+  function loadRound(i){
+    state.index = i;
+    state.answered = false;
+    roundCurrent.textContent = String(i+1).padStart(2,'0');
+    scoreLive.textContent = state.score;
+    updateSegments();
+
+    feedbackWrap.classList.remove('show');
+    toast.classList.remove('correct','wrong');
+    canvasFrame.classList.remove('flash-correct','flash-wrong');
+    btnNo.disabled = false; btnYes.disabled = false;
+
+    var cfg = ROUNDS[i];
+    var shapeDef = SHAPES[cfg.shape]();
+    var trueCenter = shapeDef.centroid;
+    var axis = Math.random() < 0.5 ? 'x' : 'y';
+    var sign = Math.random() < 0.5 ? 1 : -1;
+    var mag = cfg.offset;
+    var dot = [trueCenter[0], trueCenter[1]];
+    if (mag > 0){
+      if (axis === 'x') dot[0] += sign*mag; else dot[1] += sign*mag;
+    }
+
+    state.current = { shapeDef:shapeDef, offsetMag:mag, axis:axis, sign:sign, dotPos:dot, trueCenter:trueCenter };
+    renderShape();
+  }
+
+  function renderShape(){
+    svg.innerHTML = '';
+    svg.classList.remove('reveal-correct','reveal-wrong');
+    var c = state.current;
+    var body;
+
+    if (c.shapeDef.kind === 'circle'){
+      body = document.createElementNS(SVG_NS,'circle');
+      body.setAttribute('cx', c.shapeDef.cx);
+      body.setAttribute('cy', c.shapeDef.cy);
+      body.setAttribute('r', c.shapeDef.r);
+    } else if (c.shapeDef.kind === 'rect'){
+      body = document.createElementNS(SVG_NS,'rect');
+      body.setAttribute('x', c.shapeDef.x);
+      body.setAttribute('y', c.shapeDef.y);
+      body.setAttribute('width', c.shapeDef.w);
+      body.setAttribute('height', c.shapeDef.h);
+      body.setAttribute('rx', c.shapeDef.rx);
+    } else {
+      body = document.createElementNS(SVG_NS,'polygon');
+      body.setAttribute('points', ptsAttr(c.shapeDef.points));
+      body.setAttribute('stroke-linejoin','round');
+    }
+    body.setAttribute('class','shape-body');
+    svg.appendChild(body);
+
+    // guide lines (hidden until answer) — span the full canvas with a small inset margin
+    var margin = 6*S;
+    var gx = document.createElementNS(SVG_NS,'line');
+    gx.setAttribute('x1', margin); gx.setAttribute('x2', CANVAS_SIZE-margin);
+    gx.setAttribute('y1', c.trueCenter[1]); gx.setAttribute('y2', c.trueCenter[1]);
+    gx.setAttribute('class','guide-line'); gx.id='guide-x';
+    var gy = document.createElementNS(SVG_NS,'line');
+    gy.setAttribute('y1', margin); gy.setAttribute('y2', CANVAS_SIZE-margin);
+    gy.setAttribute('x1', c.trueCenter[0]); gy.setAttribute('x2', c.trueCenter[0]);
+    gy.setAttribute('class','guide-line'); gy.id='guide-y';
+    svg.appendChild(gx); svg.appendChild(gy);
+
+    // link line between dot and true center (only meaningful if offset)
+    var link = document.createElementNS(SVG_NS,'line');
+    link.setAttribute('x1', c.dotPos[0]); link.setAttribute('y1', c.dotPos[1]);
+    link.setAttribute('x2', c.trueCenter[0]); link.setAttribute('y2', c.trueCenter[1]);
+    link.setAttribute('class','link-line'); link.id='link-line';
+    svg.appendChild(link);
+
+    // true center marker (small ring)
+    var trueMark = document.createElementNS(SVG_NS,'circle');
+    trueMark.setAttribute('cx', c.trueCenter[0]); trueMark.setAttribute('cy', c.trueCenter[1]);
+    trueMark.setAttribute('r', 5*S);
+    trueMark.setAttribute('class','true-marker'); trueMark.id='true-marker';
+    svg.appendChild(trueMark);
+
+    // the dot itself
+    var dot = document.createElementNS(SVG_NS,'circle');
+    dot.setAttribute('cx', c.dotPos[0]); dot.setAttribute('cy', c.dotPos[1]);
+    dot.setAttribute('r', 6.5*S);
+    dot.setAttribute('class','dot-marker'); dot.id='dot-marker';
+    svg.appendChild(dot);
+
+    svg.classList.remove('shape-enter');
+    void svg.offsetWidth; // restart animation
+    svg.classList.add('shape-enter');
+  }
+
+  /* ---------- answering ---------- */
+  function handleAnswer(userSaysYes){
+    if (state.answered) return;
+    state.answered = true;
+    btnNo.disabled = true; btnYes.disabled = true;
+
+    var c = state.current;
+    var isCentered = c.offsetMag === 0;
+    var correct = (userSaysYes === isCentered);
+
+    state.roundsPlayed++;
+    if (correct){
+      state.score++;
+      state.streak++;
+      state.bestStreak = Math.max(state.bestStreak, state.streak);
+      if (isCentered) state.exactCount++;
+      else if (state.tightestCaught === null || c.offsetMag < state.tightestCaught) state.tightestCaught = c.offsetMag;
+    } else {
+      state.streak = 0;
+      if (state.mode === 'sudden') state.eliminated = true;
+    }
+    scoreLive.textContent = state.score;
+
+    // visuals
+    var cls = correct ? 'correct' : 'wrong';
+    canvasFrame.classList.add(correct ? 'flash-correct' : 'flash-wrong');
+    svg.classList.add('reveal-'+cls);
+
+    ['guide-x','guide-y','link-line','true-marker'].forEach(function(id){
+      var el = document.getElementById(id);
+      if (!el) return;
+      el.classList.remove('correct','wrong');
+      el.classList.add(cls);
+      el.classList.add('show');
+    });
+    var dotEl = document.getElementById('dot-marker');
+    dotEl.classList.add(cls);
+    // hide the redundant true-center ring when the dot IS the true center
+    if (c.offsetMag === 0){
+      document.getElementById('true-marker').classList.remove('show');
+      document.getElementById('link-line').classList.remove('show');
+    }
+
+    // toast
+    toast.classList.remove('correct','wrong');
+    toast.classList.add(cls);
+    toastIcon.textContent = correct ? '\u2713' : '\u2717';
+    var offsetMsg = isCentered
+      ? 'Exact 0px deviation \u2014 the dot is dead center.'
+      : ('Off by <strong>'+c.offsetMag+'px</strong> on the '+c.axis.toUpperCase()+'-axis.');
+    toastMsg.innerHTML = (correct ? 'Correct. ' : 'Missed it. ') + offsetMsg;
+
+    // continue control — the feedback-wrap grows open to reveal both at once
+    btnContinue.textContent = (state.mode==='sudden' && !correct) ? 'See results' : (state.index === ROUNDS.length-1 ? 'See results' : 'Continue');
+    feedbackWrap.classList.add('show');
+
+    var delay = 1900;
+    var timer = setTimeout(advance, delay);
+    btnContinue.onclick = function(){ clearTimeout(timer); advance(); };
+  }
+
+  btnNo.addEventListener('click', function(){ handleAnswer(false); });
+  btnYes.addEventListener('click', function(){ handleAnswer(true); });
+
+  document.addEventListener('keydown', function(e){
+    if (!viewGame.classList.contains('active') || state.answered) return;
+    var k = e.key.toLowerCase();
+    if (k === 'n') handleAnswer(false);
+    if (k === 'y') handleAnswer(true);
+  });
+
+  function advance(){
+    if (state.mode === 'sudden' && state.eliminated){
+      endGame();
+      return;
+    }
+    if (state.index >= ROUNDS.length-1){
+      endGame();
+      return;
+    }
+    loadRound(state.index+1);
+  }
+
+  /* ---------- end game ---------- */
+  function getRank(score){
+    for (var i=0;i<RANKS.length;i++){
+      if (score >= RANKS[i].min && score <= RANKS[i].max) return RANKS[i];
+    }
+    return RANKS[0];
+  }
+
+  var RANK_COLORS = {
+    coral:  { fg:'#FF3366' },
+    amber:  { fg:'#FFB020' },
+    teal:   { fg:'#00E5FF' },
+    lime:   { fg:'#CCFF00' }
+  };
+
+  function endGame(){
+    showView(viewEnd);
+
+    if (state.mode === 'sudden' && state.eliminated){
+      endEliminated.style.display = 'block';
+      endEliminated.textContent = 'Eliminated at round '+ (state.roundsPlayed) +' of 10';
+    } else {
+      endEliminated.style.display = 'none';
+    }
+
+    var rank = getRank(state.score);
+    var rc = RANK_COLORS[rank.color] || RANK_COLORS.lime;
+
+    rankTitle.textContent = rank.title;
+    rankTitle.style.color = rc.fg;
+    endRing.querySelector('.ring').style.stroke = rc.fg;
+    endRing.querySelector('.dot').style.fill = rc.fg;
+
+    var blurb = rank.blurb;
+    if (state.tightestCaught !== null){
+      blurb += ' Tightest correct catch: '+state.tightestCaught+'px.';
+    }
+    rankBlurb.textContent = blurb;
+
+    statScore.textContent = state.score + '/10';
+    statPerfect.textContent = state.exactCount;
+    statStreak.textContent = state.bestStreak;
+  }
+
+  btnRetry.addEventListener('click', function(){
+    showView(viewStart);
+  });
+
+  btnShare.addEventListener('click', function(){
+    var text = 'I scored '+state.score+'/10 on Designer\u2019s Eye \u2014 can you spot true center better than me? avark.agency/designers-eye';
+
+    // Web Share API can throw synchronously (not just reject) when a permissions
+    // policy blocks it inside an embedded page, so it's wrapped in try/catch rather
+    // than relying on .catch() alone catching everything.
+    if (navigator.share){
+      try{
+        navigator.share({ text: text }).catch(function(){ copyFallback(text); });
+        return;
+      } catch(e){ /* fall through to clipboard */ }
+    }
+    copyFallback(text);
+  });
+
+  function copyFallback(text){
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(function(){
+        flashShareFeedback('Copied!');
+      }).catch(function(){ legacyCopyFallback(text); });
+    } else {
+      legacyCopyFallback(text);
+    }
+  }
+
+  function legacyCopyFallback(text){
+    // Guaranteed-to-work fallback: a temporary offscreen textarea + execCommand,
+    // and if even that's blocked, hand the text to the user directly so the
+    // button never fails with zero visible result.
+    try {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed';
+      ta.style.top = '-1000px';
+      document.body.appendChild(ta);
+      ta.select();
+      var ok = document.execCommand('copy');
+      document.body.removeChild(ta);
+      if (ok){ flashShareFeedback('Copied!'); return; }
+    } catch(e){ /* fall through */ }
+    window.prompt('Copy your result:', text);
+  }
+
+  function flashShareFeedback(label){
+    var prevText = btnShare.textContent;
+    btnShare.textContent = label;
+    btnShare.disabled = true;
+    setTimeout(function(){ btnShare.textContent = prevText; btnShare.disabled = false; }, 1600);
+  }
+
+  /* ---------- init ---------- */
+  function initCanvas(){
+    svg.setAttribute('viewBox', '0 0 '+CANVAS_SIZE+' '+CANVAS_SIZE);
+    svg.setAttribute('width', CANVAS_SIZE);
+    svg.setAttribute('height', CANVAS_SIZE);
+    svg.style.width = CANVAS_SIZE+'px';
+    svg.style.height = CANVAS_SIZE+'px';
+  }
+  initCanvas();
+  buildSegments();
+
+  /* ---------- mode radiogroup keyboard support (arrow-key roving, per WAI-ARIA radiogroup pattern) ---------- */
+  var modeButtons = [modeStandard, modeSudden];
+  function focusMode(idx){
+    var btn = modeButtons[idx];
+    modeButtons.forEach(function(b,i){ b.tabIndex = (i===idx) ? 0 : -1; });
+    btn.focus();
+  }
+  document.querySelector('[role="radiogroup"]').addEventListener('keydown', function(e){
+    var idx = modeButtons.indexOf(document.activeElement);
+    if (idx === -1) return;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown'){
+      e.preventDefault();
+      var next = (idx+1) % modeButtons.length;
+      selectMode(next === 0 ? 'standard' : 'sudden');
+      focusMode(next);
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp'){
+      e.preventDefault();
+      var prev = (idx-1+modeButtons.length) % modeButtons.length;
+      selectMode(prev === 0 ? 'standard' : 'sudden');
+      focusMode(prev);
+    }
+  });
+})();
+</script>
+</body>
+</html>

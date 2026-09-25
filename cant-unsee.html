@@ -1,0 +1,2838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Can't Unsee · Sarbesh-OS</title>
+<meta name="description" content="A 100-stage UI-auditing game: spot the flawed design across Easy, Medium and Hard tiers, each unlocked at 80%.">
+<meta name="author" content="Sarbesh Lal Amatya">
+<meta name="theme-color" content="#0B0C10">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230B0C10'/%3E%3Crect x='6' y='9' width='8' height='14' rx='2' fill='none' stroke='%23CCFF00' stroke-width='2'/%3E%3Crect x='18' y='9' width='8' height='14' rx='2' fill='none' stroke='%23FF3366' stroke-width='2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=DM+Sans:opsz,wght@9..40,200..800&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+<!-- lucide-react's UMD build looks for a lowercase `react` global -->
+<script>window.react = window.React;</script>
+<script src="https://cdn.jsdelivr.net/npm/lucide-react@0.263.1/dist/umd/lucide-react.min.js"></script>
+<style>
+  :root {
+    color-scheme: dark;
+    --ground: #0B0C10;
+    --panel: #111319;
+    --panel-2: #171A22;
+    --line: rgba(255,255,255,0.10);
+    --ink: #E8EAF0;
+    --ink-dim: #8B90A0;
+    --lime: #CCFF00;
+    --coral: #FF3366;
+    --cyan: #00E5FF;
+    --purple: #A020F0;
+  }
+  html, body { height: 100%; }
+  [hidden] { display: none !important; }
+  *, *::before, *::after { box-sizing: border-box; }
+  body {
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
+    background-color: var(--ground);
+    background-image:
+      radial-gradient(rgba(255,255,255,0.07) 1px, transparent 1.2px),
+      linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 18px 18px, 90px 90px, 90px 90px;
+    background-attachment: fixed;
+    color: var(--ink);
+    font-family: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+    padding-inline: max(16px, env(safe-area-inset-left, 0px));
+    padding-block: max(clamp(10px, 2vh, 28px), env(safe-area-inset-top, 0px)) max(clamp(10px, 2vh, 28px), env(safe-area-inset-bottom, 0px));
+  }
+  .f-display { font-family: "Chakra Petch", "DM Sans", ui-sans-serif, sans-serif; }
+  .f-mono { font-family: "JetBrains Mono", ui-monospace, "Cascadia Mono", monospace; font-variant-numeric: tabular-nums; }
+  .os-window {
+    border: 1px solid var(--line);
+    box-shadow: 0 25px 60px rgba(0,0,0,0.85), 0 0 0 1px rgba(0,0,0,0.6);
+    background: linear-gradient(180deg, #12141B 0%, #0E1015 100%);
+  }
+  /* Card width fits two phones side by side in the viewport width AND keeps them short enough
+     that the whole window (header, cards, feedback, buttons, footer) fits one screen with no scroll.
+     --chrome is everything in the window that isn't the phone cards, measured in the answered state. */
+  .stage {
+    --gap: clamp(14px, 4vw, 40px);
+    --chrome: 548px;
+    --cw: min(250px, calc((100vw - 84px - var(--gap)) / 2), max(150px, calc((100dvh - var(--chrome)) * 0.577)));
+    width: calc(var(--cw) * 2 + var(--gap));
+    max-width: 100%;
+  }
+  /* Feedback slot is reserved up front so answering doesn't push the page taller. */
+  .cu-feedback { min-height: 124px; display: flex; flex-direction: column; justify-content: center; }
+  /* End-of-tier "missed" list shrinks with the screen instead of pushing the page taller. */
+  .cu-missed { max-height: max(120px, calc(100dvh - 560px)); }
+
+  /* Phones: keep title bar, tier chips and footer on one line each so the game fits one screen. */
+  /* (Selectors are doubled so they outrank Tailwind's CDN utilities, which load after this sheet.) */
+  @media (max-width: 640px) {
+    .cu-titlebar.cu-titlebar { flex-wrap: nowrap; gap: 10px; }
+    .cu-titlebar > * { flex-shrink: 0; }
+    .cu-titlebar > .cu-path.cu-path { flex: 1 1 auto; flex-shrink: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .cu-dir.cu-dir { display: none; }
+    .cu-head.cu-head { padding-top: 14px; gap: 10px; }
+    .cu-head h1.f-display { font-size: 28px; }
+    .cu-head .f-mono > span { padding-block: 6px; }
+    .cu-tiers.cu-tiers { flex-wrap: nowrap; gap: 6px; }
+    .cu-tiers.cu-tiers > button { padding: 5px 8px; letter-spacing: .04em; white-space: nowrap; }
+    .cu-play .cu-feedback .text-\[13\.5px\] { font-size: 13px; line-height: 1.5; }
+    .cu-footer.cu-footer { padding-block: 8px; }
+    .cu-foot.cu-foot { flex-wrap: nowrap; }
+    .cu-foot.cu-foot > div { min-width: 60px; }
+    .cu-stage.cu-stage { display: none; }
+    .cu-missed { max-height: max(90px, calc(100dvh - 730px)); }
+    /* cards may shrink with height too on phones, and play-area gaps tighten */
+    .stage { --chrome: 620px; --cw: min(250px, calc((100vw - 84px - var(--gap)) / 2), max(118px, calc((100dvh - var(--chrome)) * 0.577))); }
+    .cu-play > .mt-4 { margin-top: 10px; }
+    .cu-play .cu-feedback > div { padding: 10px 12px; }
+    .cu-end .text-\[64px\] { font-size: 46px; }
+    .cu-end .mt-6 { margin-top: 12px; }
+    .cu-end .mt-7 { margin-top: 14px; }
+  }
+
+  /* Short laptop screens: stacking cards + feedback + buttons can't fit, so feedback and
+     actions move into a column beside the cards and the cards get the full remaining height. */
+  @media (min-width: 900px) and (max-height: 860px) {
+    .stage { --chrome: 372px; }
+    .cu-play {
+      display: grid; justify-content: center; align-items: center; column-gap: 36px;
+      grid-template-columns: auto minmax(260px, 400px); grid-template-rows: auto 1fr auto;
+    }
+    .cu-play > p { grid-column: 1 / -1; }
+    .cu-play > .stage { grid-column: 1; grid-row: 2 / 4; margin-inline: 0; }
+    .cu-play > .cu-feedback { grid-column: 2; grid-row: 2; align-self: end; min-height: 0; margin-top: 16px; }
+    .cu-play > .cu-actions { grid-column: 2; grid-row: 3; align-self: start; justify-content: flex-start; }
+  }
+
+  @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  @keyframes pop { 0% { transform: scale(.4); opacity: 0; } 60% { transform: scale(1.12); opacity: 1; } 100% { transform: scale(1); } }
+  @keyframes glowPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(204,255,0,.55); } 50% { box-shadow: 0 0 0 8px rgba(204,255,0,0); } }
+  @keyframes shake { 0%,100% { transform: translateX(0); } 20% { transform: translateX(-6px); } 40% { transform: translateX(6px); } 60% { transform: translateX(-4px); } 80% { transform: translateX(3px); } }
+  @keyframes scan { from { transform: translateY(-100%); } to { transform: translateY(100%); } }
+  .anim-rise { animation: rise .45s cubic-bezier(.2,.8,.2,1) both; }
+  .anim-pop { animation: pop .45s cubic-bezier(.2,.8,.2,1) both; }
+  .anim-glow { animation: glowPulse 1.6s ease-out infinite; }
+  .anim-shake { animation: shake .42s ease both; }
+  .scanline::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(180deg, transparent 0%, rgba(0,229,255,.10) 48%, rgba(0,229,255,.22) 50%, transparent 52%);
+    will-change: transform;
+  }
+
+  /* Hold-to-compare: both layers stay mounted and rasterised on their own GPU layers,
+     so switching is a compositor-only opacity flip — no layout, no repaint. */
+  .stage-cards, .stage-overlay { will-change: opacity; }
+  .stage-overlay { opacity: 0; pointer-events: none; }
+  [data-compare="on"] .stage-overlay { opacity: 1; }
+  [data-compare="on"] .stage-cards { opacity: 0; pointer-events: none; }
+  [data-compare="on"] .scanline::after { animation: scan 2.4s linear infinite; }
+
+  .cmp-btn { border-color: rgba(0,229,255,.5); color: var(--cyan); background: transparent; touch-action: none; -webkit-touch-callout: none; }
+  .cmp-btn:hover { background: rgba(0,229,255,.1); }
+  /* both labels share one grid cell, so the button keeps its width when the text swaps */
+  .cmp-label { display: inline-grid; }
+  .cmp-label > span { grid-area: 1 / 1; }
+  .cmp-btn .cmp-on { visibility: hidden; }
+  [data-compare="on"] .cmp-btn { border-color: var(--cyan); background: var(--cyan); color: var(--ground); box-shadow: 0 0 24px rgba(0,229,255,.45); }
+  [data-compare="on"] .cmp-btn .cmp-on { visibility: visible; }
+  [data-compare="on"] .cmp-btn .cmp-off { visibility: hidden; }
+
+  .choice:focus-visible { outline: 2px solid var(--cyan); outline-offset: 4px; }
+  button:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
+  .thin-scroll { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.15) transparent; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
+  }
+</style>
+<style>
+  .boot { min-height: 60vh; display: grid; place-items: center; font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 13px; color: #8B90A0; letter-spacing: .04em; }
+  .boot b { color: #CCFF00; font-weight: 500; }
+</style>
+</head>
+<body>
+<div id="root"><div class="boot"><span>Booting <b>cant_unsee.exe</b>…</span></div></div>
+<script>
+const {
+  useState,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useCallback,
+  useMemo
+} = React;
+
+/* ---------- Icons (lucide-react, with a tiny fallback if the CDN is slow) ---------- */
+const Fallback = ({
+  size = 16,
+  className = ""
+}) => /*#__PURE__*/React.createElement("svg", {
+  width: size,
+  height: size,
+  viewBox: "0 0 24 24",
+  className: className,
+  fill: "none",
+  stroke: "currentColor",
+  strokeWidth: "2"
+}, /*#__PURE__*/React.createElement("rect", {
+  x: "5",
+  y: "5",
+  width: "14",
+  height: "14",
+  rx: "3"
+}));
+const L = window.LucideReact || {};
+const icon = n => L[n] || Fallback;
+const Icon = ({
+  n,
+  ...p
+}) => {
+  const C = icon(n);
+  return /*#__PURE__*/React.createElement(C, p);
+};
+const Check = icon("Check"),
+  X = icon("X"),
+  Layers = icon("Layers"),
+  ArrowRight = icon("ArrowRight"),
+  RotateCcw = icon("RotateCcw"),
+  Flame = icon("Flame"),
+  Trophy = icon("Trophy"),
+  Wifi = icon("Wifi"),
+  Signal = icon("Signal"),
+  BatteryFull = icon("BatteryFull"),
+  Lock = icon("Lock"),
+  Unlock = icon("Unlock"),
+  Flashlight = icon("Flashlight"),
+  Camera = icon("Camera"),
+  Send = icon("Send"),
+  ChevronLeft = icon("ChevronLeft"),
+  ChevronRight = icon("ChevronRight"),
+  Keyboard = icon("Keyboard"),
+  Heart = icon("Heart"),
+  Star = icon("Star"),
+  Target = icon("Target");
+
+/* ---------- Helpers ---------- */
+const shuffle = a => {
+  const r = a.slice();
+  for (let i = r.length - 1; i > 0; i--) {
+    const j = Math.random() * (i + 1) | 0;
+    [r[i], r[j]] = [r[j], r[i]];
+  }
+  return r;
+};
+const val = (x, ...args) => typeof x === "function" ? x(...args) : x;
+// A mockup reads a bug parameter through b(kind, default): the "good" card gets no bug, so every b() returns its default.
+const B = bug => (k, dflt) => bug && bug.k === k ? bug.v : dflt;
+function lum(hex) {
+  const c = hex.replace("#", "");
+  const ch = [0, 2, 4].map(i => parseInt(c.slice(i, i + 2), 16) / 255).map(x => x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4);
+  return 0.2126 * ch[0] + 0.7152 * ch[1] + 0.0722 * ch[2];
+}
+const contrast = (a, b = "#FFFFFF") => {
+  const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p);
+  return ((x + 0.05) / (y + 0.05)).toFixed(1);
+};
+function to24(t) {
+  const [hm, ap] = t.split(" ");
+  let [h, m] = hm.split(":").map(Number);
+  if (ap === "PM" && h < 12) h += 12;
+  if (ap === "AM" && h === 12) h = 0;
+  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+}
+const discount = d => Math.round((1 - d.price / d.old) * 100);
+const pctOf = d => Math.round(d.done / d.total * 100);
+
+/* ---------- Crisp scaling frame: mockups are authored at 300×520 and scaled with transform ---------- */
+const MW = 300,
+  MH = 520;
+function Scaled({
+  children
+}) {
+  const ref = useRef(null);
+  const [s, setS] = useState(1);
+  useLayoutEffect(() => {
+    setS(ref.current.getBoundingClientRect().width / MW || 1); // measure before first paint, no 300px flash
+    const ro = new ResizeObserver(([e]) => {
+      if (e.contentRect.width) setS(e.contentRect.width / MW);
+    });
+    ro.observe(ref.current);
+    return () => ro.disconnect();
+  }, []);
+  return /*#__PURE__*/React.createElement("div", {
+    ref: ref,
+    className: "relative w-full",
+    style: {
+      aspectRatio: `${MW} / ${MH}`,
+      maxWidth: "100%"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "absolute left-0 top-0",
+    style: {
+      width: MW,
+      height: MH,
+      transform: `scale(${s})`,
+      transformOrigin: "top left"
+    }
+  }, children));
+}
+
+/* ---------- Shared phone chrome ---------- */
+function StatusBar({
+  light = false
+}) {
+  const c = light ? "text-white" : "text-[#111827]";
+  return /*#__PURE__*/React.createElement("div", {
+    className: `relative flex items-center justify-between px-6 pt-3 pb-1 text-[13px] font-semibold ${c}`
+  }, /*#__PURE__*/React.createElement("span", null, "9:41"), /*#__PURE__*/React.createElement("span", {
+    className: "flex items-center gap-1"
+  }, /*#__PURE__*/React.createElement(Signal, {
+    size: 13
+  }), /*#__PURE__*/React.createElement(Wifi, {
+    size: 13
+  }), /*#__PURE__*/React.createElement(BatteryFull, {
+    size: 16
+  })));
+}
+function Phone({
+  bg = "#FFFFFF",
+  light = false,
+  under = null,
+  children
+}) {
+  return /*#__PURE__*/React.createElement("div", {
+    className: "relative w-full h-full overflow-hidden rounded-[34px] border border-white/10",
+    style: {
+      background: bg,
+      fontFamily: '"DM Sans", system-ui, sans-serif'
+    }
+  }, under, /*#__PURE__*/React.createElement("div", {
+    className: "absolute left-1/2 top-2 h-[22px] w-[86px] -translate-x-1/2 rounded-full bg-black z-10"
+  }), /*#__PURE__*/React.createElement(StatusBar, {
+    light: light
+  }), children, /*#__PURE__*/React.createElement("div", {
+    className: `absolute bottom-2 left-1/2 h-[4px] w-[110px] -translate-x-1/2 rounded-full ${light ? "bg-white/80" : "bg-black/80"}`
+  }));
+}
+
+/* =====================================================================================
+   SCREEN TEMPLATES — each takes content `d` (one of its variants) and an optional `bug`.
+   ===================================================================================== */
+
+function LockT({
+  d,
+  bug
+}) {
+  const b = B(bug);
+  const qa = b("qa", 44);
+  return /*#__PURE__*/React.createElement(Phone, {
+    light: true,
+    bg: d.bg
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex flex-col items-center text-white pt-6"
+  }, /*#__PURE__*/React.createElement(Lock, {
+    size: 16,
+    className: "opacity-80"
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "mt-3 text-[15px] font-medium",
+    style: {
+      opacity: b("dateDim", 0.8),
+      textTransform: b("dateCase", "none")
+    }
+  }, d.date), /*#__PURE__*/React.createElement("div", {
+    className: "leading-none mt-1 text-[88px]",
+    style: {
+      fontWeight: b("weight", 200),
+      letterSpacing: b("track", "-0.03em"),
+      fontVariantNumeric: "tabular-nums"
+    }
+  }, b("time", d.time))), /*#__PURE__*/React.createElement("div", {
+    className: "mt-10 rounded-[18px] bg-white/15 p-3 text-white",
+    style: {
+      marginLeft: b("inset", 16),
+      marginRight: 16
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center gap-2 text-[11px] uppercase tracking-wide opacity-70"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "grid h-5 w-5 place-items-center rounded-md",
+    style: {
+      background: d.appColor
+    }
+  }, /*#__PURE__*/React.createElement(Icon, {
+    n: d.icon,
+    size: 11
+  })), d.app, " ", /*#__PURE__*/React.createElement("span", {
+    className: "ml-auto normal-case tracking-normal"
+  }, "now")), /*#__PURE__*/React.createElement("div", {
+    className: "mt-1.5 text-[14px] font-semibold"
+  }, d.sender), /*#__PURE__*/React.createElement("div", {
+    className: "text-[13px]",
+    style: {
+      opacity: 0.85
+    }
+  }, d.msg)), /*#__PURE__*/React.createElement("div", {
+    className: "absolute bottom-10 left-0 right-0 flex items-center justify-between px-10 text-white"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "grid place-items-center rounded-full bg-white/15",
+    style: {
+      width: qa,
+      height: qa
+    }
+  }, /*#__PURE__*/React.createElement(Flashlight, {
+    size: 18
+  })), /*#__PURE__*/React.createElement("span", {
+    className: "grid place-items-center rounded-full bg-white/15",
+    style: {
+      width: 44,
+      height: 44
+    }
+  }, /*#__PURE__*/React.createElement(Camera, {
+    size: 18
+  }))));
+}
+function Field({
+  text,
+  color,
+  style
+}) {
+  return /*#__PURE__*/React.createElement("div", {
+    className: "flex h-11 w-full items-center border border-[#E5E7EB] bg-white px-3.5 text-[14px]",
+    style: {
+      color,
+      borderRadius: 12,
+      ...style
+    }
+  }, text);
+}
+function LoginT({
+  d,
+  bug
+}) {
+  const b = B(bug);
+  const ph = b("ph", "#6B7280");
+  const inset = b("btnInset", 0);
+  return /*#__PURE__*/React.createElement(Phone, {
+    bg: "#FFFFFF"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "px-6 pt-9 text-[#111827]"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "grid h-10 w-10 place-items-center rounded-xl text-white",
+    style: {
+      background: d.accent
+    }
+  }, /*#__PURE__*/React.createElement(Icon, {
+    n: d.logo,
+    size: 18
+  })), /*#__PURE__*/React.createElement("h3", {
+    className: "mt-6 text-[26px] font-bold leading-tight tracking-tight"
+  }, d.title), /*#__PURE__*/React.createElement("p", {
+    className: "mt-1 text-[14px] text-[#4B5563]"
+  }, d.sub), /*#__PURE__*/React.createElement("div", {
+    className: "mt-7 text-[13px] font-semibold"
+  }, "Email"), /*#__PURE__*/React.createElement(Field, {
+    text: d.emailPh,
+    color: ph,
+    style: {
+      marginTop: 6
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "mt-4 text-[13px] font-semibold"
+  }, "Password"), /*#__PURE__*/React.createElement(Field, {
+    text: "Enter your password",
+    color: ph,
+    style: {
+      marginTop: b("gap", 6),
+      borderRadius: b("radius", 12),
+      height: b("h2", 44)
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "mt-3 text-right text-[13px] font-semibold",
+    style: {
+      color: d.accent
+    }
+  }, "Forgot password?"), /*#__PURE__*/React.createElement("div", {
+    className: "mt-6 grid h-12 place-items-center rounded-xl text-[15px] font-semibold text-white",
+    style: {
+      background: d.accent,
+      marginLeft: inset,
+      marginRight: inset
+    }
+  }, d.cta)));
+}
+function SendT({
+  d,
+  bug
+}) {
+  const b = B(bug);
+  const c = b("center", null);
+  const off = c && c.pl != null;
+  const cancel = /*#__PURE__*/React.createElement("div", {
+    key: "c",
+    className: "grid flex-1 place-items-center border border-[#CBD5E1] bg-white text-[15px] font-semibold",
+    style: {
+      height: 48,
+      borderRadius: 12
+    }
+  }, "Cancel");
+  const send = /*#__PURE__*/React.createElement("div", {
+    key: "s",
+    className: "flex flex-1 items-center text-[15px] font-semibold text-white",
+    style: {
+      height: b("height", 48),
+      borderRadius: b("radius", 12),
+      background: d.accent,
+      justifyContent: off ? "flex-start" : "center",
+      paddingLeft: off ? c.pl : 0,
+      gap: off ? 5 : 8
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      display: "inline-flex",
+      transform: `translateY(${c ? c.y : 0}px)`
+    }
+  }, /*#__PURE__*/React.createElement(Send, {
+    size: 16
+  })), "Send");
+  return /*#__PURE__*/React.createElement(Phone, {
+    bg: "#F6F7F9"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "px-5 pt-4 text-[#0F172A]"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center gap-2 text-[15px] font-semibold"
+  }, /*#__PURE__*/React.createElement(ChevronLeft, {
+    size: 20
+  }), "Send money"), /*#__PURE__*/React.createElement("div", {
+    className: "mt-6 rounded-2xl border border-[#EEF0F3] bg-white p-4"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center gap-3"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "grid h-11 w-11 place-items-center rounded-full font-bold",
+    style: {
+      background: d.avBg,
+      color: d.avFg
+    }
+  }, d.init), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "text-[15px] font-semibold"
+  }, d.name), /*#__PURE__*/React.createElement("div", {
+    className: "text-[12px] text-[#64748B]"
+  }, d.via)))), /*#__PURE__*/React.createElement("div", {
+    className: "mt-8 text-center text-[12px] font-medium uppercase tracking-wider text-[#64748B]"
+  }, "Amount"), /*#__PURE__*/React.createElement("div", {
+    className: "text-center text-[44px] font-bold tracking-tight",
+    style: {
+      fontVariantNumeric: "tabular-nums"
+    }
+  }, b("amount", d.amt)), /*#__PURE__*/React.createElement("div", {
+    className: "mx-auto mt-2 w-fit rounded-full bg-[#E2E8F0] px-3 py-1 text-[12px] text-[#334155]"
+  }, d.note), /*#__PURE__*/React.createElement("div", {
+    className: "absolute bottom-10 left-5 right-5 flex items-center gap-3"
+  }, b("order", false) ? [send, cancel] : [cancel, send])));
+}
+function ActivityT({
+  d,
+  bug
+}) {
+  const b = B(bug);
+  const av = b("avatar", null),
+    tm = b("time", null);
+  return /*#__PURE__*/React.createElement(Phone, {
+    bg: "#FFFFFF"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "px-5 pt-4 text-[#111827]"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex items-end justify-between"
+  }, /*#__PURE__*/React.createElement("h3", {
+    className: "text-[24px] font-bold tracking-tight"
+  }, d.title), /*#__PURE__*/React.createElement("span", {
+    className: "text-[13px] font-semibold text-[#6366F1]"
+  }, "Mark all read")), /*#__PURE__*/React.createElement("div", {
+    className: "mt-3 flex flex-col"
+  }, d.rows.map(([ini, bg, fg, name, msg, t], k) => {
+    const size = k === 3 ? b("size", 40) : 40;
+    const pad = k === 2 ? b("pad", 12) : 12;
+    return /*#__PURE__*/React.createElement("div", {
+      key: k,
+      className: "flex items-start gap-3 border-b border-[#F1F2F4]",
+      style: {
+        paddingTop: pad,
+        paddingBottom: pad
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "flex shrink-0",
+      style: {
+        width: 40
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "grid place-items-center rounded-full text-[13px] font-bold",
+      style: {
+        width: size,
+        height: size,
+        background: bg,
+        color: fg,
+        marginLeft: k === 2 && av ? av.x : 0,
+        marginTop: k === 2 && av ? av.y : 0
+      }
+    }, ini)), /*#__PURE__*/React.createElement("div", {
+      className: "min-w-0 flex-1 text-[14px] leading-snug"
+    }, /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontWeight: k === 4 ? b("weight", 600) : 600
+      }
+    }, name), " ", /*#__PURE__*/React.createElement("span", {
+      className: "text-[#4B5563]"
+    }, msg)), /*#__PURE__*/React.createElement("span", {
+      className: "text-[12px] text-[#6B7280]",
+      style: {
+        marginRight: k === 1 && tm ? tm.x : 0,
+        marginTop: k === 1 && tm ? tm.y : 0
+      }
+    }, k === 1 ? b("timeFmt", t) : t));
+  }))));
+}
+function TabT({
+  d,
+  bug
+}) {
+  const b = B(bug);
+  const lbl = b("label", null);
+  const spread = b("spread", false);
+  return /*#__PURE__*/React.createElement(Phone, {
+    bg: "#FAFAFB"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "px-5 pt-4"
+  }, /*#__PURE__*/React.createElement("h3", {
+    className: "text-[24px] font-bold tracking-tight text-[#111827]"
+  }, d.title), /*#__PURE__*/React.createElement("div", {
+    className: "mt-4 h-[150px] rounded-2xl",
+    style: {
+      background: d.grad
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "mt-3 text-[15px] font-semibold text-[#111827]"
+  }, d.headline), /*#__PURE__*/React.createElement("div", {
+    className: "text-[13px] text-[#6B7280]"
+  }, d.meta), /*#__PURE__*/React.createElement("div", {
+    className: "mt-4 flex gap-3"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "h-[70px] flex-1 rounded-xl bg-[#E5E7EB]"
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "h-[70px] flex-1 rounded-xl bg-[#E5E7EB]"
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "absolute bottom-0 left-0 right-0 flex border-t border-[#ECECF1] bg-white pb-6 pt-2.5",
+    style: {
+      justifyContent: spread ? "space-between" : "space-around",
+      paddingInline: spread ? 10 : 0
+    }
+  }, d.tabs.map(([ic, label], k) => {
+    const active = k === 0;
+    return /*#__PURE__*/React.createElement("div", {
+      key: k,
+      className: "flex flex-col items-center gap-1",
+      style: {
+        width: k === 1 ? b("tabW", 56) : 56
+      }
+    }, /*#__PURE__*/React.createElement(Icon, {
+      n: ic,
+      size: k === 2 ? b("icon", 21) : 21,
+      color: active ? d.accent : "#9CA3AF",
+      strokeWidth: active ? 2.4 : k === 1 ? b("stroke", 2) : 2
+    }), /*#__PURE__*/React.createElement("span", {
+      className: "text-[11px]",
+      style: {
+        color: active ? lbl && lbl.c ? lbl.c : d.accent : "#9CA3AF",
+        opacity: active && lbl && lbl.op ? lbl.op : 1,
+        fontWeight: active ? lbl && lbl.w ? lbl.w : 700 : 500,
+        transform: k === 3 ? `translateY(${b("base", 0)}px)` : undefined
+      }
+    }, label));
+  })));
+}
+function WalletT({
+  d,
+  bug
+}) {
+  const b = B(bug);
+  return /*#__PURE__*/React.createElement(Phone, {
+    bg: "#0F1115",
+    light: true
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "px-5 pt-4 text-white"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "text-[13px] text-white/60"
+  }, d.greet), /*#__PURE__*/React.createElement("div", {
+    className: "mt-5 rounded-[20px] p-5",
+    style: {
+      background: d.card,
+      border: "1px solid rgba(255,255,255,.08)"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "text-[12px] uppercase tracking-wider text-white/55"
+  }, "Total balance"), /*#__PURE__*/React.createElement("div", {
+    className: "mt-1 text-[38px] font-bold tracking-tight",
+    style: {
+      fontVariantNumeric: "tabular-nums"
+    }
+  }, b("bal", d.bal)), /*#__PURE__*/React.createElement("div", {
+    className: "mt-4 flex gap-2"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "flex items-center gap-1 rounded-full bg-white/10 px-3 py-1.5 text-[12px] font-semibold"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    n: "ArrowUpRight",
+    size: 13
+  }), "Send"), /*#__PURE__*/React.createElement("span", {
+    className: "flex items-center gap-1 rounded-full bg-white/10 px-3 py-1.5 text-[12px] font-semibold"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    n: "ArrowDownLeft",
+    size: 13
+  }), "Request"))), /*#__PURE__*/React.createElement("div", {
+    className: "mt-6 text-[14px] font-semibold"
+  }, "Recent"), /*#__PURE__*/React.createElement("div", {
+    className: "mt-2 flex flex-col"
+  }, d.txs.map(([ic, name, date, amt, bg, fg], k) => {
+    const shown = k === 0 ? b("minus", amt) : k === 1 ? b("dec", amt) : amt;
+    const incoming = amt.startsWith("+");
+    const green = incoming || k === 1 && b("expGreen", false);
+    return /*#__PURE__*/React.createElement("div", {
+      key: k,
+      className: "flex items-center gap-3 py-2.5"
+    }, /*#__PURE__*/React.createElement("span", {
+      className: "grid h-10 w-10 place-items-center",
+      style: {
+        background: bg,
+        color: fg,
+        borderRadius: k === 2 ? b("iconShape", 12) : 12
+      }
+    }, /*#__PURE__*/React.createElement(Icon, {
+      n: ic,
+      size: 17
+    })), /*#__PURE__*/React.createElement("div", {
+      className: "flex-1"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "text-[14px] font-semibold"
+    }, name), /*#__PURE__*/React.createElement("div", {
+      className: "text-[12px] text-white/50"
+    }, date)), /*#__PURE__*/React.createElement("div", {
+      className: "text-[14px] font-semibold",
+      style: {
+        fontVariantNumeric: "tabular-nums",
+        color: green ? "#4ADE80" : "#fff"
+      }
+    }, shown));
+  }))));
+}
+function Toggle({
+  on,
+  bg,
+  left,
+  w = 51
+}) {
+  const knobLeft = left != null ? left : !on;
+  return /*#__PURE__*/React.createElement("div", {
+    className: "relative shrink-0 rounded-full",
+    style: {
+      width: w,
+      height: 31,
+      background: bg || (on ? "#34C759" : "#E5E5EA")
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "absolute rounded-full bg-white",
+    style: {
+      top: 2,
+      width: 27,
+      height: 27,
+      left: knobLeft ? 2 : w - 29,
+      boxShadow: "0 2px 4px rgba(0,0,0,.18)"
+    }
+  }));
+}
+function SettingsT({
+  d,
+  bug
+}) {
+  const b = B(bug);
+  const tg = b("toggle", null);
+  const onRows = d.rows.map((r, i) => r[3] === true ? i : -1).filter(i => i >= 0);
+  const [t1, t2] = onRows;
+  return /*#__PURE__*/React.createElement(Phone, {
+    bg: "#F2F2F7"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "pt-3"
+  }, /*#__PURE__*/React.createElement("h3", {
+    className: "px-5 text-[28px] font-bold tracking-tight text-[#111827]"
+  }, d.title), /*#__PURE__*/React.createElement("div", {
+    className: "mt-4 px-5 text-[12px] uppercase tracking-wide text-[#6B7280]"
+  }, d.section), /*#__PURE__*/React.createElement("div", {
+    className: "mx-4 mt-2 overflow-hidden rounded-2xl bg-white"
+  }, d.rows.map(([label, ic, color, v], k) => /*#__PURE__*/React.createElement("div", {
+    key: k,
+    className: "relative flex h-[50px] items-center gap-3 px-4"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "grid h-7 w-7 shrink-0 place-items-center rounded-[7px] text-white",
+    style: {
+      background: color
+    }
+  }, /*#__PURE__*/React.createElement(Icon, {
+    n: ic,
+    size: 15
+  })), /*#__PURE__*/React.createElement("span", {
+    className: "flex-1 text-[#111827]",
+    style: {
+      fontSize: k === 2 ? b("label", 15) : 15
+    }
+  }, label), typeof v === "boolean" ? /*#__PURE__*/React.createElement(Toggle, {
+    on: v,
+    bg: k === t1 && tg ? tg.bg : undefined,
+    left: k === t1 && tg ? tg.left : undefined,
+    w: k === t2 ? b("tglW", 51) : 51
+  }) : /*#__PURE__*/React.createElement("span", {
+    className: "flex items-center gap-1 text-[15px] text-[#8E8E93]"
+  }, v, /*#__PURE__*/React.createElement("span", {
+    style: {
+      display: "inline-flex",
+      transform: `translateY(${b("chev", 0)}px)`
+    }
+  }, /*#__PURE__*/React.createElement(ChevronRight, {
+    size: 18,
+    color: "#C7C7CC"
+  }))), k < d.rows.length - 1 && /*#__PURE__*/React.createElement("div", {
+    className: "absolute bottom-0 right-0 h-px bg-[#E5E5EA]",
+    style: {
+      left: k === 1 ? b("sep", 56) : 56
+    }
+  })))), /*#__PURE__*/React.createElement("p", {
+    className: "mt-2 px-5 text-[12px] leading-snug text-[#6B7280]"
+  }, d.foot)));
+}
+function Stars({
+  value
+}) {
+  return /*#__PURE__*/React.createElement("span", {
+    className: "flex items-center gap-[2px]"
+  }, [0, 1, 2, 3, 4].map(i => {
+    const f = Math.max(0, Math.min(1, value - i));
+    return /*#__PURE__*/React.createElement("span", {
+      key: i,
+      className: "relative inline-block",
+      style: {
+        width: 14,
+        height: 14
+      }
+    }, /*#__PURE__*/React.createElement(Star, {
+      size: 14,
+      color: "#D4D4D8",
+      fill: "#E4E4E7",
+      className: "absolute inset-0"
+    }), /*#__PURE__*/React.createElement("span", {
+      className: "absolute inset-y-0 left-0 overflow-hidden",
+      style: {
+        width: `${f * 100}%`
+      }
+    }, /*#__PURE__*/React.createElement(Star, {
+      size: 14,
+      color: "#F59E0B",
+      fill: "#F59E0B"
+    })));
+  }));
+}
+function ProductT({
+  d,
+  bug
+}) {
+  const b = B(bug);
+  const ph = b("price", null);
+  return /*#__PURE__*/React.createElement(Phone, {
+    bg: "#F4F4F5"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "px-4 pt-1"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center justify-between py-2 text-[#111827]"
+  }, /*#__PURE__*/React.createElement(ChevronLeft, {
+    size: 20
+  }), /*#__PURE__*/React.createElement("span", {
+    className: "text-[14px] font-semibold"
+  }, d.brand), /*#__PURE__*/React.createElement(Heart, {
+    size: 19
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "mt-1 rounded-[24px] bg-white p-2"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "relative grid h-[176px] place-items-center",
+    style: {
+      background: d.grad,
+      borderRadius: b("imgR", 16)
+    }
+  }, /*#__PURE__*/React.createElement(Icon, {
+    n: d.icon,
+    size: 84,
+    color: "rgba(255,255,255,.92)",
+    strokeWidth: 1.4
+  }), /*#__PURE__*/React.createElement("span", {
+    className: "absolute left-3 top-3 rounded-full bg-[#111827] px-2.5 py-1 text-[11px] font-bold text-white"
+  }, "\u2212", b("badge", discount(d)), "%")), /*#__PURE__*/React.createElement("div", {
+    className: "px-2 pb-2 pt-3"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "text-[17px] font-bold leading-tight text-[#111827]"
+  }, d.name), /*#__PURE__*/React.createElement("div", {
+    className: "mt-1.5 flex items-center gap-2 text-[12px] text-[#52525B]"
+  }, /*#__PURE__*/React.createElement(Stars, {
+    value: b("stars", d.rating)
+  }), /*#__PURE__*/React.createElement("span", {
+    className: "font-semibold text-[#111827]"
+  }, d.rating.toFixed(1)), /*#__PURE__*/React.createElement("span", null, "(", d.reviews, ")")), /*#__PURE__*/React.createElement("div", {
+    className: "mt-3 flex items-baseline gap-2"
+  }, ph && ph.swap ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("span", {
+    className: "text-[13px] text-[#A1A1AA] line-through"
+  }, "$", d.price), /*#__PURE__*/React.createElement("span", {
+    className: "text-[26px] font-bold text-[#111827]"
+  }, "$", d.old)) : /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("span", {
+    className: "text-[26px] font-bold text-[#111827]"
+  }, "$", d.price), /*#__PURE__*/React.createElement("span", {
+    className: "text-[14px] text-[#A1A1AA]",
+    style: {
+      textDecoration: ph && ph.noStrike ? "none" : "line-through"
+    }
+  }, "$", d.old))))), /*#__PURE__*/React.createElement("div", {
+    className: "mt-4 grid h-12 place-items-center rounded-[14px] text-[15px] font-semibold text-white",
+    style: {
+      background: b("cta", d.cta)
+    }
+  }, "Add to cart")));
+}
+function ChatT({
+  d,
+  bug
+}) {
+  const b = B(bug);
+  const sn = b("send", {
+    x: 0,
+    y: 0
+  });
+  return /*#__PURE__*/React.createElement(Phone, {
+    bg: "#FFFFFF"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center gap-3 border-b border-[#F1F1F4] px-4 pb-3 pt-1"
+  }, /*#__PURE__*/React.createElement(ChevronLeft, {
+    size: 20,
+    color: "#111827"
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "grid h-9 w-9 place-items-center rounded-full text-[12px] font-bold text-[#1F2937]",
+    style: {
+      background: d.color
+    }
+  }, d.init), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "text-[15px] font-semibold text-[#111827]"
+  }, d.name), /*#__PURE__*/React.createElement("div", {
+    className: "text-[11px] text-[#16A34A]"
+  }, d.status))), /*#__PURE__*/React.createElement("div", {
+    className: "flex flex-col gap-2 px-3 pt-4"
+  }, d.msgs.map(([side, text, time], k) => {
+    const out = side === "out";
+    const mr = out && k === 1 ? b("outX", 0) : 0;
+    return /*#__PURE__*/React.createElement("div", {
+      key: k,
+      className: `flex flex-col ${out ? "items-end" : "items-start"}`
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "max-w-[78%] px-3.5 py-2 text-[14px] leading-snug",
+      style: {
+        background: out ? d.accent : "#F1F1F4",
+        color: out ? "#fff" : b("inText", "#111827"),
+        borderRadius: k === 3 ? b("radius", 18) : 18,
+        marginRight: mr
+      }
+    }, text), /*#__PURE__*/React.createElement("span", {
+      className: "mt-1 px-1 text-[10px] text-[#6B7280]",
+      style: {
+        marginRight: mr
+      }
+    }, k === 2 ? b("time", time) : time));
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "absolute bottom-7 left-3 right-3 flex items-center gap-2"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex h-11 flex-1 items-center rounded-full bg-[#F1F1F4] px-4 text-[14px] text-[#6B7280]"
+  }, "Message\u2026"), /*#__PURE__*/React.createElement("div", {
+    className: "grid h-11 w-11 place-items-center rounded-full text-white",
+    style: {
+      background: d.accent
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      display: "inline-flex",
+      transform: `translate(${sn.x}px, ${sn.y}px)`
+    }
+  }, /*#__PURE__*/React.createElement(Send, {
+    size: 17
+  })))));
+}
+function DialogT({
+  d,
+  bug
+}) {
+  const b = B(bug);
+  const ds = b("destr", null);
+  const al = b("align", null);
+  const cl = b("close", {
+    x: 0,
+    y: 0
+  });
+  const actionStyle = ds === "blue" ? {
+    background: "#4F46E5",
+    color: "#fff"
+  } : ds === "gray" ? {
+    background: "#F3F4F6",
+    color: "#111827"
+  } : {
+    background: "#DC2626",
+    color: "#fff"
+  };
+  const cancel = /*#__PURE__*/React.createElement("div", {
+    key: "c",
+    className: "grid h-11 flex-1 place-items-center rounded-xl bg-[#F3F4F6] text-[15px] font-semibold text-[#111827]"
+  }, "Cancel");
+  const act = /*#__PURE__*/React.createElement("div", {
+    key: "a",
+    className: "grid h-11 flex-1 place-items-center rounded-xl text-[15px] font-semibold",
+    style: actionStyle
+  }, d.action);
+  return /*#__PURE__*/React.createElement(Phone, {
+    bg: "#FFFFFF"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "px-5 pt-4"
+  }, /*#__PURE__*/React.createElement("h3", {
+    className: "text-[24px] font-bold tracking-tight text-[#111827]"
+  }, d.page), /*#__PURE__*/React.createElement("div", {
+    className: "mt-4 grid grid-cols-2 gap-3"
+  }, d.tiles.map((c, k) => /*#__PURE__*/React.createElement("div", {
+    key: k,
+    className: "h-[92px] rounded-2xl",
+    style: {
+      background: c
+    }
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "mt-4 h-3 w-2/3 rounded bg-[#E5E7EB]"
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "mt-2 h-3 w-1/2 rounded bg-[#E5E7EB]"
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "absolute inset-0",
+    style: {
+      background: `rgba(15,17,21,${b("scrim", 0.5)})`
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "absolute left-5 right-5 top-[140px] rounded-[20px] bg-white p-5 pt-6",
+    style: {
+      boxShadow: "0 20px 50px rgba(0,0,0,.25)"
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "absolute grid h-7 w-7 place-items-center rounded-full bg-[#F3F4F6]",
+    style: {
+      top: 12 + cl.y,
+      right: 12 + cl.x
+    }
+  }, /*#__PURE__*/React.createElement(X, {
+    size: 14,
+    color: "#6B7280"
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "mx-auto grid h-11 w-11 place-items-center rounded-full bg-[#FEE2E2] text-[#DC2626]"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    n: d.icon,
+    size: 20
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "mt-3 text-center text-[18px] font-bold text-[#111827]"
+  }, d.title), /*#__PURE__*/React.createElement("p", {
+    className: "mt-1.5 text-[13.5px] leading-relaxed text-[#4B5563]",
+    style: {
+      textAlign: al === "left" ? "left" : "center",
+      paddingRight: al && al.pr ? al.pr : 0
+    }
+  }, d.body), /*#__PURE__*/React.createElement("div", {
+    className: "mt-5 flex gap-2.5"
+  }, b("order", false) ? [act, cancel] : [cancel, act])));
+}
+function ProgressT({
+  d,
+  bug
+}) {
+  const b = B(bug);
+  const pct = pctOf(d);
+  const firstDone = d.tasks.findIndex(t => t[1]);
+  return /*#__PURE__*/React.createElement(Phone, {
+    bg: "#F7F7F8"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "px-5 pt-4 text-[#111827]"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "text-[12px] font-semibold uppercase tracking-wider text-[#6B7280]"
+  }, d.team), /*#__PURE__*/React.createElement("h3", {
+    className: "mt-1 text-[24px] font-bold tracking-tight"
+  }, d.project), /*#__PURE__*/React.createElement("div", {
+    className: "mt-4 rounded-2xl border border-[#EEEEF0] bg-white p-4"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex items-baseline justify-between"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "text-[13px] text-[#6B7280]"
+  }, d.done, " of ", d.total, " tasks"), /*#__PURE__*/React.createElement("span", {
+    className: "text-[22px] font-bold",
+    style: {
+      fontVariantNumeric: "tabular-nums"
+    }
+  }, b("label", pct), "%")), /*#__PURE__*/React.createElement("div", {
+    className: "mt-2 h-2 overflow-hidden rounded-full bg-[#EEEEF0]"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "h-full rounded-full",
+    style: {
+      width: `${b("bar", pct)}%`,
+      background: d.accent
+    }
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "mt-3 flex items-center"
+  }, d.people.map(([ini, c], k) => /*#__PURE__*/React.createElement("span", {
+    key: k,
+    className: "grid h-7 w-7 place-items-center rounded-full border-2 border-white text-[10px] font-bold text-[#1F2937]",
+    style: {
+      background: c,
+      marginLeft: k === 0 ? 0 : k === 2 ? b("stack", -8) : -8
+    }
+  }, ini)), /*#__PURE__*/React.createElement("span", {
+    className: "ml-2 text-[12px] text-[#6B7280]"
+  }, "Due ", d.due))), /*#__PURE__*/React.createElement("div", {
+    className: "mt-4 flex flex-col gap-2"
+  }, d.tasks.map(([label, done, date], k) => {
+    const struck = done && !(k === firstDone && b("strike", false));
+    return /*#__PURE__*/React.createElement("div", {
+      key: k,
+      className: "flex items-center gap-3 rounded-xl border border-[#EEEEF0] bg-white px-3.5 py-3"
+    }, /*#__PURE__*/React.createElement("span", {
+      className: "grid h-5 w-5 shrink-0 place-items-center rounded-md",
+      style: {
+        background: done ? d.accent : "transparent",
+        border: done ? "none" : "1.5px solid #D1D5DB",
+        transform: k === 1 ? `translateY(${b("check", 0)}px)` : undefined
+      }
+    }, done && /*#__PURE__*/React.createElement(Check, {
+      size: 13,
+      color: "#fff",
+      strokeWidth: 3
+    })), /*#__PURE__*/React.createElement("span", {
+      className: "flex-1 text-[14px]",
+      style: {
+        textDecoration: struck ? "line-through" : "none",
+        color: struck ? "#9CA3AF" : "#111827"
+      }
+    }, label), /*#__PURE__*/React.createElement("span", {
+      className: "text-[12px] text-[#6B7280]"
+    }, k === 2 ? b("date", date) : date));
+  }))));
+}
+function ProfileT({
+  d,
+  bug
+}) {
+  const b = B(bug);
+  const bw = b("btnW", 1);
+  return /*#__PURE__*/React.createElement(Phone, {
+    bg: "#FFFFFF",
+    under: /*#__PURE__*/React.createElement("div", {
+      className: "absolute left-0 right-0 top-0 h-[140px]",
+      style: {
+        background: d.cover
+      }
+    })
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "relative px-5 pt-[58px] text-[#111827]"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "grid h-[92px] w-[92px] place-items-center rounded-full border-4 border-white text-[28px] font-bold",
+    style: {
+      background: d.avBg,
+      color: d.avFg,
+      transform: `scaleX(${b("aspect", 1)})`,
+      transformOrigin: "left center"
+    }
+  }, d.init), /*#__PURE__*/React.createElement("div", {
+    className: "mt-3 text-[21px] font-bold leading-tight tracking-tight"
+  }, d.name), /*#__PURE__*/React.createElement("div", {
+    className: "text-[13px] text-[#6B7280]"
+  }, d.role), /*#__PURE__*/React.createElement("div", {
+    className: "mt-5 grid grid-cols-3 rounded-2xl border border-[#EEEEF0] py-3 text-center"
+  }, d.stats.map(([v, l], k) => /*#__PURE__*/React.createElement("div", {
+    key: k
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "text-[17px] font-bold",
+    style: {
+      fontVariantNumeric: "tabular-nums"
+    }
+  }, k === 1 ? b("num", v) : v), /*#__PURE__*/React.createElement("div", {
+    className: "text-[12px] text-[#6B7280]",
+    style: {
+      transform: k === 2 ? `translateY(${b("statY", 0)}px)` : undefined
+    }
+  }, l)))), /*#__PURE__*/React.createElement("div", {
+    className: "mt-4 flex gap-2.5"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "grid h-11 place-items-center rounded-xl text-[15px] font-semibold text-white",
+    style: {
+      flex: bw,
+      background: d.accent
+    }
+  }, "Follow"), /*#__PURE__*/React.createElement("div", {
+    className: "grid h-11 place-items-center rounded-xl border border-[#D1D5DB] text-[15px] font-semibold",
+    style: {
+      flex: 1
+    }
+  }, b("trunc", "Message"))), /*#__PURE__*/React.createElement("p", {
+    className: "mt-4 text-[13.5px] leading-relaxed text-[#374151]"
+  }, d.bio)));
+}
+
+/* =====================================================================================
+   CONTENT VARIANTS — the same bug looks different on different content.
+   ===================================================================================== */
+const TEMPLATES = {
+  lock: {
+    Comp: LockT,
+    variants: [{
+      time: "12:30",
+      date: "Thursday, 24 September",
+      bg: "radial-gradient(120% 80% at 20% 0%, #2B3A67 0%, #1A1633 45%, #0B0A14 100%)",
+      app: "Messages",
+      icon: "MessageSquare",
+      appColor: "#34C759",
+      sender: "Aarav",
+      msg: "Reached Thamel, grabbing a table."
+    }, {
+      time: "07:45",
+      date: "Monday, 3 March",
+      bg: "radial-gradient(120% 80% at 80% 0%, #0F766E 0%, #134E4A 40%, #042F2E 100%)",
+      app: "Messages",
+      icon: "MessageSquare",
+      appColor: "#34C759",
+      sender: "Mum",
+      msg: "Call me once you land."
+    }, {
+      time: "22:10",
+      date: "Saturday, 11 October",
+      bg: "radial-gradient(120% 90% at 30% 10%, #9D174D 0%, #4C1D95 50%, #1E1B4B 100%)",
+      app: "Calendar",
+      icon: "CalendarDays",
+      appColor: "#FF3B30",
+      sender: "Design crit",
+      msg: "Moved to Room 4B, 10:30 tomorrow."
+    }]
+  },
+  login: {
+    Comp: LoginT,
+    variants: [{
+      title: "Welcome back",
+      sub: "Sign in to continue to your wallet.",
+      accent: "#111827",
+      logo: "Zap",
+      emailPh: "you@example.com",
+      cta: "Sign in"
+    }, {
+      title: "Sign in to Studio",
+      sub: "Pick up where your team left off.",
+      accent: "#4F46E5",
+      logo: "PenTool",
+      emailPh: "name@studio.com",
+      cta: "Continue"
+    }, {
+      title: "Log in",
+      sub: "Your trips, tickets and boarding passes.",
+      accent: "#0F766E",
+      logo: "Plane",
+      emailPh: "traveller@mail.com",
+      cta: "Log in"
+    }]
+  },
+  send: {
+    Comp: SendT,
+    variants: [{
+      name: "Priya Shrestha",
+      init: "PS",
+      avBg: "#E0E7FF",
+      avFg: "#4338CA",
+      via: "98•• ••• 421 · eSewa",
+      amt: "Rs 2,500",
+      note: "Dinner split 🍜",
+      accent: "#4F46E5"
+    }, {
+      name: "Kiran Rai",
+      init: "KR",
+      avBg: "#E0F2FE",
+      avFg: "#0369A1",
+      via: "Nabil Bank ••• 0917",
+      amt: "Rs 12,000",
+      note: "Rent share · October",
+      accent: "#0284C7"
+    }, {
+      name: "Bishal Gurung",
+      init: "BG",
+      avBg: "#DCFCE7",
+      avFg: "#15803D",
+      via: "98•• ••• 118 · Khalti",
+      amt: "Rs 1,850",
+      note: "Futsal fee ⚽",
+      accent: "#16A34A"
+    }]
+  },
+  activity: {
+    Comp: ActivityT,
+    variants: [{
+      title: "Activity",
+      rows: [["AK", "#FDE68A", "#92400E", "Anjali K.", "liked your case study", "2m"], ["RT", "#BFDBFE", "#1E40AF", "Rohan T.", "commented: “that spacing ✨”", "18m"], ["NP", "#FBCFE8", "#9D174D", "Nisha P.", "started following you", "1h"], ["SB", "#BBF7D0", "#166534", "Suman B.", "shared your Figma file", "3h"], ["MG", "#DDD6FE", "#5B21B6", "Maya G.", "mentioned you in Crit", "1d"]]
+    }, {
+      title: "Inbox",
+      rows: [["JD", "#FECACA", "#991B1B", "Jenish D.", "approved your pull request", "4m"], ["PS", "#C7D2FE", "#3730A3", "Pooja S.", "assigned you “Empty states”", "26m"], ["LB", "#FDE68A", "#92400E", "Laxmi B.", "replied in #design-crit", "2h"], ["KR", "#A7F3D0", "#065F46", "Kiran R.", "reacted 🔥 to your post", "5h"], ["AM", "#FBCFE8", "#9D174D", "Aarav M.", "invited you to “Q4 roadmap”", "2d"]]
+    }, {
+      title: "Mentions",
+      rows: [["SL", "#DDD6FE", "#5B21B6", "Sita L.", "tagged you on “Pricing v3”", "1m"], ["BG", "#BAE6FD", "#075985", "Bishal G.", "asked for your review", "12m"], ["UT", "#FED7AA", "#9A3412", "Ujjwal T.", "quoted your comment", "3h"], ["RM", "#D9F99D", "#3F6212", "Rina M.", "added you to “Handoff”", "6h"], ["DK", "#E5E7EB", "#374151", "Dipesh K.", "resolved your thread", "3d"]]
+    }]
+  },
+  tabs: {
+    Comp: TabT,
+    variants: [{
+      title: "For you",
+      accent: "#6D28D9",
+      grad: "linear-gradient(135deg,#C4B5FD,#818CF8 50%,#22D3EE)",
+      headline: "Designing for thumbs, not cursors",
+      meta: "6 min read · Interaction",
+      tabs: [["Home", "Home"], ["Search", "Explore"], ["Bell", "Alerts"], ["User", "Profile"]]
+    }, {
+      title: "Discover",
+      accent: "#DB2777",
+      grad: "linear-gradient(135deg,#FBCFE8,#F472B6 55%,#FB923C)",
+      headline: "12 colour palettes for autumn",
+      meta: "Collection · 48 swatches",
+      tabs: [["Compass", "Discover"], ["Heart", "Saved"], ["MessageCircle", "Chats"], ["User", "Me"]]
+    }, {
+      title: "Library",
+      accent: "#0891B2",
+      grad: "linear-gradient(135deg,#A5F3FC,#22D3EE 50%,#0E7490)",
+      headline: "Deep Work — Chapter 4",
+      meta: "Audiobook · 38 min left",
+      tabs: [["BookOpen", "Library"], ["Headphones", "Listen"], ["Download", "Offline"], ["Settings", "Settings"]]
+    }]
+  },
+  wallet: {
+    Comp: WalletT,
+    variants: [{
+      greet: "Good evening, Sarbesh",
+      bal: "$1,249.00",
+      card: "linear-gradient(135deg,#1F2937,#111827)",
+      txs: [["Coffee", "Himalayan Java", "Today, 08:14", "−$4.50", "#FEF3C7", "#B45309"], ["ShoppingBag", "Daraz", "Yesterday", "−$32.99", "#FCE7F3", "#BE185D"], ["ArrowDownLeft", "Salary · Studio", "20 Sep", "+$980.00", "#DCFCE7", "#15803D"]]
+    }, {
+      greet: "Hi Anjali — payday!",
+      bal: "$18,420.50",
+      card: "linear-gradient(135deg,#312E81,#1E1B4B)",
+      txs: [["Car", "Pathao ride", "Today, 18:02", "−$3.20", "#E0F2FE", "#0369A1"], ["Music", "Spotify Premium", "22 Sep", "−$10.99", "#DCFCE7", "#15803D"], ["ArrowDownLeft", "Client · Acme Co.", "21 Sep", "+$2,400.00", "#DCFCE7", "#15803D"]]
+    }, {
+      greet: "Good morning, Rohan",
+      bal: "$406.75",
+      card: "linear-gradient(135deg,#134E4A,#042F2E)",
+      txs: [["Utensils", "Bhojan Griha", "Today, 13:30", "−$18.40", "#FFEDD5", "#C2410C"], ["Plane", "Buddha Air", "19 Sep", "−$126.00", "#E0E7FF", "#4338CA"], ["ArrowDownLeft", "Refund · Daraz", "18 Sep", "+$24.99", "#DCFCE7", "#15803D"]]
+    }]
+  },
+  settings: {
+    Comp: SettingsT,
+    variants: [{
+      title: "Settings",
+      section: "General",
+      foot: "Backups run nightly over Wi-Fi.",
+      rows: [["Notifications", "Bell", "#FF3B30", true], ["Dark mode", "Moon", "#5856D6", false], ["Face ID", "ScanFace", "#34C759", true], ["Auto-backup", "UploadCloud", "#007AFF", true], ["Language", "Globe", "#FF9500", "English"]]
+    }, {
+      title: "Privacy",
+      section: "Permissions",
+      foot: "Apps can’t see your location unless you allow it.",
+      rows: [["Location", "Navigation", "#007AFF", true], ["Camera access", "Camera", "#8E8E93", false], ["Analytics", "BarChart3", "#FF9500", true], ["Crash reports", "Bug", "#FF2D55", true], ["Blocked", "UserX", "#FF3B30", "3 people"]]
+    }, {
+      title: "Sounds",
+      section: "Ring & alerts",
+      foot: "Vibration follows Focus modes.",
+      rows: [["Vibrate on ring", "Vibrate", "#AF52DE", true], ["Silent mode", "BellOff", "#FF3B30", false], ["Keyboard clicks", "Keyboard", "#8E8E93", true], ["Lock sound", "Lock", "#34C759", true], ["Ringtone", "Music", "#FF2D55", "Reflection"]]
+    }]
+  },
+  product: {
+    Comp: ProductT,
+    variants: [{
+      brand: "Stride Lab",
+      name: "Aero Knit Runner",
+      price: 89,
+      old: 120,
+      rating: 4.5,
+      reviews: "2,114",
+      grad: "linear-gradient(135deg,#FDE68A,#FB923C)",
+      icon: "Footprints",
+      cta: "#111827"
+    }, {
+      brand: "Sonora",
+      name: "Studio ANC Headphones",
+      price: 149,
+      old: 199,
+      rating: 4.0,
+      reviews: "864",
+      grad: "linear-gradient(135deg,#C7D2FE,#6366F1)",
+      icon: "Headphones",
+      cta: "#1E1B4B"
+    }, {
+      brand: "Tempo",
+      name: "Field Watch 38 mm",
+      price: 210,
+      old: 260,
+      rating: 3.5,
+      reviews: "317",
+      grad: "linear-gradient(135deg,#A7F3D0,#059669)",
+      icon: "Watch",
+      cta: "#064E3B"
+    }]
+  },
+  chat: {
+    Comp: ChatT,
+    variants: [{
+      name: "Anjali K.",
+      init: "AK",
+      color: "#FDE68A",
+      status: "Active now",
+      accent: "#4F46E5",
+      msgs: [["in", "Did you check the new onboarding flow?", "9:38 PM"], ["out", "Yes! Step 2 spacing feels off.", "9:39 PM"], ["in", "Off how? I used the 8pt grid 😅", "9:40 PM"], ["out", "Button padding is 14 on one side, 18 on the other.", "9:41 PM"]]
+    }, {
+      name: "Rohan T.",
+      init: "RT",
+      color: "#BFDBFE",
+      status: "Active 5m ago",
+      accent: "#0EA5E9",
+      msgs: [["in", "Momo at Bhojan Griha today?", "12:02 PM"], ["out", "Always. 1 o’clock?", "12:03 PM"], ["in", "Perfect, I’ll book a table", "12:05 PM"], ["out", "Bring the printed specs, we can review there.", "12:06 PM"]]
+    }, {
+      name: "Design Team",
+      init: "DT",
+      color: "#D9F99D",
+      status: "Maya is typing…",
+      accent: "#DB2777",
+      msgs: [["in", "Handoff for Checkout v2 is ready", "4:15 PM"], ["out", "Nice — tokens exported too?", "4:16 PM"], ["in", "Yep, colours and spacing both", "4:18 PM"], ["out", "Great, I’ll start the build tomorrow morning.", "4:20 PM"]]
+    }]
+  },
+  dialog: {
+    Comp: DialogT,
+    variants: [{
+      page: "Projects",
+      tiles: ["#E0E7FF", "#FCE7F3", "#DCFCE7", "#FEF3C7"],
+      icon: "Trash2",
+      title: "Delete project?",
+      body: "“Brand refresh” and its 48 files will be removed. This can’t be undone.",
+      action: "Delete"
+    }, {
+      page: "Team",
+      tiles: ["#FFEDD5", "#E0F2FE", "#EDE9FE", "#F1F5F9"],
+      icon: "UserMinus",
+      title: "Remove Maya?",
+      body: "Maya will immediately lose access to 6 shared boards and their comments.",
+      action: "Remove"
+    }, {
+      page: "Drafts",
+      tiles: ["#F1F5F9", "#ECFCCB", "#FAE8FF", "#E0F2FE"],
+      icon: "FileX",
+      title: "Discard changes?",
+      body: "You have 3 unsaved edits on “Checkout v2”. Leaving now will lose them.",
+      action: "Discard"
+    }]
+  },
+  progress: {
+    Comp: ProgressT,
+    variants: [{
+      team: "Growth squad",
+      project: "Onboarding flow",
+      done: 9,
+      total: 12,
+      due: "Oct 24",
+      accent: "#7C3AED",
+      people: [["AK", "#FDE68A"], ["RT", "#BFDBFE"], ["NP", "#FBCFE8"], ["SB", "#BBF7D0"]],
+      tasks: [["Audit current screens", true, "Oct 2", "02/10", "October 2"], ["Map drop-off points", true, "Oct 6", "06/10", "October 6"], ["Wireframe v2", false, "Oct 14", "14/10", "October 14"], ["Usability test", false, "Oct 20", "20/10", "October 20"]]
+    }, {
+      team: "Payments",
+      project: "Checkout redesign",
+      done: 4,
+      total: 10,
+      due: "Nov 8",
+      accent: "#0EA5E9",
+      people: [["JD", "#FECACA"], ["PS", "#C7D2FE"], ["LB", "#FDE68A"]],
+      tasks: [["Competitor teardown", true, "Oct 9", "09/10", "October 9"], ["Payment method picker", true, "Oct 15", "15/10", "October 15"], ["Error states", false, "Oct 27", "27/10", "October 27"], ["Dev handoff", false, "Nov 3", "03/11", "November 3"]]
+    }, {
+      team: "Design system",
+      project: "Icon audit",
+      done: 18,
+      total: 20,
+      due: "Sep 30",
+      accent: "#16A34A",
+      people: [["SL", "#DDD6FE"], ["BG", "#BAE6FD"], ["UT", "#FED7AA"], ["RM", "#D9F99D"]],
+      tasks: [["Inventory all glyphs", true, "Sep 8", "08/09", "September 8"], ["Fix stroke widths", true, "Sep 15", "15/09", "September 15"], ["Redraw 24px set", false, "Sep 24", "24/09", "September 24"], ["Publish v4.0", false, "Sep 29", "29/09", "September 29"]]
+    }]
+  },
+  profile: {
+    Comp: ProfileT,
+    variants: [{
+      name: "Sarbesh Lal Amatya",
+      role: "UI/UX Designer · Kathmandu",
+      init: "SA",
+      avBg: "#1F2937",
+      avFg: "#CCFF00",
+      accent: "#111827",
+      cover: "linear-gradient(120deg,#CCFF00,#00E5FF)",
+      stats: [["12.4k", "Followers"], ["48.2k", "Likes"], ["318", "Following"]],
+      raw: "48200",
+      bio: "Designing calm interfaces for noisy problems. Currently obsessing over 4px grids."
+    }, {
+      name: "Anjali Karki",
+      role: "Product Designer · Pokhara",
+      init: "AK",
+      avBg: "#FDE68A",
+      avFg: "#92400E",
+      accent: "#DB2777",
+      cover: "linear-gradient(120deg,#FBCFE8,#A78BFA)",
+      stats: [["8.9k", "Followers"], ["21.7k", "Likes"], ["540", "Following"]],
+      raw: "21700",
+      bio: "Fintech flows, accessible forms, and far too many Figma variables."
+    }, {
+      name: "Rohan Thapa",
+      role: "Motion Designer · Lalitpur",
+      init: "RT",
+      avBg: "#BFDBFE",
+      avFg: "#1E40AF",
+      accent: "#0369A1",
+      cover: "linear-gradient(120deg,#A5F3FC,#6366F1)",
+      stats: [["3.1k", "Followers"], ["15.6k", "Likes"], ["212", "Following"]],
+      raw: "15600",
+      bio: "Easing curves, micro-interactions and the occasional Lottie crime."
+    }]
+  }
+};
+
+/* =====================================================================================
+   BUG CATALOGUE — each entry: template, kind, tag, the rule the good design follows,
+   and per-tier strength: e (easy), m (medium), h (hard) = [value, why].
+   value/why may be functions of (d) / (v, d).
+   ===================================================================================== */
+const BUGS = [
+// Lock screen
+{
+  t: "lock",
+  k: "time",
+  tag: "Typography · Time",
+  rule: "The clock shows a valid 24-hour time set in real numerals.",
+  e: ["31:78", "31:78 isn't a time: hours stop at 23 and minutes at 59."],
+  m: [d => "24:" + d.time.slice(3), "24:xx doesn't exist on a 24-hour clock. Midnight is 00:xx."],
+  h: [d => d.time.replace("0", "O"), "One “0” is actually a capital letter O, rounder and wider than the numeral."]
+}, {
+  t: "lock",
+  k: "weight",
+  tag: "Typography · Weight",
+  rule: "The lock-screen clock uses the system's thin 200 display weight.",
+  e: [700, v => `The clock is set at weight ${v}, a heavy block instead of the thin system clock.`],
+  m: [500, v => `The clock is weight ${v}, noticeably heavier than the system's thin 200.`],
+  h: [300, v => `The clock is weight ${v}, one step heavier than the 200 used by the system.`]
+}, {
+  t: "lock",
+  k: "track",
+  tag: "Typography · Tracking",
+  rule: "Large display numerals are tracked tight (−0.03em) so the time reads as one shape.",
+  m: ["0.08em", "The digits are spaced loosely (+0.08em) and drift apart at this size."],
+  h: ["0.01em", "The time uses default tracking instead of −0.03em, so the digits look slightly airy."]
+}, {
+  t: "lock",
+  k: "inset",
+  tag: "Layout · Margins",
+  rule: "The notification card has equal 16px margins on both sides.",
+  m: [28, v => `The card sits ${v}px from the left edge but 16px from the right.`],
+  h: [20, v => `The card is ${v}px from the left edge and 16px from the right, a 4px imbalance.`]
+}, {
+  t: "lock",
+  k: "qa",
+  tag: "Components · Size",
+  rule: "Both quick-action buttons are the same 44px circle.",
+  m: [54, v => `The flashlight button is ${v}px wide; the camera button is 44px.`],
+  h: [48, v => `The flashlight button is ${v}px, 4px larger than the 44px camera button.`]
+}, {
+  t: "lock",
+  k: "dateCase",
+  tag: "Content · Case",
+  rule: "Dates use their proper capitals: “Thursday, 24 September”.",
+  m: ["lowercase", "The day and month names lost their capital letters."]
+}, {
+  t: "lock",
+  k: "dateDim",
+  tag: "Contrast · Text",
+  rule: "Secondary text on the lock screen stays readable at 80% white.",
+  h: [0.5, "The date drops to 50% white, too faint to read against the wallpaper."]
+},
+// Login form
+{
+  t: "login",
+  k: "ph",
+  tag: "Contrast · Forms",
+  rule: "Placeholder text meets 4.5 : 1 contrast (#6B7280 on white ≈ 4.8 : 1).",
+  e: ["#D9DCE1", v => `${v} on white is about ${contrast(v)} : 1, practically invisible.`],
+  m: ["#BFC3CA", v => `${v} on white is about ${contrast(v)} : 1, well under the 4.5 : 1 minimum.`],
+  h: ["#9CA3AF", v => `${v} (a very common grey) is only ${contrast(v)} : 1 on white, which fails AA.`]
+}, {
+  t: "login",
+  k: "radius",
+  tag: "Components · Radius",
+  rule: "Both fields share one 12px corner radius.",
+  e: [0, "The password field has square corners; the email field has 12px."],
+  m: [4, v => `The password field has a ${v}px radius; the email field has 12px.`],
+  h: [9, v => `The password field has a ${v}px radius, 3px less than the email field.`]
+}, {
+  t: "login",
+  k: "gap",
+  tag: "Spacing · Forms",
+  rule: "Every label sits the same 6px above its field.",
+  m: [16, v => `The Password label is ${v}px above its field; the Email label is 6px.`],
+  h: [10, v => `The Password label is ${v}px above its field, 4px more than Email's.`]
+}, {
+  t: "login",
+  k: "btnInset",
+  tag: "Layout · Edges",
+  rule: "The primary button spans the same width as the fields above it.",
+  m: [14, v => `The button is inset ${v}px on each side, so its edges miss the fields.`],
+  h: [5, v => `The button is inset ${v}px per side, slightly narrower than the fields.`]
+}, {
+  t: "login",
+  k: "h2",
+  tag: "Components · Size",
+  rule: "Both inputs are the same 44px tall.",
+  m: [36, v => `The password field is ${v}px tall; the email field is 44px.`],
+  h: [41, v => `The password field is ${v}px tall, 3px shorter than the email field.`]
+},
+// Send money
+{
+  t: "send",
+  k: "center",
+  tag: "Buttons · Alignment",
+  rule: "Button label and icon are optically centred with equal padding.",
+  e: [{
+    pl: 30,
+    y: -3
+  }, "The Send label is pushed off-centre and the icon sits 3px high."],
+  m: [{
+    pl: 22,
+    y: -2
+  }, "The Send content is shifted left of centre and the icon rides 2px high."],
+  h: [{
+    pl: null,
+    y: -2
+  }, "The send icon sits 2px above the text's centre line."]
+}, {
+  t: "send",
+  k: "order",
+  tag: "Buttons · Order",
+  rule: "The primary action sits on the right, where the flow ends.",
+  e: [true, "Send is on the left and Cancel on the right, the reverse of the platform convention."]
+}, {
+  t: "send",
+  k: "radius",
+  tag: "Buttons · Radius",
+  rule: "Both buttons share one 12px radius.",
+  e: [2, "Send is nearly square (2px) while Cancel is rounded (12px)."],
+  m: [6, v => `Send has a ${v}px radius; Cancel has 12px.`],
+  h: [9, v => `Send has a ${v}px radius, 3px tighter than Cancel.`]
+}, {
+  t: "send",
+  k: "height",
+  tag: "Buttons · Size",
+  rule: "Paired buttons are the same 48px height.",
+  m: [40, v => `Send is ${v}px tall next to a 48px Cancel.`],
+  h: [45, v => `Send is ${v}px tall, 3px shorter than Cancel.`]
+}, {
+  t: "send",
+  k: "amount",
+  tag: "Data · Currency",
+  rule: "Amounts use grouping commas and no stray decimals: Rs 2,500.",
+  m: [d => d.amt.replace(",", ""), v => `“${v}” drops the thousands separator used everywhere else.`]
+},
+// Activity list
+{
+  t: "activity",
+  k: "avatar",
+  tag: "Alignment · Lists",
+  rule: "Every avatar shares one left edge and top alignment.",
+  e: [{
+    x: 12,
+    y: 9
+  }, (v, d) => `${d.rows[2][3]}'s avatar is knocked ${v.x}px right and ${v.y}px down.`],
+  m: [{
+    x: 6,
+    y: 5
+  }, (v, d) => `${d.rows[2][3]}'s avatar drifts ${v.x}px right and ${v.y}px down.`],
+  h: [{
+    x: 2,
+    y: 0
+  }, (v, d) => `${d.rows[2][3]}'s avatar is ${v.x}px right of the column edge.`]
+}, {
+  t: "activity",
+  k: "time",
+  tag: "Alignment · Columns",
+  rule: "Timestamps align to one right edge and the first text line.",
+  m: [{
+    x: -7,
+    y: 4
+  }, (v, d) => `${d.rows[1][3]}'s timestamp pokes 7px past the column and drops 4px.`],
+  h: [{
+    x: -3,
+    y: 0
+  }, (v, d) => `${d.rows[1][3]}'s timestamp overhangs the right edge by 3px.`]
+}, {
+  t: "activity",
+  k: "size",
+  tag: "Components · Size",
+  rule: "All avatars are the same 40px circle.",
+  m: [33, (v, d) => `${d.rows[3][3]}'s avatar is ${v}px; the others are 40px.`],
+  h: [37, (v, d) => `${d.rows[3][3]}'s avatar is ${v}px, 3px smaller than the rest.`]
+}, {
+  t: "activity",
+  k: "weight",
+  tag: "Typography · Weight",
+  rule: "Every name uses the same 600 weight.",
+  m: [400, (v, d) => `${d.rows[4][3]} is set in regular (400) while the other names are semibold.`],
+  h: [500, (v, d) => `${d.rows[4][3]} is weight 500, a notch lighter than the other names.`]
+}, {
+  t: "activity",
+  k: "pad",
+  tag: "Spacing · Rhythm",
+  rule: "Rows keep a consistent 12px vertical padding.",
+  m: [20, v => `One row has ${v}px padding, which breaks the list rhythm.`],
+  h: [15, v => `One row has ${v}px padding instead of 12px.`]
+}, {
+  t: "activity",
+  k: "timeFmt",
+  tag: "Content · Format",
+  rule: "Relative times use one short format: 2m, 1h, 3d.",
+  m: [d => d.rows[1][5].replace(/m$/, " min").replace(/h$/, " hr").replace(/d$/, " days"), v => `“${v}” uses a different format from every other row.`]
+},
+// Tab bar
+{
+  t: "tabs",
+  k: "label",
+  tag: "Navigation · State",
+  rule: "The active tab colours and bolds both its icon and its label.",
+  e: [{
+    c: "#9CA3AF",
+    w: 500
+  }, "Only the icon is active; the grey, regular label looks unselected."],
+  m: [{
+    c: "#9CA3AF"
+  }, "The active label stays grey, so the tab reads as half-selected."],
+  h: [{
+    op: 0.6
+  }, "The active label is the accent at 60% opacity, weaker than its icon."]
+}, {
+  t: "tabs",
+  k: "icon",
+  tag: "Icons · Size",
+  rule: "Tab icons share one 21px size.",
+  m: [26, (v, d) => `The ${d.tabs[2][1]} icon is ${v}px; the others are 21px.`],
+  h: [23, (v, d) => `The ${d.tabs[2][1]} icon is ${v}px, 2px larger than its neighbours.`]
+}, {
+  t: "tabs",
+  k: "base",
+  tag: "Alignment · Baseline",
+  rule: "All tab labels sit on one baseline.",
+  m: [4, (v, d) => `“${d.tabs[3][1]}” sits ${v}px below the other labels.`],
+  h: [1.5, (v, d) => `“${d.tabs[3][1]}” sits 1.5px below the others' baseline.`]
+}, {
+  t: "tabs",
+  k: "spread",
+  tag: "Layout · Distribution",
+  rule: "Tabs are evenly distributed with equal space around each.",
+  m: [true, "Tabs are pushed to the edges (space-between), so the gaps are uneven."]
+}, {
+  t: "tabs",
+  k: "tabW",
+  tag: "Layout · Distribution",
+  rule: "Every tab has the same 56px hit area, so spacing stays even.",
+  h: [66, (v, d) => `The ${d.tabs[1][1]} tab is ${v}px wide, which pushes its neighbours apart unevenly.`]
+}, {
+  t: "tabs",
+  k: "stroke",
+  tag: "Icons · Stroke",
+  rule: "Inactive icons share one 2px stroke.",
+  h: [2.7, (v, d) => `The ${d.tabs[1][1]} icon has a ${v}px stroke, heavier than the other inactive icons.`]
+},
+// Wallet
+{
+  t: "wallet",
+  k: "bal",
+  tag: "Data · Currency",
+  rule: "Balances read $1,234.56: symbol first, grouping commas, a decimal point and two decimals.",
+  e: [d => d.bal.replace(/,/g, "").slice(0, -1), v => `“${v}” drops the separator and a decimal, so it reads like a raw float.`],
+  m: [d => d.bal.slice(1) + "$", v => `“${v}” puts the dollar sign after the number.`],
+  h: [d => d.bal.replace(/\.(\d\d)$/, ",$1"), v => `“${v}” uses a comma where the decimal point belongs, so it reads as a much larger number.`]
+}, {
+  t: "wallet",
+  k: "minus",
+  tag: "Typography · Symbols",
+  rule: "Negative amounts use a true minus sign (−), matching the other rows.",
+  h: [d => d.txs[0][3].replace("−", "-"), "The first amount uses a hyphen (-), which is shorter and higher than the minus (−)."]
+}, {
+  t: "wallet",
+  k: "expGreen",
+  tag: "Colour · Semantics",
+  rule: "Only incoming money is green; spending stays neutral.",
+  m: [true, (v, d) => `The ${d.txs[1][1]} purchase is green, so it reads as money received.`]
+}, {
+  t: "wallet",
+  k: "dec",
+  tag: "Data · Currency",
+  rule: "Every amount shows exactly two decimals.",
+  m: [d => d.txs[1][3].slice(0, -1), v => `“${v}” shows one decimal place; the other rows show two.`]
+}, {
+  t: "wallet",
+  k: "iconShape",
+  tag: "Components · Shape",
+  rule: "Transaction icons share one rounded-square shape.",
+  m: [999, "One transaction icon is a circle; the others are rounded squares."],
+  h: [16, "One icon uses a 16px radius, rounder than the 12px squares beside it."]
+},
+// Settings
+{
+  t: "settings",
+  k: "toggle",
+  tag: "Components · State",
+  rule: "Every ‘on’ switch is green with its knob on the right.",
+  e: [{
+    bg: "#D1D5DB"
+  }, "One switch is on (knob right) but grey, so it reads as disabled."],
+  m: [{
+    bg: "#34C759",
+    left: true
+  }, "One switch is green but its knob is on the left, which contradicts itself."],
+  h: [{
+    bg: "#4CD964"
+  }, "One switch uses the old #4CD964 green; the rest use #34C759."]
+}, {
+  t: "settings",
+  k: "tglW",
+  tag: "Components · Size",
+  rule: "Switches share one 51 × 31 size.",
+  m: [42, v => `One switch is ${v}px wide; the rest are 51px.`],
+  h: [47, v => `One switch is ${v}px wide, 4px narrower than the others.`]
+}, {
+  t: "settings",
+  k: "sep",
+  tag: "Layout · Dividers",
+  rule: "Separators start where the label starts, not under the icon.",
+  m: [0, "One divider runs full width while the others start at the label."],
+  h: [48, "One divider starts 8px early, under the icon's edge."]
+}, {
+  t: "settings",
+  k: "chev",
+  tag: "Alignment · Icons",
+  rule: "Chevrons are vertically centred on their row.",
+  m: [-5, "The chevron floats 5px above the row's centre."],
+  h: [-2, "The chevron sits 2px above centre."]
+}, {
+  t: "settings",
+  k: "label",
+  tag: "Typography · Size",
+  rule: "Row labels share one 15px size.",
+  m: [13, (v, d) => `“${d.rows[2][0]}” is ${v}px while the other labels are 15px.`],
+  h: [14, (v, d) => `“${d.rows[2][0]}” is ${v}px, 1px smaller than its neighbours.`]
+},
+// Product
+{
+  t: "product",
+  k: "stars",
+  tag: "Data · Consistency",
+  rule: "The stars match the numeric rating beside them.",
+  e: [d => d.rating - 2, (v, d) => `The rating says ${d.rating.toFixed(1)} but only ${v} stars are filled.`],
+  m: [d => Math.min(5, d.rating + 1), (v, d) => `The rating says ${d.rating.toFixed(1)} but ${v} stars are filled.`],
+  h: [d => d.rating - 0.5, (v, d) => `The rating says ${d.rating.toFixed(1)} but the stars show ${v}.`]
+}, {
+  t: "product",
+  k: "price",
+  tag: "Hierarchy · Pricing",
+  rule: "The sale price leads; the old price is smaller and struck through.",
+  e: [{
+    swap: true
+  }, "The old price is big and bold while the sale price is small and struck out."],
+  m: [{
+    noStrike: true
+  }, "The old price isn't struck through, so it looks like a second price."]
+}, {
+  t: "product",
+  k: "cta",
+  tag: "Contrast · Buttons",
+  rule: "Button text meets 4.5 : 1 against its fill.",
+  e: ["#D9F99D", v => `White on ${v} is ${contrast(v)} : 1, almost unreadable.`],
+  m: ["#86EFAC", v => `White on ${v} is only ${contrast(v)} : 1.`],
+  h: ["#22C55E", v => `White on ${v} looks fine but is ${contrast(v)} : 1, which fails AA.`]
+}, {
+  t: "product",
+  k: "imgR",
+  tag: "Components · Radius",
+  rule: "Nested corners are concentric: a 24px card with 8px padding needs a 16px image radius.",
+  m: [4, "The image corners are 4px inside a 24px card, which looks pinched."],
+  h: [22, "The image radius is 22px, too round for its 24px card with 8px padding."]
+}, {
+  t: "product",
+  k: "badge",
+  tag: "Data · Consistency",
+  rule: "The discount badge matches the actual price drop.",
+  m: [d => discount(d) + 15, (v, d) => `$${d.price} from $${d.old} is ${discount(d)}% off, not ${v}%.`],
+  h: [d => discount(d) + 4, (v, d) => `$${d.price} from $${d.old} is ${discount(d)}% off, not ${v}%.`]
+},
+// Chat
+{
+  t: "chat",
+  k: "outX",
+  tag: "Alignment · Bubbles",
+  rule: "Outgoing bubbles sit flush to the same right edge.",
+  e: [70, "One outgoing bubble floats 70px away from the right edge."],
+  m: [16, "One outgoing bubble sits 16px left of the others."],
+  h: [5, "One outgoing bubble is 5px off the right edge."]
+}, {
+  t: "chat",
+  k: "time",
+  tag: "Content · Format",
+  rule: "Timestamps share one format: 9:41 PM.",
+  m: [d => to24(d.msgs[2][2]), v => `“${v}” is a 24-hour time among 12-hour timestamps.`],
+  h: [d => d.msgs[2][2].replace(" ", ""), v => `“${v}” is missing the space before AM/PM.`]
+}, {
+  t: "chat",
+  k: "radius",
+  tag: "Components · Radius",
+  rule: "All bubbles share one 18px radius.",
+  m: [6, "The last bubble has 6px corners; the others are 18px."],
+  h: [13, "The last bubble has 13px corners, a little tighter than the others."]
+}, {
+  t: "chat",
+  k: "send",
+  tag: "Icons · Alignment",
+  rule: "The send icon is optically centred in its circle.",
+  m: [{
+    x: 4,
+    y: 4
+  }, "The send icon slides 4px right and down inside its circle."],
+  h: [{
+    x: 0,
+    y: 2
+  }, "The send icon sits 2px low in its circle."]
+}, {
+  t: "chat",
+  k: "inText",
+  tag: "Contrast · Text",
+  rule: "Incoming message text stays at 4.5 : 1 or better.",
+  e: ["#D4D4D8", v => `Incoming text is ${v} on light grey, around ${contrast(v, "#F1F1F4")} : 1.`],
+  m: ["#A1A1AA", v => `Incoming text is ${v} on light grey, only ${contrast(v, "#F1F1F4")} : 1.`]
+},
+// Dialog
+{
+  t: "dialog",
+  k: "destr",
+  tag: "Colour · Semantics",
+  rule: "Destructive actions are red and clearly distinct from Cancel.",
+  e: ["blue", (v, d) => `“${d.action}” uses the calm primary blue, hiding that it's destructive.`],
+  m: ["gray", (v, d) => `“${d.action}” looks identical to Cancel, so the risky choice has no weight.`]
+}, {
+  t: "dialog",
+  k: "order",
+  tag: "Buttons · Order",
+  rule: "Cancel sits left and the destructive action right, in platform order.",
+  m: [true, (v, d) => `“${d.action}” is on the left, where people expect Cancel.`]
+}, {
+  t: "dialog",
+  k: "align",
+  tag: "Typography · Alignment",
+  rule: "Title and body share one alignment with symmetric padding.",
+  m: ["left", "The title is centred but the body text is left-aligned."],
+  h: [{
+    pr: 18
+  }, "The body has 18px of extra right padding, so it sits off-centre."]
+}, {
+  t: "dialog",
+  k: "scrim",
+  tag: "Layers · Focus",
+  rule: "A scrim dims the page so the dialog reads as modal.",
+  e: [0, "There's no scrim. The page behind looks just as tappable as the dialog."],
+  m: [0.12, "The scrim is so faint that the dialog barely separates from the page."]
+}, {
+  t: "dialog",
+  k: "close",
+  tag: "Alignment · Icons",
+  rule: "The close button is inset equally from the top and right.",
+  h: [{
+    x: 6,
+    y: 0
+  }, "The close button is 18px from the right but 12px from the top."]
+},
+// Progress
+{
+  t: "progress",
+  k: "bar",
+  tag: "Data · Consistency",
+  rule: "Bar, percentage and task count all describe the same progress.",
+  e: [d => pctOf(d) > 50 ? pctOf(d) - 50 : pctOf(d) + 45, (v, d) => `The label says ${pctOf(d)}% but the bar is only ${v}% full.`],
+  m: [d => pctOf(d) > 50 ? pctOf(d) - 18 : pctOf(d) + 18, (v, d) => `The label says ${pctOf(d)}% but the bar shows ${v}%.`]
+}, {
+  t: "progress",
+  k: "label",
+  tag: "Data · Consistency",
+  rule: "Bar, percentage and task count all describe the same progress.",
+  h: [d => pctOf(d) + 5, (v, d) => `${d.done} of ${d.total} is ${pctOf(d)}%, not ${v}%.`]
+}, {
+  t: "progress",
+  k: "check",
+  tag: "Alignment · Controls",
+  rule: "Checkboxes are centred on their task text.",
+  m: [5, "The second checkbox drops 5px below its label."],
+  h: [2, "The second checkbox sits 2px below centre."]
+}, {
+  t: "progress",
+  k: "strike",
+  tag: "Components · State",
+  rule: "Completed tasks are all struck through and dimmed.",
+  m: [true, "One completed task isn't struck through, unlike the other done items."]
+}, {
+  t: "progress",
+  k: "date",
+  tag: "Content · Format",
+  rule: "Dates share one short format: Oct 14.",
+  m: [d => d.tasks[2][3], v => `“${v}” is numeric while the other dates are “Mon D”.`],
+  h: [d => d.tasks[2][4], v => `“${v}” spells the month out while the others abbreviate it.`]
+}, {
+  t: "progress",
+  k: "stack",
+  tag: "Spacing · Overlap",
+  rule: "Stacked avatars overlap by the same 8px.",
+  m: [2, "The third avatar doesn't overlap at all and leaves a gap in the stack."],
+  h: [-4, "The third avatar overlaps by 4px instead of 8px."]
+},
+// Profile
+{
+  t: "profile",
+  k: "aspect",
+  tag: "Media · Aspect ratio",
+  rule: "Avatars keep a 1:1 aspect ratio and are never stretched.",
+  e: [1.3, "The avatar is stretched 30% wider than it is tall."],
+  m: [1.12, "The avatar is stretched 12% horizontally."],
+  h: [1.05, "The avatar is stretched 5% horizontally, just enough to look off."]
+}, {
+  t: "profile",
+  k: "trunc",
+  tag: "Content · Truncation",
+  rule: "Button labels are short enough never to truncate.",
+  e: ["Mess…", "“Message” is cut off even though there's room."]
+}, {
+  t: "profile",
+  k: "btnW",
+  tag: "Layout · Balance",
+  rule: "Paired buttons share equal widths.",
+  m: [1.6, "Follow is much wider than Message, so the pair looks lopsided."],
+  h: [1.15, "Follow is about 15% wider than Message."]
+}, {
+  t: "profile",
+  k: "num",
+  tag: "Data · Format",
+  rule: "Large counts are abbreviated consistently: 12.4k.",
+  m: [d => d.raw, v => `“${v}” is spelled out while the neighbouring stat is abbreviated.`],
+  h: [d => d.stats[1][0].replace("k", "K"), v => `“${v}” uses a capital K; the other counts use a lowercase k.`]
+}, {
+  t: "profile",
+  k: "statY",
+  tag: "Alignment · Baseline",
+  rule: "Stat labels share one baseline.",
+  m: [5, (v, d) => `“${d.stats[2][1]}” drops ${v}px below the other labels.`],
+  h: [2, (v, d) => `“${d.stats[2][1]}” sits 2px below the other labels.`]
+}];
+
+/* =====================================================================================
+   TIERS — 10 + 30 + 60 = 100 stages. 80% in a tier unlocks the next.
+   ===================================================================================== */
+const TIERS = [{
+  id: "easy",
+  label: "Easy",
+  n: 10,
+  lv: "e",
+  base: 100,
+  color: "#CCFF00",
+  blurb: "Obvious slips: wrong times, broken contrast, swapped buttons."
+}, {
+  id: "medium",
+  label: "Medium",
+  n: 30,
+  lv: "m",
+  base: 150,
+  color: "#00E5FF",
+  blurb: "Subtler slips: 4–8px drifts, mixed formats, near-miss colours."
+}, {
+  id: "hard",
+  label: "Hard",
+  n: 60,
+  lv: "h",
+  base: 200,
+  color: "#FF3366",
+  blurb: "1–3px shifts, single-step weights, colours that fail AA quietly."
+}];
+const PASS = 0.8;
+const OFFSET = [0, 10, 40];
+const TOTAL_STAGES = 100;
+const needFor = t => Math.ceil(TIERS[t].n * PASS);
+
+// Deal a tier: interleave templates so neighbours differ, and when the catalogue runs out,
+// deal the same bug again on a different content variant.
+function buildTier(t) {
+  const {
+    n,
+    lv
+  } = TIERS[t];
+  const pool = BUGS.filter(bg => bg[lv]);
+  const startVi = new Map(pool.map(bg => [bg, Math.random() * TEMPLATES[bg.t].variants.length | 0]));
+  const items = [];
+  for (let round = 0; items.length < n; round++) {
+    const byT = {};
+    shuffle(pool).forEach(bg => (byT[bg.t] = byT[bg.t] || []).push(bg));
+    const queues = shuffle(Object.values(byT));
+    while (items.length < n && queues.some(q => q.length)) {
+      for (const q of queues) {
+        if (!q.length || items.length >= n) continue;
+        const bg = q.shift();
+        const nv = TEMPLATES[bg.t].variants.length;
+        items.push({
+          bug: bg,
+          vi: (startVi.get(bg) + round) % nv,
+          lv,
+          good: Math.random() < 0.5 ? 0 : 1
+        });
+      }
+    }
+  }
+  // Where one dealing round meets the next, the same screen can land twice in a row: swap it forward.
+  const tOf = i => items[i] && items[i].bug.t;
+  for (let i = 1; i < items.length; i++) {
+    if (tOf(i) !== tOf(i - 1)) continue;
+    const j = items.findIndex((_, k) => k > i && tOf(k) !== tOf(i - 1) && tOf(k) !== tOf(i + 1) && tOf(i) !== tOf(k - 1) && tOf(i) !== tOf(k + 1));
+    if (j > 0) [items[i], items[j]] = [items[j], items[i]];
+  }
+  return items;
+}
+function resolve(item) {
+  const T = TEMPLATES[item.bug.t];
+  const d = T.variants[item.vi];
+  const [rawV, rawWhy] = item.bug[item.lv];
+  const v = val(rawV, d);
+  return {
+    Comp: T.Comp,
+    d,
+    badBug: {
+      k: item.bug.k,
+      v
+    },
+    rule: val(item.bug.rule, d),
+    why: val(rawWhy, v, d),
+    tag: item.bug.tag
+  };
+}
+
+/* ---------- Per-viewer progress (unlocked tiers, best results) ---------- */
+const STORE = "cant-unsee.progress.v2";
+const loadProgress = () => {
+  try {
+    const p = JSON.parse(localStorage.getItem(STORE));
+    if (p && typeof p.unlocked === "number") return p;
+  } catch (_) {}
+  return {
+    unlocked: 0,
+    best: {}
+  };
+};
+const saveProgress = p => {
+  try {
+    localStorage.setItem(STORE, JSON.stringify(p));
+  } catch (_) {}
+};
+
+/* ---------- Game UI ---------- */
+function Badge({
+  ok
+}) {
+  return /*#__PURE__*/React.createElement("div", {
+    className: `anim-pop absolute -top-3 -right-3 z-20 grid h-11 w-11 place-items-center rounded-full border-2 border-[#0B0C10] ${ok ? "bg-[#CCFF00] text-[#0B0C10] anim-glow" : "bg-[#FF3366] text-white"}`
+  }, ok ? /*#__PURE__*/React.createElement(Check, {
+    size: 22,
+    strokeWidth: 3.2
+  }) : /*#__PURE__*/React.createElement(X, {
+    size: 22,
+    strokeWidth: 3.2
+  }));
+}
+function ChoiceCard({
+  label,
+  onPick,
+  state,
+  disabled,
+  children
+}) {
+  // state: idle | correct | wrong | reveal | faded
+  const ring = {
+    idle: "ring-1 ring-white/10 hover:ring-2 hover:ring-[#00E5FF]/70 hover:-translate-y-1",
+    correct: "ring-2 ring-[#CCFF00]",
+    wrong: "ring-2 ring-[#FF3366] anim-shake",
+    reveal: "ring-2 ring-[#CCFF00]/70",
+    faded: "ring-1 ring-white/5 opacity-0 scale-95 blur-[2px]"
+  }[state];
+  return /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    onClick: onPick,
+    disabled: disabled,
+    "aria-label": `Option ${label}`,
+    className: `choice group relative w-full rounded-[40px] p-[6px] bg-[#07080B] transition-all duration-300 ease-out ${ring} ${disabled ? "cursor-default" : "cursor-pointer"}`
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "pointer-events-none select-none text-left"
+  }, children), /*#__PURE__*/React.createElement("span", {
+    className: `f-mono absolute -bottom-3 left-1/2 -translate-x-1/2 rounded-full border px-2.5 py-0.5 text-[11px] tracking-widest transition-colors
+        ${state === "correct" || state === "reveal" ? "bg-[#CCFF00] text-[#0B0C10] border-[#CCFF00]" : state === "wrong" ? "bg-[#FF3366] text-white border-[#FF3366]" : "bg-[#111319] text-[#8B90A0] border-white/10 group-hover:text-[#00E5FF]"}`
+  }, label), state === "correct" && /*#__PURE__*/React.createElement(Badge, {
+    ok: true
+  }), state === "wrong" && /*#__PURE__*/React.createElement(Badge, {
+    ok: false
+  }));
+}
+
+/* Compare mode deliberately lives outside React. The overlay is always mounted and already painted;
+   holding just flips one data attribute, and CSS swaps opacity on GPU layers. No React render,
+   no Tailwind class rescan, no fresh layout or paint, so the swap lands on the very next frame. */
+const isComparing = () => document.documentElement.dataset.compare === "on";
+function setCompare(on) {
+  const root = document.documentElement;
+  if (typeof on === "function") on = on(isComparing());
+  if (on === isComparing()) return;
+  if (on) root.dataset.compare = "on";else delete root.dataset.compare;
+  const btn = document.getElementById("compare-btn");
+  if (btn) btn.setAttribute("aria-pressed", String(on));
+}
+function TierChips({
+  tier,
+  unlocked,
+  pending,
+  onChoose
+}) {
+  return /*#__PURE__*/React.createElement("div", {
+    className: "cu-tiers flex flex-wrap gap-2",
+    role: "group",
+    "aria-label": "Difficulty"
+  }, TIERS.map((T, i) => {
+    const locked = i > unlocked;
+    const active = i === tier;
+    const confirm = pending === i;
+    return /*#__PURE__*/React.createElement("button", {
+      key: T.id,
+      type: "button",
+      disabled: locked,
+      onClick: () => onChoose(i),
+      title: locked ? `Score ${Math.round(PASS * 100)}% in ${TIERS[i - 1].label} to unlock` : undefined,
+      className: "f-mono flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-[11px] uppercase tracking-wider transition-colors",
+      style: {
+        borderColor: active ? T.color : confirm ? "#FFB020" : "rgba(255,255,255,.1)",
+        background: active ? `${T.color}1A` : "transparent",
+        color: locked ? "#555A6A" : active ? T.color : confirm ? "#FFB020" : "#C9CDD8",
+        cursor: locked ? "not-allowed" : "pointer"
+      }
+    }, locked ? /*#__PURE__*/React.createElement(Lock, {
+      size: 11
+    }) : /*#__PURE__*/React.createElement("span", {
+      className: "h-1.5 w-1.5 rounded-full",
+      style: {
+        background: T.color
+      }
+    }), confirm ? `Restart ${T.label}?` : `${T.label} · ${T.n}`);
+  }));
+}
+function App() {
+  const [progress, setProgress] = useState(loadProgress);
+  const [tier, setTier] = useState(0);
+  const [items, setItems] = useState(() => buildTier(0));
+  const [idx, setIdx] = useState(0);
+  const [picked, setPicked] = useState(null); // 0 | 1 | null
+  const [collapsed, setCollapsed] = useState(false); // after a correct pick, the wrong card leaves the layout
+  const [phase, setPhase] = useState("play"); // play | tierEnd
+  const [score, setScore] = useState(0);
+  const [tierStartScore, setTierStartScore] = useState(0);
+  const [streak, setStreak] = useState(0);
+  const [best, setBest] = useState(0);
+  const [results, setResults] = useState([]); // this tier: true/false per stage
+  const [pending, setPending] = useState(null); // tier awaiting a confirm click
+  const primaryRef = useRef(null); // tier-end screen's main action, for Enter
+  // Synchronous guard. React state lags a frame behind fast input (a double-tap, key + click),
+  // so a second event could still see "not answered yet" and count twice or skip a stage.
+  const gate = useRef({
+    answered: false,
+    phase: "play"
+  });
+  const T = TIERS[tier];
+  const item = items[idx];
+  const Q = useMemo(() => resolve(item), [item]);
+  const good = item.good;
+  const answered = picked !== null;
+  const correct = answered && picked === good;
+  const hits = results.filter(Boolean).length;
+  const misses = results.length - hits;
+  const need = needFor(tier);
+  const reachable = misses <= T.n - need;
+  const startTier = useCallback((t, nextScore) => {
+    setCompare(false);
+    gate.current = {
+      answered: false,
+      phase: "play"
+    };
+    setTier(t);
+    setItems(buildTier(t));
+    setIdx(0);
+    setPicked(null);
+    setCollapsed(false);
+    setResults([]);
+    setStreak(0);
+    setPhase("play");
+    setPending(null);
+    setScore(nextScore);
+    setTierStartScore(nextScore);
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  }, []);
+  const pick = useCallback(side => {
+    if (answered || phase !== "play" || gate.current.answered || gate.current.phase !== "play") return;
+    gate.current.answered = true;
+    setCompare(false);
+    setPicked(side);
+    const ok = side === good;
+    setResults(r => [...r, ok]);
+    // A correct pick snaps straight to the single centred card, in the same render as the pick.
+    setCollapsed(ok);
+    if (ok) {
+      const s = streak + 1;
+      setStreak(s);
+      setBest(b => Math.max(b, s));
+      setScore(v => v + T.base + Math.min(s - 1, 10) * 25);
+    } else {
+      setStreak(0);
+      setScore(v => Math.max(0, v - 25));
+    }
+  }, [answered, phase, good, streak, T]);
+
+  const finishTier = useCallback(() => {
+    const passed = hits >= need;
+    setProgress(p => {
+      const np = {
+        unlocked: p.unlocked,
+        best: {
+          ...p.best
+        }
+      };
+      if (passed && tier < TIERS.length - 1) np.unlocked = Math.max(np.unlocked, tier + 1);
+      np.best[tier] = Math.max(np.best[tier] || 0, hits);
+      saveProgress(np);
+      return np;
+    });
+    gate.current = {
+      answered: false,
+      phase: "tierEnd"
+    };
+    setCompare(false);
+    setPhase("tierEnd");
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  }, [hits, need, tier]);
+  const next = useCallback(() => {
+    if (!answered || phase !== "play" || !gate.current.answered || gate.current.phase !== "play") return;
+    if (idx + 1 >= T.n) {
+      finishTier();
+      return;
+    }
+    gate.current.answered = false;
+    setIdx(i => i + 1);
+    setPicked(null);
+    setCollapsed(false);
+    setCompare(false);
+  }, [answered, phase, idx, T, finishTier]);
+  const chooseTier = t => {
+    if (t > progress.unlocked) return;
+    const midRun = phase === "play" && (idx > 0 || answered);
+    if (midRun && pending !== t) {
+      setPending(t);
+      return;
+    }
+    startTier(t, 0);
+  };
+  useEffect(() => {
+    if (pending === null) return;
+    const h = setTimeout(() => setPending(null), 3000);
+    return () => clearTimeout(h);
+  }, [pending]);
+  useEffect(() => {
+    const isHold = e => e.key === "Shift" || e.key === " ";
+    const down = e => {
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+      if (isHold(e)) {
+        // Space must not scroll the page or "click" whichever button has focus.
+        e.preventDefault();
+        if (phase === "play") setCompare(true);
+        return;
+      }
+      if (e.repeat) return;
+      const k = e.key.toLowerCase();
+      // A focused button already activates on Enter; handling it here too would advance twice.
+      if (k === "enter" && e.target.closest && e.target.closest("button")) return;
+      if (phase === "tierEnd") {
+        if (k === "enter") {
+          e.preventDefault();
+          primaryRef.current && primaryRef.current();
+        }
+        return;
+      }
+      if (k === "arrowleft" || k === "1" || k === "a") pick(0);else if (k === "arrowright" || k === "2" || k === "b") pick(1);else if (k === "enter" || k === "n") {
+        e.preventDefault();
+        next();
+      }
+    };
+    const up = e => {
+      if (isHold(e)) {
+        e.preventDefault();
+        setCompare(false);
+      }
+    };
+    const off = () => setCompare(false); // releasing Shift in another window never sends keyup here
+    window.addEventListener("keydown", down);
+    window.addEventListener("keyup", up);
+    window.addEventListener("blur", off);
+    return () => {
+      window.removeEventListener("keydown", down);
+      window.removeEventListener("keyup", up);
+      window.removeEventListener("blur", off);
+    };
+  }, [pick, next, phase]);
+  const stageDone = OFFSET[tier] + idx + (answered || phase === "tierEnd" ? 1 : 0);
+  const cardState = side => {
+    if (!answered) return "idle";
+    if (side === picked) return correct ? "correct" : "wrong";
+    return correct ? "faded" : "reveal";
+  };
+  const labels = ["A", "B"];
+  const {
+    Comp,
+    d,
+    badBug
+  } = Q;
+  const gained = T.base + Math.min(streak - 1, 10) * 25;
+  return /*#__PURE__*/React.createElement("div", {
+    className: "mx-auto w-full max-w-[860px]"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "os-window rounded-2xl overflow-hidden"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "cu-titlebar flex flex-wrap items-center gap-3 border-b border-white/10 bg-[#0D0F14] px-4 py-2.5"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex gap-1.5",
+    "aria-hidden": "true"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "h-3 w-3 rounded-full bg-[#FF3366]"
+  }), /*#__PURE__*/React.createElement("span", {
+    className: "h-3 w-3 rounded-full bg-[#FFB020]"
+  }), /*#__PURE__*/React.createElement("span", {
+    className: "h-3 w-3 rounded-full bg-[#CCFF00]"
+  })), /*#__PURE__*/React.createElement("span", {
+    className: "cu-path f-mono text-[12px] text-[#8B90A0]"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "cu-dir"
+  }, "~/sarbesh-os/apps/"), /*#__PURE__*/React.createElement("span", {
+    className: "text-[#E8EAF0]"
+  }, "cant_unsee"), ".exe"), /*#__PURE__*/React.createElement("span", {
+    className: "f-mono ml-auto rounded-full border border-[#CCFF00]/30 bg-[#CCFF00]/[0.07] px-3 py-1 text-[11px] text-[#CCFF00]"
+  }, "Sarbesh Lal Amatya")), /*#__PURE__*/React.createElement("div", {
+    className: "cu-head flex flex-wrap items-end justify-between gap-4 px-5 sm:px-8 pt-5"
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "f-mono text-[11px] uppercase tracking-[0.2em]",
+    style: {
+      color: T.color
+    }
+  }, T.label, " mode \xB7 ", phase === "tierEnd" ? "results" : Q.tag), /*#__PURE__*/React.createElement("h1", {
+    className: "f-display mt-1 text-[34px] sm:text-[42px] font-bold leading-none tracking-tight",
+    style: {
+      textWrap: "balance"
+    }
+  }, "Can't Unsee", /*#__PURE__*/React.createElement("span", {
+    className: "text-[#CCFF00]"
+  }, "_"))), /*#__PURE__*/React.createElement("div", {
+    className: "flex flex-wrap gap-2 f-mono text-[12px]"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "flex items-center gap-1.5 rounded-lg border border-white/10 bg-[#171A22] px-3 py-2",
+    title: "Score"
+  }, /*#__PURE__*/React.createElement(Trophy, {
+    size: 14,
+    className: "text-[#CCFF00]"
+  }), score.toLocaleString()), /*#__PURE__*/React.createElement("span", {
+    className: `flex items-center gap-1.5 rounded-lg border px-3 py-2 transition-colors ${streak > 1 ? "border-[#FF3366]/40 bg-[#FF3366]/10 text-[#FF7A99]" : "border-white/10 bg-[#171A22]"}`,
+    title: "Streak"
+  }, /*#__PURE__*/React.createElement(Flame, {
+    size: 14
+  }), "\xD7", streak), /*#__PURE__*/React.createElement("span", {
+    className: "flex items-center gap-1.5 rounded-lg border px-3 py-2",
+    hidden: phase === "tierEnd",
+    title: `Get ${need} of ${T.n} right to ${tier < 2 ? "unlock " + TIERS[tier + 1].label : "master Hard"}`,
+    style: {
+      borderColor: reachable ? "rgba(255,255,255,.1)" : "rgba(255,51,102,.45)",
+      background: reachable ? "#171A22" : "rgba(255,51,102,.08)",
+      color: reachable ? "#E8EAF0" : "#FF7A99"
+    }
+  }, /*#__PURE__*/React.createElement(Target, {
+    size: 14,
+    className: reachable ? "text-[#00E5FF]" : ""
+  }), hits, "/", need, /*#__PURE__*/React.createElement("span", {
+    className: "hidden sm:inline text-[#8B90A0]"
+  }, reachable ? "to pass" : "out of reach")))), /*#__PURE__*/React.createElement("div", {
+    className: "px-5 sm:px-8 pt-4"
+  }, /*#__PURE__*/React.createElement(TierChips, {
+    tier: tier,
+    unlocked: progress.unlocked,
+    pending: pending,
+    onChoose: chooseTier
+  })), phase === "tierEnd" ? /*#__PURE__*/React.createElement(TierEnd, {
+    tier: tier,
+    items: items,
+    results: results,
+    score: score,
+    best: best,
+    progress: progress,
+    primaryRef: primaryRef,
+    onAdvance: () => startTier(tier + 1, score),
+    onRetry: () => startTier(tier, tierStartScore),
+    onRestartAll: () => {
+      setBest(0);
+      startTier(0, 0);
+    }
+  }) : /*#__PURE__*/React.createElement("div", {
+    key: `${tier}-${idx}`,
+    className: "cu-play anim-rise px-5 sm:px-8 pb-5"
+  }, /*#__PURE__*/React.createElement("p", {
+    className: "f-display mt-4 text-[18px] sm:text-[20px] font-semibold text-center"
+  }, answered ? correct ? "Sharp eye." : "Not quite. Here's what slipped." : "Select the design that is most correct"), /*#__PURE__*/React.createElement("div", {
+    className: "stage relative mt-4 mx-auto"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "stage-cards grid grid-cols-2 gap-[var(--gap)]"
+  }, collapsed ? /*#__PURE__*/React.createElement("div", {
+    className: "col-span-2 mx-auto w-[var(--cw)]"
+  }, /*#__PURE__*/React.createElement(ChoiceCard, {
+    label: labels[good],
+    state: "correct",
+    disabled: true
+  }, /*#__PURE__*/React.createElement(Scaled, null, /*#__PURE__*/React.createElement(Comp, {
+    d: d,
+    bug: null
+  })))) : [0, 1].map(side => /*#__PURE__*/React.createElement(ChoiceCard, {
+    key: side,
+    label: labels[side],
+    state: cardState(side),
+    disabled: answered,
+    onPick: () => pick(side)
+  }, /*#__PURE__*/React.createElement(Scaled, null, /*#__PURE__*/React.createElement(Comp, {
+    d: d,
+    bug: side === good ? null : badBug
+  }))))), /*#__PURE__*/React.createElement("div", {
+    className: "stage-overlay absolute inset-0 flex items-start justify-center gap-[var(--gap)]",
+    role: "img",
+    "aria-label": "Overlay of both designs with differences highlighted"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "w-[var(--cw)] shrink-0"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "relative scanline rounded-[40px] overflow-hidden ring-2 ring-[#00E5FF] p-[6px] bg-black"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "relative"
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      opacity: 0.22,
+      filter: "grayscale(1)"
+    }
+  }, /*#__PURE__*/React.createElement(Scaled, null, /*#__PURE__*/React.createElement(Comp, {
+    d: d,
+    bug: null
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "absolute inset-0",
+    style: {
+      mixBlendMode: "screen",
+      filter: "brightness(3.5)"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "relative",
+    style: {
+      isolation: "isolate"
+    }
+  }, /*#__PURE__*/React.createElement(Scaled, null, /*#__PURE__*/React.createElement(Comp, {
+    d: d,
+    bug: null
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "absolute inset-0",
+    style: {
+      mixBlendMode: "difference"
+    }
+  }, /*#__PURE__*/React.createElement(Scaled, null, /*#__PURE__*/React.createElement(Comp, {
+    d: d,
+    bug: badBug
+  })))))))), /*#__PURE__*/React.createElement("div", {
+    className: "hidden sm:flex w-[var(--cw)] shrink-0 flex-col justify-center self-center gap-3 f-mono text-[12px] leading-relaxed text-[#8B90A0]"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "text-[#00E5FF] text-[11px] uppercase tracking-[0.2em]"
+  }, "A \u2296 B overlay"), /*#__PURE__*/React.createElement("p", null, "Both designs stacked and subtracted. Anything identical cancels out; ", /*#__PURE__*/React.createElement("span", {
+    className: "text-[#E8EAF0]"
+  }, "only the pixels that differ light up.")), /*#__PURE__*/React.createElement("p", null, "Release to go back and pick.")))), /*#__PURE__*/React.createElement("div", {
+    className: "cu-feedback mt-4 mx-auto w-full max-w-[680px]"
+  }, answered && /*#__PURE__*/React.createElement("div", {
+    className: `anim-rise flex gap-3 rounded-xl border px-4 py-3 ${correct ? "border-[#CCFF00]/35 bg-[#CCFF00]/[0.06]" : "border-[#FF3366]/40 bg-[#FF3366]/[0.07]"}`
+  }, /*#__PURE__*/React.createElement("span", {
+    className: `grid h-7 w-7 shrink-0 place-items-center rounded-full ${correct ? "bg-[#CCFF00] text-[#0B0C10]" : "bg-[#FF3366] text-white"}`
+  }, correct ? /*#__PURE__*/React.createElement(Check, {
+    size: 16,
+    strokeWidth: 3
+  }) : /*#__PURE__*/React.createElement(X, {
+    size: 16,
+    strokeWidth: 3
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "text-[13.5px] leading-relaxed"
+  }, correct ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    className: "font-semibold text-[#CCFF00]"
+  }, "+", gained, " pts", streak > 1 ? ` · ${streak} in a row` : ""), /*#__PURE__*/React.createElement("div", {
+    className: "text-[#C9CDD8]"
+  }, Q.rule), /*#__PURE__*/React.createElement("div", {
+    className: "mt-1 text-[#8B90A0]"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "text-[#FF7A99]"
+  }, "The other one:"), " ", Q.why)) : /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    className: "font-semibold text-[#FF7A99]"
+  }, "Option ", labels[picked], " has the bug \xB7 \u221225 pts, streak reset"), /*#__PURE__*/React.createElement("div", {
+    className: "text-[#C9CDD8]"
+  }, Q.why), /*#__PURE__*/React.createElement("div", {
+    className: "mt-1 text-[#8B90A0]"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "text-[#CCFF00]"
+  }, "Rule:"), " ", Q.rule)))), !answered && /*#__PURE__*/React.createElement("p", {
+    className: "f-mono hidden sm:flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[11px] text-[#6C7182]"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "flex items-center gap-1"
+  }, /*#__PURE__*/React.createElement(Keyboard, {
+    size: 13
+  }), " \u2190 / \u2192 pick"), /*#__PURE__*/React.createElement("span", null, "hold Shift or Space to compare"), /*#__PURE__*/React.createElement("span", null, "Enter next"))), /*#__PURE__*/React.createElement("div", {
+    className: "cu-actions mt-4 flex flex-wrap items-center justify-center gap-3"
+  }, /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    id: "compare-btn",
+    "aria-pressed": "false",
+    onPointerDown: e => {
+      if (e.button !== 0) return;
+      e.preventDefault();
+      // Capture keeps the hold alive even if the pointer drifts off the button.
+      try {
+        e.currentTarget.setPointerCapture(e.pointerId);
+      } catch (_) {}
+      setCompare(true);
+    },
+    onPointerUp: () => setCompare(false),
+    onPointerCancel: () => setCompare(false),
+    onLostPointerCapture: () => setCompare(false),
+    onContextMenu: e => e.preventDefault(),
+    onClick: e => {
+      if (e.detail === 0) setCompare(c => !c); /* keyboard Enter toggles; mouse/touch use the hold */
+    },
+    onBlur: () => setCompare(false),
+    className: "cmp-btn f-display flex items-center gap-2 rounded-xl border px-5 py-2.5 text-[15px] font-semibold select-none"
+  }, /*#__PURE__*/React.createElement(Layers, {
+    size: 17
+  }), " ", /*#__PURE__*/React.createElement("span", {
+    className: "cmp-label"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "cmp-off"
+  }, "Hold to compare"), /*#__PURE__*/React.createElement("span", {
+    className: "cmp-on"
+  }, "Comparing\u2026"))), /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    onClick: next,
+    disabled: !answered,
+    className: `f-display flex items-center gap-2 rounded-xl px-6 py-2.5 text-[15px] font-bold transition-all
+                  ${!answered ? "bg-[#1A1D26] text-[#555A6A] cursor-not-allowed" : correct ? "bg-[#CCFF00] text-[#0B0C10] shadow-[0_0_28px_rgba(204,255,0,.45)] hover:brightness-110" : "bg-gradient-to-r from-[#A020F0] to-[#00E5FF] text-white hover:brightness-110"}`
+  }, idx + 1 >= T.n ? `Finish ${T.label}` : "Next", " ", /*#__PURE__*/React.createElement(ArrowRight, {
+    size: 17
+  })))), /*#__PURE__*/React.createElement("div", {
+    className: "cu-footer border-t border-white/10 bg-[#0D0F14] px-4 py-3"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "cu-foot mx-auto flex max-w-[660px] flex-wrap items-center gap-x-3 gap-y-2 rounded-2xl sm:rounded-full border border-white/10 bg-[#111319] px-4 py-2 f-mono text-[12px]"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "rounded-full px-2 py-0.5 text-[11px] font-bold",
+    style: {
+      background: `${T.color}22`,
+      color: T.color
+    }
+  }, T.label), /*#__PURE__*/React.createElement("span", {
+    className: "text-[#E8EAF0]"
+  }, phase === "tierEnd" ? T.n : idx + 1, " / ", T.n), /*#__PURE__*/React.createElement("span", {
+    className: "cu-stage text-[#6C7182]"
+  }, "Stage ", Math.min(TOTAL_STAGES, OFFSET[tier] + (phase === "tierEnd" ? T.n : idx + 1)), "/", TOTAL_STAGES), /*#__PURE__*/React.createElement("div", {
+    className: "flex h-1.5 min-w-[120px] flex-1 gap-[3px]",
+    "aria-hidden": "true"
+  }, TIERS.map((X_, i) => {
+    const fill = i < tier ? 100 : i > tier ? 0 : (idx + (answered || phase === "tierEnd" ? 1 : 0)) / X_.n * 100;
+    return /*#__PURE__*/React.createElement("div", {
+      key: i,
+      className: "relative overflow-hidden rounded-full bg-white/10",
+      style: {
+        flexGrow: X_.n
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "absolute inset-y-0 left-0 rounded-full transition-all duration-500",
+      style: {
+        width: `${fill}%`,
+        background: X_.color,
+        boxShadow: `0 0 10px ${X_.color}99`
+      }
+    }));
+  })), /*#__PURE__*/React.createElement("span", {
+    className: "w-10 text-right text-[#CCFF00]"
+  }, stageDone, "%")))));
+}
+function TierEnd({
+  tier,
+  items,
+  results,
+  score,
+  best,
+  progress,
+  primaryRef,
+  onAdvance,
+  onRetry,
+  onRestartAll
+}) {
+  const T = TIERS[tier];
+  const hits = results.filter(Boolean).length;
+  const need = needFor(tier);
+  const passed = hits >= need;
+  const last = tier === TIERS.length - 1;
+  const pct = Math.round(hits / T.n * 100);
+  const missed = items.map((it, k) => ({
+    it,
+    ok: results[k]
+  })).filter(x => !x.ok).map(x => resolve(x.it));
+  let headline,
+    sub,
+    primary,
+    secondary = [];
+  if (last) {
+    headline = passed ? "All 100 stages cleared. You can't unsee it now." : "All 100 stages played.";
+    sub = passed ? `${pct}% on Hard: pixel-level eye confirmed.` : `${pct}% on Hard. ${need} of ${T.n} earns the Hard badge. Go again?`;
+    primary = {
+      label: "Replay Hard",
+      fn: onRetry,
+      icon: RotateCcw
+    };
+    secondary = [{
+      label: "Start over from Easy",
+      fn: onRestartAll
+    }];
+  } else if (passed) {
+    const N = TIERS[tier + 1];
+    headline = `${N.label} mode unlocked.`;
+    sub = `${hits} of ${T.n} right (${pct}%). Next: ${N.n} stages. ${N.blurb}`;
+    primary = {
+      label: `Enter ${N.label} mode`,
+      fn: onAdvance,
+      icon: ArrowRight
+    };
+    secondary = [{
+      label: `Replay ${T.label}`,
+      fn: onRetry
+    }];
+  } else {
+    headline = `${hits} of ${T.n}. You need ${need} to unlock ${TIERS[tier + 1].label}.`;
+    sub = `That's ${pct}%, and the gate is ${Math.round(PASS * 100)}%. The stages reshuffle and some bugs change content when you retry.`;
+    primary = {
+      label: `Retry ${T.label}`,
+      fn: onRetry,
+      icon: RotateCcw
+    };
+    if (progress.unlocked > tier) secondary = [{
+      label: `Go to ${TIERS[tier + 1].label}`,
+      fn: onAdvance
+    }];
+  }
+  primaryRef.current = primary.fn;
+  const PIcon = primary.icon;
+  return /*#__PURE__*/React.createElement("div", {
+    className: "cu-end anim-rise px-5 sm:px-8 pb-7"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "mt-6 grid gap-5 sm:grid-cols-[auto_1fr] sm:items-center"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "f-display text-[64px] font-bold leading-none",
+    style: {
+      color: passed ? "#CCFF00" : "#FF3366",
+      textShadow: `0 0 30px ${passed ? "rgba(204,255,0,.35)" : "rgba(255,51,102,.35)"}`
+    }
+  }, hits, "/", T.n), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "f-display text-[21px] font-semibold leading-snug",
+    style: {
+      textWrap: "balance"
+    }
+  }, headline), /*#__PURE__*/React.createElement("p", {
+    className: "mt-1 max-w-[60ch] text-[14px] leading-relaxed text-[#A9AEBC]"
+  }, sub), /*#__PURE__*/React.createElement("div", {
+    className: "f-mono mt-2 text-[12px] text-[#8B90A0]"
+  }, score.toLocaleString(), " pts \xB7 best streak \xD7", best, " \xB7 personal best in ", T.label, ": ", Math.max(progress.best[tier] || 0, hits), "/", T.n))), /*#__PURE__*/React.createElement("div", {
+    className: "mt-6 flex flex-wrap gap-3"
+  }, /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    onClick: primary.fn,
+    className: "f-display flex items-center gap-2 rounded-xl px-6 py-2.5 text-[15px] font-bold text-[#0B0C10] hover:brightness-110",
+    style: {
+      background: passed || last ? "#CCFF00" : "#00E5FF",
+      boxShadow: `0 0 28px ${passed || last ? "rgba(204,255,0,.4)" : "rgba(0,229,255,.35)"}`
+    }
+  }, primary.label, " ", /*#__PURE__*/React.createElement(PIcon, {
+    size: 17
+  })), secondary.map(s => /*#__PURE__*/React.createElement("button", {
+    key: s.label,
+    type: "button",
+    onClick: s.fn,
+    className: "f-display rounded-xl border border-white/15 px-5 py-2.5 text-[15px] font-semibold text-[#C9CDD8] hover:border-white/30"
+  }, s.label))), /*#__PURE__*/React.createElement("div", {
+    className: "mt-7"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "f-mono text-[11px] uppercase tracking-[0.2em] text-[#8B90A0]"
+  }, missed.length ? `The ${missed.length} you missed` : "Nothing missed"), missed.length > 0 && /*#__PURE__*/React.createElement("ul", {
+    className: "cu-missed thin-scroll mt-3 flex flex-col gap-2 overflow-y-auto pr-1"
+  }, missed.map((m, k) => /*#__PURE__*/React.createElement("li", {
+    key: k,
+    className: "flex gap-3 rounded-xl border border-white/10 bg-[#111319] p-3"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "grid h-6 w-6 shrink-0 place-items-center rounded-full bg-[#FF3366] text-white"
+  }, /*#__PURE__*/React.createElement(X, {
+    size: 14,
+    strokeWidth: 3
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "text-[13px] leading-relaxed"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "f-mono text-[11px] uppercase tracking-wider text-[#00E5FF]"
+  }, m.tag), /*#__PURE__*/React.createElement("div", {
+    className: "text-[#C9CDD8]"
+  }, m.rule), /*#__PURE__*/React.createElement("div", {
+    className: "text-[#8B90A0]"
+  }, m.why)))))));
+}
+ReactDOM.createRoot(document.getElementById("root")).render( /*#__PURE__*/React.createElement(App, null));
+</script>
+<script>
+  // Shown only if the CDN libraries couldn't load (e.g. opened offline for the first time).
+  if (!window.React || !window.ReactDOM) {
+    document.getElementById("root").innerHTML =
+      '<div class="boot"><span style="max-width:46ch;text-align:center;line-height:1.7">Can’t Unsee needs an internet connection to load React, Tailwind and its fonts from a CDN.<br><b>Reconnect and refresh.</b></span></div>';
+  }
+</script>
+</body>
+</html>
