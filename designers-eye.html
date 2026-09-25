@@ -81,15 +81,17 @@
     padding:10px 16px; background:#0D0F14; border-bottom:1px solid rgba(255,255,255,0.10);
   }
   .os-lights{ display:flex; gap:6px; }
-  .os-lights span{ width:12px; height:12px; border-radius:50%; }
+  .os-lights span, .os-lights a{ width:12px; height:12px; border-radius:50%; }
   .os-path{ font-family:'JetBrains Mono', monospace; font-size:12px; color: var(--text-mid); }
   .os-path b{ color: var(--text-hi); font-weight:400; }
   .os-lights{ flex-shrink:0; }
+  .os-back{ display:block; cursor:pointer; transition:filter .15s ease, transform .15s ease; }
+  .os-back:hover{ filter:brightness(1.25); transform:scale(1.15); }
   .os-path{ flex:1 1 auto; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .os-pill{ flex-shrink:0; }
   @media (max-width: 480px){ .os-titlebar{ gap:8px; } }
   /* phones: show just the file name and tighten type so the bar stays on one line */
-  @container (max-width: 440px){ .os-path-dir, .os-path-ext{ display:none; } .os-lights{ gap:5px; } .os-lights span{ width:10px; height:10px; } .os-path{ font-size:11.5px; } .os-pill{ font-size:10.5px; padding:4px 10px; } }
+  @container (max-width: 440px){ .os-path-dir, .os-path-ext{ display:none; } .os-lights{ gap:5px; } .os-lights span, .os-lights a{ width:10px; height:10px; } .os-path{ font-size:11.5px; } .os-pill{ font-size:10.5px; padding:4px 10px; } }
   .os-pill{
     margin-left:auto; white-space:nowrap;
     font-family:'JetBrains Mono', monospace; font-size:11px; color: var(--lime); text-decoration:none;
@@ -381,7 +383,7 @@
 
 <div class="stage os-window">
   <div class="os-titlebar">
-    <div class="os-lights" aria-hidden="true"><span style="background:#FF3366"></span><span style="background:#FFB020"></span><span style="background:#CCFF00"></span></div>
+    <div class="os-lights"><a class="os-back" href="../arcade.html" title="Back to Arcade" aria-label="Back to Arcade" style="background:#FF3366"></a><span style="background:#FFB020"></span><span style="background:#CCFF00"></span></div>
     <span class="os-path"><span class="os-path-dir">~/sarbesh-os/apps/</span><b>designers_eye</b><span class="os-path-ext">.exe</span></span>
     <a class="os-pill" href="https://sarbeshlalamatya.com.np" target="_blank" rel="noopener">Sarbesh Lal Amatya</a>
   </div>
@@ -1015,5 +1017,34 @@
   });
 })();
 </script>
+<!-- Sarbesh-OS custom cursor (same look as Boolean Construct) -->
+<style>
+  @media (pointer:fine){ html, body, *{ cursor:none !important; } }
+  .cursor-dot,.cursor-ring{ position:fixed; top:0; left:0; border-radius:50%; pointer-events:none; z-index:2147483647; transform:translate(-50%,-50%); opacity:0; transition:opacity .15s ease, background .15s ease, border-color .15s ease, width .18s cubic-bezier(.22,1,.36,1), height .18s cubic-bezier(.22,1,.36,1); }
+  .cursor-dot{ width:8px; height:8px; background:#CCFF00; }
+  .cursor-ring{ width:36px; height:36px; border:1.5px solid #CCFF00; }
+  body.cursor-visible .cursor-dot, body.cursor-visible .cursor-ring{ opacity:1; }
+  body.cursor-hover .cursor-dot{ background:#FFB020; }
+  body.cursor-hover .cursor-ring{ border-color:#FFB020; width:46px; height:46px; }
+  @media (pointer:coarse){ .cursor-dot,.cursor-ring{ display:none !important; } }
+</style>
+<script>
+(function(){
+  var dot = document.createElement('div'); dot.className = 'cursor-dot';
+  var ring = document.createElement('div'); ring.className = 'cursor-ring';
+  document.body.appendChild(dot); document.body.appendChild(ring);
+  var HOVER = 'a, button:not(:disabled), [role="button"], [role="radio"], [data-interactive], [tabindex="0"], label, select, summary';
+  window.addEventListener('pointermove', function(e){
+    if (e.pointerType !== 'mouse' && e.pointerType !== 'pen') return;
+    dot.style.left = ring.style.left = e.clientX + 'px';
+    dot.style.top = ring.style.top = e.clientY + 'px';
+    document.body.classList.add('cursor-visible');
+    var el = document.elementFromPoint(e.clientX, e.clientY);
+    document.body.classList.toggle('cursor-hover', !!(el && el.closest && el.closest(HOVER)));
+  });
+  document.documentElement.addEventListener('mouseleave', function(){ document.body.classList.remove('cursor-visible'); });
+})();
+</script>
+
 </body>
 </html>

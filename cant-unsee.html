@@ -2435,10 +2435,12 @@ function App() {
   }, /*#__PURE__*/React.createElement("div", {
     className: "cu-titlebar flex flex-wrap items-center gap-3 border-b border-white/10 bg-[#0D0F14] px-4 py-2.5"
   }, /*#__PURE__*/React.createElement("div", {
-    className: "flex gap-1.5",
-    "aria-hidden": "true"
-  }, /*#__PURE__*/React.createElement("span", {
-    className: "h-3 w-3 rounded-full bg-[#FF3366]"
+    className: "flex gap-1.5"
+  }, /*#__PURE__*/React.createElement("a", {
+    href: "../arcade.html",
+    title: "Back to Arcade",
+    "aria-label": "Back to Arcade",
+    className: "block h-3 w-3 rounded-full bg-[#FF3366] cursor-pointer transition hover:brightness-125 hover:scale-110"
   }), /*#__PURE__*/React.createElement("span", {
     className: "h-3 w-3 rounded-full bg-[#FFB020]"
   }), /*#__PURE__*/React.createElement("span", {
@@ -2834,5 +2836,34 @@ ReactDOM.createRoot(document.getElementById("root")).render( /*#__PURE__*/React.
       '<div class="boot"><span style="max-width:46ch;text-align:center;line-height:1.7">Can’t Unsee needs an internet connection to load React, Tailwind and its fonts from a CDN.<br><b>Reconnect and refresh.</b></span></div>';
   }
 </script>
+<!-- Sarbesh-OS custom cursor (same look as Boolean Construct) -->
+<style>
+  @media (pointer:fine){ html, body, *{ cursor:none !important; } }
+  .cursor-dot,.cursor-ring{ position:fixed; top:0; left:0; border-radius:50%; pointer-events:none; z-index:2147483647; transform:translate(-50%,-50%); opacity:0; transition:opacity .15s ease, background .15s ease, border-color .15s ease, width .18s cubic-bezier(.22,1,.36,1), height .18s cubic-bezier(.22,1,.36,1); }
+  .cursor-dot{ width:8px; height:8px; background:#CCFF00; }
+  .cursor-ring{ width:36px; height:36px; border:1.5px solid #CCFF00; }
+  body.cursor-visible .cursor-dot, body.cursor-visible .cursor-ring{ opacity:1; }
+  body.cursor-hover .cursor-dot{ background:#FFB020; }
+  body.cursor-hover .cursor-ring{ border-color:#FFB020; width:46px; height:46px; }
+  @media (pointer:coarse){ .cursor-dot,.cursor-ring{ display:none !important; } }
+</style>
+<script>
+(function(){
+  var dot = document.createElement('div'); dot.className = 'cursor-dot';
+  var ring = document.createElement('div'); ring.className = 'cursor-ring';
+  document.body.appendChild(dot); document.body.appendChild(ring);
+  var HOVER = 'a, button:not(:disabled), [role="button"], [role="radio"], [data-interactive], [tabindex="0"], label, select, summary';
+  window.addEventListener('pointermove', function(e){
+    if (e.pointerType !== 'mouse' && e.pointerType !== 'pen') return;
+    dot.style.left = ring.style.left = e.clientX + 'px';
+    dot.style.top = ring.style.top = e.clientY + 'px';
+    document.body.classList.add('cursor-visible');
+    var el = document.elementFromPoint(e.clientX, e.clientY);
+    document.body.classList.toggle('cursor-hover', !!(el && el.closest && el.closest(HOVER)));
+  });
+  document.documentElement.addEventListener('mouseleave', function(){ document.body.classList.remove('cursor-visible'); });
+})();
+</script>
+
 </body>
 </html>
