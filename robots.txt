@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://sarbeshlalamatya.com.np/sitemap.xml
