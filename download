@@ -1,0 +1,8 @@
+.git
+.github
+node_modules
+wrangler.jsonc
+wrangler.toml
+DEPLOY.md
+README.md
+CNAME
