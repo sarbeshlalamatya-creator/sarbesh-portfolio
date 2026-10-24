@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ING Tech Design System</title>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&amp;family=Geist:wght@400;500;600;700&amp;family=Caveat:wght@500;700&amp;family=Instrument+Serif:ital@0;1&amp;family=Lato:wght@400;700&amp;display=swap" rel="stylesheet">
+<style>
+/* Layout: portfolio cream and ink with the teal card colour as signature; the system's own purple and Lato appear only where ING Tech itself is on show. */
+:root{
+  --paper:#F3EEE4; --paper-2:#EAE3D5; --ink:#1B1A17; --ink-2:#3E3B35; --mute:#6F6A61; --line:rgba(27,26,23,.12);
+  --signal:#F2552C; --ind:#067B8F; --ind-ink:#ECFEFF; --sys:#774EA7; --sys-font:'Lato',system-ui,sans-serif;
+  --display:'Bricolage Grotesque',system-ui,sans-serif; --body:'Geist',system-ui,sans-serif; --hand:'Caveat',cursive; --serif:'Instrument Serif',Georgia,serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img{max-width:100%;height:auto;display:block}
+a{color:inherit}
+::selection{background:var(--signal);color:var(--ink)}
+:focus-visible{outline:2px solid var(--signal);outline-offset:3px;border-radius:6px}
+.wrap{max-width:1240px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.read{max-width:660px}
+section{padding-block:clamp(64px,10vw,128px)}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--mute)}
+h1,h2,h3{font-family:var(--display);letter-spacing:-.04em;line-height:1;margin:0;text-wrap:balance}
+h2{font-size:clamp(36px,5.4vw,72px);font-weight:800}
+h3{font-size:clamp(20px,2vw,26px);font-weight:800;letter-spacing:-.03em}
+p{margin:0}
+.lede{font-size:clamp(19px,1.7vw,22px);line-height:1.5;color:var(--ink-2)}
+.hand{font-family:var(--hand);font-weight:700;color:var(--signal);font-size:clamp(24px,2.4vw,30px);line-height:1.1}
+.stack{display:flex;flex-direction:column;gap:20px}
+.shot{border-radius:18px;overflow:hidden;box-shadow:0 30px 70px rgba(27,26,23,.14),0 2px 0 rgba(27,26,23,.04);background:#fff}
+.reading{display:inline-flex;align-items:center;gap:8px;align-self:flex-start;font-size:13px;font-weight:600;color:var(--ink-2);border:1.5px dashed rgba(27,26,23,.3);border-radius:999px;padding:5px 12px}
+.reading::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--signal)}
+.tbc{border-bottom:1.5px dashed var(--signal)}
+.split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:clamp(32px,6vw,88px);align-items:center}
+
+.bar{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:50;display:flex;align-items:center;gap:6px;padding:6px;background:rgba(255,255,255,.62);backdrop-filter:blur(16px) saturate(1.4);-webkit-backdrop-filter:blur(16px) saturate(1.4);border:1px solid rgba(27,26,23,.08);border-radius:999px;box-shadow:0 8px 30px rgba(27,26,23,.08);max-width:calc(100vw - 24px)}
+.bar a{text-decoration:none;font-size:14px;font-weight:600;padding:8px 14px;border-radius:999px;white-space:nowrap}
+.bar a:hover{background:rgba(27,26,23,.06)}
+.bar .dark-btn{background:var(--ink);color:var(--paper)}
+.bar .dark-btn:hover{background:var(--ink);color:var(--signal)}
+.bar img{width:30px;height:30px;border-radius:50%;object-fit:cover;background:var(--paper-2)}
+.meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:18px;border-top:1px solid var(--line);padding-top:20px;margin-top:36px}
+.meta div > span{display:block;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+.meta div > strong{display:block;margin-top:6px;font-weight:600;font-size:16px;line-height:1.4}
+.reflect{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(28px,5vw,72px)}
+.reflect ol{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:22px}
+.reflect li{display:flex;flex-direction:column;gap:6px;padding-left:18px;border-left:3px solid var(--ind)}
+.reflect li strong{font-weight:600}
+
+.end{background:var(--ind);color:var(--ind-ink);border-radius:32px 32px 0 0}
+.end h2{font-size:clamp(44px,7vw,104px)}
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:32px}
+.cta a{text-decoration:none;font-weight:600;font-size:15px;padding:13px 22px;border-radius:999px}
+.cta .solid{background:var(--ind-ink);color:var(--ind)}
+.cta .ghost{border:1.5px solid var(--ind-ink);color:var(--ind-ink)}
+footer{background:var(--ind);color:rgba(236,254,255,.7);font-size:13px;padding-block:0 32px}
+.rise{transition:transform .8s cubic-bezier(.2,.8,.2,1)}
+.rise.pre{transform:translateY(28px)}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.rise,.rise.pre,.tpin,.menu-frame img{transition:none}.rise.pre{transform:none}}
+/* hero */
+.hero{padding-top:clamp(110px,14vh,150px);padding-bottom:clamp(40px,6vw,80px)}
+.hero-grid{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:clamp(24px,4vw,56px);align-items:end}
+.name h1{font-size:clamp(64px,10vw,140px);font-weight:800;letter-spacing:-.065em;line-height:.86}
+.name h1 em{font-style:normal;color:var(--ind)}
+.name small{display:block;margin-top:14px;font:700 13px var(--body);letter-spacing:.16em;text-transform:uppercase;color:var(--sys)}
+.statement{font-family:var(--serif);font-size:clamp(28px,3.2vw,44px);line-height:1.08;max-width:20ch;margin-top:32px}
+.stage-h{position:relative;height:clamp(380px,40vw,540px)}
+.browser{position:absolute;left:0;right:6%;top:6%;border-radius:14px;overflow:hidden;background:#fff;box-shadow:0 30px 70px rgba(27,26,23,.2);transform:rotate(-2deg)}
+.browser::before{content:"";display:block;height:22px;background:#F1EDF6 radial-gradient(circle at 12px 11px,#F0979E 4px,transparent 5px) ,radial-gradient(circle at 26px 11px,#F2C07E 4px,transparent 5px),radial-gradient(circle at 40px 11px,#87D89D 4px,transparent 5px);background-color:#F1EDF6}
+.float{position:absolute;border-radius:12px;box-shadow:0 20px 44px rgba(27,26,23,.22);background:#fff}
+.f-toast{right:0;top:0;width:clamp(200px,22vw,300px);transform:rotate(3deg)}
+.f-dialog{right:2%;bottom:0;width:clamp(150px,15vw,210px);transform:rotate(4deg)}
+.hero-band{position:absolute;left:4%;right:0;bottom:-6%;height:50%;background:var(--ind);border-radius:28px;z-index:-1}
+
+/* segmented controls */
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{border:1.5px solid var(--line);background:#fff;font:600 14px var(--body);color:var(--ink-2);padding:8px 16px;border-radius:999px;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.seg button i{width:12px;height:12px;border-radius:50%}
+.seg button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+
+/* menu widths */
+.menu{display:grid;grid-template-columns:auto minmax(0,1fr);gap:clamp(24px,5vw,72px);align-items:start;margin-top:40px}
+.menu-frame{position:relative;width:274px;height:560px;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 30px 70px rgba(27,26,23,.12)}
+.menu-frame img{width:auto;max-width:none;height:auto;transition:opacity .25s}
+.menu-frame::after{content:"";position:absolute;left:0;right:0;bottom:0;height:70px;background:linear-gradient(transparent,#fff)}
+.menu-copy h3{margin:22px 0 10px}
+.menu-copy p{color:var(--ink-2);max-width:48ch}
+.width-ruler{display:flex;align-items:flex-end;gap:14px;margin-top:28px}
+.width-ruler div{display:flex;flex-direction:column;gap:6px;font:600 12px ui-monospace,Menlo,monospace;color:var(--mute)}
+.width-ruler span{display:block;height:10px;border-radius:3px;background:rgba(27,26,23,.15);transition:background .2s}
+.width-ruler div.on span{background:var(--sys)}
+.width-ruler div.on{color:var(--ink)}
+
+/* status */
+.status{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(14px,2vw,24px);margin-top:28px;align-items:start}
+.status figure{margin:0;background:#fff;border-radius:20px;padding:18px;display:flex;flex-direction:column;gap:14px;min-height:100%}
+.status figcaption{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+.status .chipbig{height:120px;border-radius:14px;display:flex;align-items:flex-end;padding:12px;font:600 14px ui-monospace,Menlo,monospace;color:#fff;transition:background .3s}
+.status .stack-sm{display:flex;flex-direction:column;gap:10px}
+.status img{border-radius:10px}
+
+/* calendars */
+.cals{display:grid;grid-template-columns:repeat(2,minmax(0,360px));gap:clamp(20px,4vw,48px);margin-top:44px;justify-content:start}
+.cal{background:#fff;border-radius:18px;padding:18px 16px 14px;box-shadow:0 24px 50px rgba(27,26,23,.1);font-family:var(--sys-font)}
+.cal header{display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:17px;color:#404040;padding:0 8px 10px}
+.cal header span{color:#6B7280;font-weight:400}
+.cal .grid{display:grid;grid-template-columns:repeat(7,1fr);row-gap:4px;text-align:center}
+.cal .dow{font-size:13px;color:#6B7280;padding-bottom:8px}
+.cal .d{font-size:15px;color:#404040;height:34px;display:grid;place-items:center;cursor:pointer;border-radius:8px}
+.cal .d:hover{background:#F6EDFC}
+.cal .d.out{color:#D9D9D9;cursor:default}
+.cal .d.out:hover{background:none}
+.cal .d.sat{color:#E53935}
+.cal .d.in{background:#F6EDFC;border-radius:0}
+.cal .d.edge{background:#774EA7;color:#fff;border-radius:8px}
+.cal-cap{margin-top:14px;font-size:15px;color:var(--ink-2)}
+.cal-cap b{display:block;font-family:var(--display);font-size:20px;letter-spacing:-.02em;color:var(--ink)}
+.notes3{list-style:none;padding:0;margin:36px 0 0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px 28px}
+.notes3 li{border-top:2px solid var(--ink);padding-top:10px;display:flex;flex-direction:column;gap:2px}
+.notes3 b{font-weight:600}
+.notes3 span{color:var(--mute);font-size:15px}
+
+/* table anatomy */
+.tframe{position:relative;margin-top:44px;border-radius:16px;overflow:hidden;box-shadow:0 30px 70px rgba(27,26,23,.14);background:#fff}
+.tpin{position:absolute;width:26px;height:26px;border-radius:50%;background:var(--signal);color:var(--ink);font:800 12px var(--display);display:grid;place-items:center;box-shadow:0 0 0 4px rgba(242,85,44,.3);transform:translate(-50%,-50%);transition:transform .2s}
+.tpin.on{transform:translate(-50%,-50%) scale(1.3)}
+.tlist{list-style:none;padding:0;margin:28px 0 0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px 24px}
+.tlist li{display:grid;grid-template-columns:26px minmax(0,1fr);gap:12px;padding:10px;border-radius:12px;transition:background .2s}
+.tlist li.on{background:#fff}
+.tlist li i{width:26px;height:26px;border-radius:50%;background:var(--signal);color:var(--ink);font:800 12px var(--display);font-style:normal;display:grid;place-items:center}
+.tlist b{display:block;font-weight:600}
+.tlist span{display:block;color:var(--mute);font-size:15px}
+.trio{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(14px,2vw,28px);margin-top:56px;align-items:start}
+.trio figure{margin:0;display:flex;flex-direction:column;gap:12px}
+.trio figcaption b{display:block;font-family:var(--display);font-size:20px;letter-spacing:-.02em}
+.trio figcaption span{color:var(--ink-2);font-size:15px}
+
+/* foundations */
+.swatches{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:10px;margin-top:36px}
+.sw{border:0;border-radius:12px;height:86px;cursor:pointer;display:flex;align-items:flex-end;padding:8px;font:600 12px ui-monospace,Menlo,monospace;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);position:relative}
+.sw:hover{outline:2px solid var(--ink);outline-offset:2px}
+.sw.dupe::after{content:"listed twice";position:absolute;top:8px;left:8px;font:700 10px var(--body);letter-spacing:.06em;text-transform:uppercase;background:var(--signal);color:var(--ink);border-radius:999px;padding:2px 7px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:var(--paper);font-size:14px;font-weight:600;padding:10px 18px;border-radius:999px;z-index:60}
+.scrollx{overflow-x:auto;margin-top:28px;border-radius:16px;background:#fff;padding:12px}
+.scrollx img{max-width:none;height:clamp(180px,22vw,280px);width:auto}
+
+@media (max-width:860px){
+  .hero-grid,.split,.menu,.reflect{grid-template-columns:minmax(0,1fr)}
+  .status{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .cals,.notes3,.tlist,.trio{grid-template-columns:minmax(0,1fr)}
+  .menu-frame{margin-inline:auto}
+  .stage-h{height:300px}
+  .tpin{width:18px;height:18px;font-size:10px;box-shadow:0 0 0 2px rgba(242,85,44,.3)}
+}
+@media (max-width:520px){.status{grid-template-columns:minmax(0,1fr)}}
+</style>
+<style>body{animation:cnIn .45s ease both}@keyframes cnIn{from{opacity:0}}@media (prefers-reduced-motion:reduce){body{animation:none}}</style>
+<script src="case-nav.js" defer></script>
+</head>
+<body>
+<nav class="bar" aria-label="Case study">
+  <a href="../index.html#work" style="display:flex;align-items:center;gap:8px;padding:2px 12px 2px 2px"><img src="../work/avatar.webp" alt="" width="30" height="30"><span style="font-family:var(--display);font-weight:800;font-size:16px;letter-spacing:-.02em">Sarbesh</span></a>
+  <a href="../index.html#work">All work</a>
+  <a class="dark-btn" href="https://www.figma.com/design/TG7wWOeI2XfeerQSwPuFDR/ING-TECH-DESIGN-LIBRARY?node-id=6-9735" target="_blank" rel="noopener">Figma ↗</a>
+</nav>
+<header class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="eyebrow">Case study · Design system · 2026</div>
+      <div class="name" style="margin-top:18px"><h1>ING<br><em>Tech</em></h1><small>Design System 2026</small></div>
+      <p class="statement">Built for the screens nobody screenshots: menus, tables and error messages.</p>
+      <div class="meta">
+        <div><span>What it is</span><strong>The design system behind ING Tech's web tools, shown here inside AttendEase</strong></div>
+        <div><span>Shown here</span><strong>12 sheets: menu, colour, buttons, tags, feedback, calendars, tables, login</strong></div>
+        <div><span>My role</span><strong><span class="tbc">Design system design</span></strong></div>
+      </div>
+    </div>
+    <div class="stage-h" aria-label="System pieces assembled on a page">
+      <div class="browser"><img src="ingtech/screen-filters.webp" alt="AttendEase page with tabs, filters and a data table" width="1920" height="1080"></div>
+      <img class="float f-toast" src="ingtech/toast-success.webp" alt="Success toast" width="637" height="148">
+      <img class="float f-dialog" src="ingtech/dialog-success.webp" alt="Success dialog" width="560" height="480">
+      <div class="hero-band" aria-hidden="true"></div>
+    </div>
+  </div>
+</header>
+
+<section style="padding-top:clamp(40px,6vw,80px)">
+  <div class="wrap">
+    <div class="split" style="align-items:end">
+      <div class="stack rise">
+        <div class="eyebrow">Navigation</div>
+        <h2>One menu, three widths.</h2>
+      </div>
+      <div class="stack rise">
+        <p class="lede">An admin tool with nineteen pages needs a menu that can get out of the way. The sheet draws the same sidebar five ways, from full labels down to a 52px rail of icons.</p>
+        <p>Switch between them. The icons never move, so the rail is just the full menu with the words switched off.</p>
+      </div>
+    </div>
+    <div class="menu rise">
+      <div class="menu-frame"><img id="mimg" src="ingtech/nav-full.webp" alt="" width="238" height="1079"></div>
+      <div class="menu-copy">
+        <div class="seg" id="mseg" role="group" aria-label="Menu state"></div>
+        <h3 id="mtitle"></h3>
+        <p id="mtext"></p>
+        <div class="width-ruler" id="ruler" aria-hidden="true"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="background:#fff">
+  <div class="wrap">
+    <div class="split" style="align-items:end">
+      <div class="stack rise">
+        <div class="eyebrow">Feedback</div>
+        <h2>One status, four places.</h2>
+      </div>
+      <div class="stack rise">
+        <p class="lede">Success, warning, error and info each get one soft colour. That colour follows the message from a button to a toast to a full dialog, so a user learns it once.</p>
+        <span class="reading">My reading of the colour, button, toast and dialog sheets together</span>
+      </div>
+    </div>
+    <div class="seg rise" id="sseg" role="group" aria-label="Status" style="margin-top:40px"></div>
+    <div class="status rise">
+      <figure><figcaption>Colour</figcaption><div class="chipbig" id="schip"></div></figure>
+      <figure><figcaption>Buttons</figcaption><div class="stack-sm"><img id="sb1" src="" alt="" width="300" height="78"><img id="sb2" src="" alt="" width="330" height="78"></div></figure>
+      <figure><figcaption>Toast</figcaption><img id="stoast" src="" alt="" width="637" height="148"></figure>
+      <figure><figcaption>Dialog</figcaption><img id="sdialog" src="" alt="" width="560" height="480"></figure>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="split" style="align-items:end">
+      <div class="stack rise">
+        <div class="eyebrow">Dates</div>
+        <h2>Two calendars, one grid.</h2>
+      </div>
+      <div class="stack rise">
+        <p class="lede">Nepal runs on two calendars. Offices and colleges date things in Bikram Sambat, while software and email default to the Gregorian one. The system gives both the same component.</p>
+        <p>Click any two days to select a range.</p>
+      </div>
+    </div>
+    <div class="cals rise">
+      <div><div class="cal" id="calAD"></div><p class="cal-cap"><b>Gregorian</b>March 2025, English day names.</p></div>
+      <div><div class="cal" id="calBS"></div><p class="cal-cap"><b>Bikram Sambat</b>Baisakh 2081, Nepali day names and Devanagari numerals.</p></div>
+    </div>
+    <ul class="notes3">
+      <li class="rise"><b>Saturday is red</b><span>Saturday is Nepal's weekly holiday, so it's the day marked red in both versions.</span></li>
+      <li class="rise"><b>Same shape</b><span>Header, arrows, seven columns and the range fill are identical. Only the labels change.</span></li>
+      <li class="rise"><b>A day stepper too</b><span>For single-day screens there's a small "‹ Sunday ›" control instead of the full month.</span></li>
+    </ul>
+    <p class="rise" style="margin-top:18px;color:var(--mute);font-size:14px">Both calendars are rebuilt in code from the sheet, using the real dates for each month.</p>
+  </div>
+</section>
+
+<section style="background:var(--paper-2)">
+  <div class="wrap">
+    <div class="read stack rise">
+      <div class="eyebrow">Layout</div>
+      <h2>The page is a table.</h2>
+      <p class="lede">Almost every AttendEase screen is a list of students, logs or devices. So the system treats the table as the page: tabs and filters above it, actions inside it, pagination pinned below it.</p>
+    </div>
+    <div class="tframe rise" id="tframe"><img src="ingtech/screen-filters.webp" alt="Table page with section tabs, a filter bar, column headers, rows and row actions" width="1920" height="1080"></div>
+    <ol class="tlist" id="tlist"></ol>
+    <div class="trio">
+      <figure class="rise"><img class="shot" src="ingtech/screen-table.webp" alt="Table layout with collapsed menu and pagination" width="1600" height="900"><figcaption><b>Pagination</b><span>"Showing 1–10 out of 239", page numbers in the middle, rows per page on the right.</span></figcaption></figure>
+      <figure class="rise"><img class="shot" src="ingtech/form-modal.webp" alt="Form modal with title, dropdown, text field and two buttons" width="586" height="336"><figcaption><b>Form modal</b><span>Title, a line of help text, fields, then Secondary and Primary bottom right.</span></figcaption></figure>
+      <figure class="rise"><img class="shot" src="ingtech/login.webp" alt="ING Tech login page with email, password and Login with Outlook" width="1600" height="900"><figcaption><b>The front door</b><span>Email and password, or Login with Outlook for staff accounts.</span></figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="split" style="align-items:end">
+      <div class="stack rise">
+        <div class="eyebrow">Foundations</div>
+        <h2>Purple for doing, grey for everything else.</h2>
+      </div>
+      <div class="stack rise">
+        <p class="lede">Two purples carry every action. A ladder of greys and lavender tints handles surfaces and text, and four pastels handle status. Click a swatch to copy it.</p>
+      </div>
+    </div>
+    <div class="swatches rise" id="swatches"></div>
+    <div class="scrollx rise" tabindex="0" aria-label="Button sheet, scroll sideways"><img src="ingtech/buttons.webp" alt="Button sheet: primary, secondary, tertiary and alternate buttons in default, hover and disabled states, with and without icons, plus status buttons" width="2400" height="417"></div>
+    <p class="rise" style="margin-top:12px;color:var(--mute);font-size:15px">Four button types, each with and without an icon, in default, hover and disabled rows.</p>
+    <div class="rise" style="margin-top:32px;display:grid;grid-template-columns:minmax(0,1fr);gap:12px;max-width:620px"><img src="ingtech/tags.webp" alt="Twelve pastel tags" width="736" height="138" style="border-radius:14px"><p style="color:var(--mute);font-size:15px">Twelve pastel tags, for labels that need to be told apart rather than ranked.</p></div>
+  </div>
+</section>
+
+<section style="padding-top:0">
+  <div class="wrap reflect">
+    <div class="stack rise">
+      <div class="eyebrow">Looking back</div>
+      <h2>What I'd tighten next.</h2>
+      <p class="lede">The menu, the shared status colours and the two calendars do real work. These are the next fixes.</p>
+    </div>
+    <ol class="rise">
+      <li><strong>Name the palette.</strong><span>The colour sheet lists 23 swatches by hex only, and #6B7280 and #404040 appear twice. Named tokens such as "text-muted" or "surface-tint" would stop that drift.</span></li>
+      <li><strong>Darken text on the pastels.</strong><span>The filled status buttons put white text on soft fills. White on the success green #87D89D is about 1.7:1, far below the 4.5:1 small text needs.</span></li>
+      <li><strong>Let actions follow the status.</strong><span>Error and warning dialogs still use a green "Okay" or "Continue". A risky action should carry the warning or error colour, not success.</span></li>
+    </ol>
+  </div>
+</section>
+
+<section class="end">
+  <div class="wrap stack">
+    <div class="hand" style="color:var(--ind-ink)">thanks for reading</div>
+    <h2>Open the library, or keep exploring.</h2>
+    <div class="cta">
+      <a class="solid" href="https://www.figma.com/design/TG7wWOeI2XfeerQSwPuFDR/ING-TECH-DESIGN-LIBRARY?node-id=6-9735" target="_blank" rel="noopener">Open in Figma ↗</a>
+      <a class="ghost" href="hippie-stay.html">Next: Hippie Stay</a>
+      <a class="ghost" href="../index.html#work">Back to all work</a>
+    </div>
+  </div>
+</section>
+<footer><div class="wrap">© 2026 Sarbesh Lal Amatya · Kathmandu, Nepal</div></footer>
+
+<script>
+(function(){
+  function seg(host,items,onPick){
+    items.forEach(function(it,i){var b=document.createElement('button');b.type='button';b.innerHTML=(it.dot?'<i style="background:'+it.dot+'"></i>':'')+it.label;b.addEventListener('click',function(){pick(i);});host.appendChild(b);});
+    function pick(n){[].forEach.call(host.children,function(b,i){b.setAttribute('aria-pressed',String(i===n));});onPick(n);}
+    pick(0);
+  }
+  // menu widths
+  var M=[
+    {label:'Expanded',img:'nav-full',w:238,t:'Full labels',x:'Logo, six pages, and two groups (Admin and Attendance) holding thirteen more that fold away behind a chevron.'},
+    {label:'Groups open',img:'nav-open',w:238,t:'Groups open',x:'The group header turns solid purple and its children indent under it, so you can see which branch you are in.'},
+    {label:'Rail',img:'nav-rail',w:52,t:'Icon rail',x:'Labels drop away and the icons stay in place. The active page keeps its purple tile.'},
+    {label:'Rail + Admin',img:'nav-admin',w:274,t:'Rail with a flyout',x:'Tapping a group on the rail opens a panel beside it with the group’s pages, instead of expanding the whole menu.'},
+    {label:'Rail + Attendance',img:'nav-att',w:274,t:'Same flyout, longer list',x:'Attendance has eight pages. The flyout takes them all without the rail changing width.'}
+  ];
+  var ruler=document.getElementById('ruler');
+  [['expanded',238],['rail',52],['rail + flyout',274]].forEach(function(r){var d=document.createElement('div');d.innerHTML='<span style="width:'+r[1]/2+'px"></span>'+r[0]+' · '+r[1]+'px';ruler.appendChild(d);});
+  seg(document.getElementById('mseg'),M,function(n){
+    var m=M[n],img=document.getElementById('mimg'); img.src='ingtech/'+m.img+'.webp'; img.width=m.w; img.alt='Sidebar: '+m.t;
+    document.getElementById('mtitle').textContent=m.t; document.getElementById('mtext').textContent=m.x;
+    var k=m.w===52?1:m.w===238?0:2; [].forEach.call(ruler.children,function(d,i){d.classList.toggle('on',i===k);});
+  });
+  // status
+  var S=[{label:'Success',dot:'#87D89D',k:'success'},{label:'Warning',dot:'#F2C07E',k:'warning'},{label:'Error',dot:'#F0979E',k:'error'},{label:'Info',dot:'#9D90D1',k:'info'}];
+  seg(document.getElementById('sseg'),S,function(n){
+    var s=S[n],c=document.getElementById('schip'); c.style.background=s.dot; c.textContent=s.dot;
+    var set=function(id,src,alt){var e=document.getElementById(id);e.src='ingtech/'+src+'.webp';e.alt=alt;};
+    set('sb1','btn-'+s.k+'-1','Primary '+s.k+' button'); set('sb2','btn-'+s.k+'-2','Secondary '+s.k+' button');
+    set('stoast','toast-'+s.k,s.label+' toast'); set('sdialog','dialog-'+s.k,s.label+' dialog');
+  });
+  // calendars: lead = blanks before day 1 (Sunday first), sats are red
+  var dev=function(n){return String(n).replace(/\d/g,function(d){return '०१२३४५६७८९'[d];});};
+  function cal(id,title,dows,lead,days,prevDays,fmt){
+    var host=document.getElementById(id), sel=[];
+    host.innerHTML='<header><span aria-hidden="true">‹</span>'+title+'<span aria-hidden="true">›</span></header><div class="grid"></div>';
+    var g=host.querySelector('.grid');
+    dows.forEach(function(d){var e=document.createElement('div');e.className='dow';e.textContent=d;g.appendChild(e);});
+    var cells=[];
+    for(var i=0;i<42;i++){
+      var e=document.createElement('div'),n=i-lead+1,out=n<1||n>days;
+      e.className='d'+(out?' out':'')+(i%7===6&&!out?' sat':'');
+      e.textContent=fmt(n<1?prevDays+n:n>days?n-days:n);
+      if(!out){e.dataset.n=n;e.addEventListener('click',(function(n){return function(){sel=sel.length===1?[sel[0],n].sort(function(a,b){return a-b;}):[n];paint();};})(n));}
+      g.appendChild(e);cells.push(e);
+      if(i===34&&lead+days<=35)break;
+    }
+    function paint(){cells.forEach(function(e){var n=+e.dataset.n;e.classList.remove('in','edge');if(!n)return;
+      if(sel.length===2&&n>sel[0]&&n<sel[1])e.classList.add('in');if(sel.indexOf(n)>-1)e.classList.add('edge');});}
+    sel=[];
+  }
+  cal('calAD','March 2025',['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],6,31,28,String);
+  cal('calBS','बैशाख २०८१',['आइत','सोम','मंगल','बुध','बिही','शुक्र','शनि'],6,31,30,dev);
+  // table anatomy, positions as % of 1920x1080
+  var T=[[10,12.6,'Section tabs','One tab per class group, with arrows when they run out of room'],[11,17.3,'Range filter','Two number boxes, then Filter and Reset'],[45,17.3,'Search','Name, ID or specialisation in one field'],[72,17.3,'Date range','From and To pickers, using the same calendar'],[95,17.3,'Page action','One outlined button for the page’s main task'],[16,21.9,'Column headers','Purple capitals on a lavender band'],[30,28.6,'Long text','Cells wrap to two lines rather than truncating'],[89,38,'Action center','Up to five icon buttons per row'],[5,44,'Selected row','A lavender fill marks the row you’re on']];
+  var tf=document.getElementById('tframe'),tl=document.getElementById('tlist');
+  T.forEach(function(t,i){var p=document.createElement('span');p.className='tpin';p.textContent=i+1;p.style.left=t[0]+'%';p.style.top=t[1]+'%';p.setAttribute('aria-hidden','true');tf.appendChild(p);
+    var li=document.createElement('li');li.className='rise';li.innerHTML='<i>'+(i+1)+'</i><div><b>'+t[2]+'</b><span>'+t[3]+'</span></div>';tl.appendChild(li);
+    var on=function(v){p.classList.toggle('on',v);li.classList.toggle('on',v);};li.addEventListener('mouseenter',function(){on(true);});li.addEventListener('mouseleave',function(){on(false);});});
+  // palette, in the sheet's order
+  var pal=['#774EA7','#9550E4','#F6EDFC','#E2D3EB','#B7B7B7','#E8E8E8','#F1EDF6','#E4DCED','#6B7280','#FFFFFF','#FAFAFA','#404040','#87D89D','#F2C07E','#F0979E','#9D90D1','#FCF9FF','#E5E7EB','#F5F5F5','#6B7280','#404040','#5D626A','#F0F0F0'];
+  var seen={},host=document.getElementById('swatches');
+  var dark=function(h){var n=parseInt(h.slice(1),16);return ((n>>16)*299+(n>>8&255)*587+(n&255)*114)/1000<150;};
+  pal.forEach(function(h){var b=document.createElement('button');b.type='button';b.className='sw'+(seen[h]?' dupe':'');seen[h]=1;b.style.background=h;b.style.color=dark(h)?'#fff':'#404040';b.textContent=h;b.dataset.hex=h;b.setAttribute('aria-label','Copy '+h);host.appendChild(b);});
+  var toast;
+  host.addEventListener('click',function(e){var b=e.target.closest('[data-hex]');if(!b)return;var hex=b.dataset.hex,show=function(m){if(toast)toast.remove();toast=document.createElement('div');toast.className='toast';toast.textContent=m;document.body.appendChild(toast);setTimeout(function(){toast&&toast.remove();},1600);};
+    try{navigator.clipboard.writeText(hex).then(function(){show('Copied '+hex);},function(){show(hex);});}catch(err){show(hex);}});
+  // rise: content stays visible; below-the-fold blocks lift into place
+  if(!matchMedia('(prefers-reduced-motion: reduce)').matches && 'IntersectionObserver' in window){
+    var els=[].slice.call(document.querySelectorAll('.rise')).filter(function(el){return el.getBoundingClientRect().top>innerHeight;});
+    els.forEach(function(el){el.classList.add('pre');});
+    var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.remove('pre');io.unobserve(e.target);}});},{rootMargin:'0px 0px -8% 0px'});
+    els.forEach(function(el){io.observe(el);});
+  }
+})();
+</script>
+</body>
+</html>

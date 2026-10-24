@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Itahari International College</title>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&amp;family=Geist:wght@400;500;600;700&amp;family=Caveat:wght@500;700&amp;family=Instrument+Serif:ital@0;1&amp;family=Lato:wght@400;700&amp;display=swap" rel="stylesheet">
+<style>
+/* Layout: portfolio cream and ink with the rust card colour as signature; IIC's red and room colours appear only where the site itself is on show. */
+:root{
+  --paper:#F3EEE4; --paper-2:#EAE3D5; --ink:#1B1A17; --ink-2:#3E3B35; --mute:#6F6A61; --line:rgba(27,26,23,.12);
+  --signal:#F2552C; --ind:#A94808; --ind-ink:#FFF7ED; --red:#D9534F; --sys-font:'Lato',system-ui,sans-serif;
+  --display:'Bricolage Grotesque',system-ui,sans-serif; --body:'Geist',system-ui,sans-serif; --hand:'Caveat',cursive; --serif:'Instrument Serif',Georgia,serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img{max-width:100%;height:auto;display:block}
+a{color:inherit}
+::selection{background:var(--signal);color:var(--ink)}
+:focus-visible{outline:2px solid var(--signal);outline-offset:3px;border-radius:6px}
+.wrap{max-width:1240px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.read{max-width:660px}
+section{padding-block:clamp(64px,10vw,128px)}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--mute)}
+h1,h2,h3{font-family:var(--display);letter-spacing:-.04em;line-height:1;margin:0;text-wrap:balance}
+h2{font-size:clamp(36px,5.4vw,72px);font-weight:800}
+h3{font-size:clamp(20px,2vw,26px);font-weight:800;letter-spacing:-.03em}
+p{margin:0}
+.lede{font-size:clamp(19px,1.7vw,22px);line-height:1.5;color:var(--ink-2)}
+.hand{font-family:var(--hand);font-weight:700;color:var(--signal);font-size:clamp(24px,2.4vw,30px);line-height:1.1}
+.stack{display:flex;flex-direction:column;gap:20px}
+.shot{border-radius:18px;overflow:hidden;box-shadow:0 30px 70px rgba(27,26,23,.14),0 2px 0 rgba(27,26,23,.04);background:#fff}
+.reading{display:inline-flex;align-items:center;gap:8px;align-self:flex-start;font-size:13px;font-weight:600;color:var(--ink-2);border:1.5px dashed rgba(27,26,23,.3);border-radius:999px;padding:5px 12px}
+.reading::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--signal)}
+.tbc{border-bottom:1.5px dashed var(--signal)}
+.split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:clamp(32px,6vw,88px);align-items:center}
+
+.bar{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:50;display:flex;align-items:center;gap:6px;padding:6px;background:rgba(255,255,255,.62);backdrop-filter:blur(16px) saturate(1.4);-webkit-backdrop-filter:blur(16px) saturate(1.4);border:1px solid rgba(27,26,23,.08);border-radius:999px;box-shadow:0 8px 30px rgba(27,26,23,.08);max-width:calc(100vw - 24px)}
+.bar a{text-decoration:none;font-size:14px;font-weight:600;padding:8px 14px;border-radius:999px;white-space:nowrap}
+.bar a:hover{background:rgba(27,26,23,.06)}
+.bar .dark-btn{background:var(--ink);color:var(--paper)}
+.bar .dark-btn:hover{background:var(--ink);color:var(--signal)}
+.bar img{width:30px;height:30px;border-radius:50%;object-fit:cover;background:var(--paper-2)}
+.meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:18px;border-top:1px solid var(--line);padding-top:20px;margin-top:36px}
+.meta div > span{display:block;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+.meta div > strong{display:block;margin-top:6px;font-weight:600;font-size:16px;line-height:1.4}
+.reflect{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(28px,5vw,72px)}
+.reflect ol{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:22px}
+.reflect li{display:flex;flex-direction:column;gap:6px;padding-left:18px;border-left:3px solid var(--ind)}
+.reflect li strong{font-weight:600}
+
+.end{background:var(--ind);color:var(--ind-ink);border-radius:32px 32px 0 0}
+.end h2{font-size:clamp(44px,7vw,104px)}
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:32px}
+.cta a{text-decoration:none;font-weight:600;font-size:15px;padding:13px 22px;border-radius:999px}
+.cta .solid{background:var(--ind-ink);color:var(--ind)}
+.cta .ghost{border:1.5px solid var(--ind-ink);color:var(--ind-ink)}
+footer{background:var(--ind);color:rgba(255,247,237,.75);font-size:13px;padding-block:0 32px}
+.rise{transition:transform .8s cubic-bezier(.2,.8,.2,1)}
+.rise.pre{transform:translateY(28px)}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.rise,.rise.pre,.strip button{transition:none}.rise.pre{transform:none}}
+/* hero */
+.hero{padding-top:clamp(110px,14vh,150px);padding-bottom:clamp(40px,6vw,80px)}
+.hero-top{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(24px,4vw,56px);align-items:end}
+.name h1{font-size:clamp(72px,11vw,160px);font-weight:800;letter-spacing:-.065em;line-height:.86}
+.name h1 span{color:var(--red)}
+.name small{display:block;margin-top:16px;font:700 13px var(--body);letter-spacing:.16em;text-transform:uppercase;color:var(--mute)}
+.statement{font-family:var(--serif);font-size:clamp(28px,3.2vw,44px);line-height:1.08;max-width:18ch}
+.stage{position:relative;margin-top:clamp(36px,5vw,64px);padding:0 clamp(16px,3vw,40px) clamp(24px,3vw,40px)}
+.stage::before{content:"";position:absolute;left:0;right:0;top:35%;bottom:0;background:var(--ind);border-radius:28px;z-index:-1}
+.frame{border-radius:14px;overflow:hidden;background:#fff;box-shadow:0 30px 70px rgba(27,26,23,.22)}
+
+/* sibling */
+.sib{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(16px,3vw,40px);margin-top:44px;align-items:start}
+.sib figure{margin:0}
+.sib img{border-radius:12px;box-shadow:0 14px 40px rgba(27,26,23,.12);background:#fff}
+.sib figcaption{margin-top:10px;font-weight:600}
+.sib figcaption small{display:block;font-weight:500;color:var(--mute);font-size:14px}
+.cmp{margin-top:28px;background:#fff;border-radius:20px;overflow-x:auto}
+.cmp table{width:100%;border-collapse:collapse;min-width:560px}
+.cmp th,.cmp td{text-align:left;padding:14px 18px;border-bottom:1px solid var(--line);vertical-align:top;font-size:15px}
+.cmp th{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);font-weight:700}
+.cmp td:first-child{font-weight:600;white-space:nowrap}
+
+/* tab strip */
+.strip{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));margin-top:40px;background:#4A4A4A;border-radius:6px;overflow:hidden}
+.strip button{all:unset;cursor:pointer;color:#fff;font:600 14px var(--body);padding:22px 14px 18px;position:relative;line-height:1.25;border-left:1px solid rgba(255,255,255,.15);transition:background .2s}
+.strip button:first-child{border-left:0}
+.strip button::after{content:"›";position:absolute;right:12px;top:8px;color:var(--c,#C6CF5A);font-size:18px}
+.strip button[aria-pressed="true"]{background:var(--red);transform:translateY(-6px);box-shadow:0 8px 0 var(--red)}
+.strip button:disabled{cursor:default;color:rgba(255,255,255,.45)}
+.strip button:focus-visible{outline:2px solid #fff;outline-offset:-4px}
+.pg{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr);gap:clamp(24px,4vw,48px);margin-top:24px;align-items:start}
+.scroll{height:clamp(420px,48vw,620px);overflow-y:auto;border-radius:14px;background:#fff;box-shadow:0 20px 50px rgba(27,26,23,.14);overscroll-behavior:contain}
+.scroll img{display:block;width:100%}
+.pnote h3{font-size:clamp(22px,2.2vw,30px)}
+.pnote p{color:var(--ink-2)}
+
+/* header card */
+.card{position:relative;margin-top:44px;border-radius:18px;overflow:hidden;aspect-ratio:800/380;background:#ddd}
+.card img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top}
+
+/* rooms */
+.rooms{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(24px,4vw,56px);margin-top:44px;align-items:start}
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.tiles button{all:unset;cursor:pointer;background:var(--c);color:#fff;padding:18px;font:800 clamp(18px,1.8vw,24px)/1.05 var(--display);text-transform:uppercase;letter-spacing:.01em;min-height:70px;outline-offset:3px}
+.tiles button[aria-pressed="true"]{outline:3px solid var(--ink)}
+.tiles button:focus-visible{outline:3px solid var(--ink)}
+.copy{background:#fff;border-radius:18px;padding:clamp(20px,3vw,32px)}
+.copy q{font-family:var(--serif);font-size:clamp(22px,2.2vw,30px);line-height:1.2;quotes:none;display:block}
+.copy .same{display:inline-block;margin-top:16px;font-size:13px;font-weight:700;background:#FDECEC;color:#B91C1C;border-radius:999px;padding:4px 12px}
+.copy .fit{margin-top:12px;color:var(--ink-2);font-size:15px}
+
+/* news filter */
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{border:1.5px solid var(--line);background:#fff;font:600 14px var(--body);color:var(--ink-2);padding:8px 16px;border-radius:6px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:#5AA0D8;border-color:#5AA0D8;color:#fff}
+.ncards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:20px;min-height:200px}
+.nc{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 6px 20px rgba(27,26,23,.08);display:flex;flex-direction:column}
+.nc img{aspect-ratio:300/353;object-fit:cover}
+.nc div{padding:12px;display:flex;flex-direction:column;gap:6px}
+.nc span{align-self:flex-start;font-size:11px;font-weight:700;color:#fff;border-radius:4px;padding:2px 8px}
+.nc b{font-size:14px;line-height:1.3}
+.nc small{color:var(--mute);font-size:12px}
+.t-News{background:#2A6FB0}.t-Event{background:#D9534F}.t-Blog{background:#2BA39A}
+
+/* recipients */
+.rec{display:grid;grid-template-columns:auto minmax(0,1fr);gap:clamp(24px,5vw,72px);align-items:center;margin-top:44px}
+.dots{display:grid;grid-template-columns:repeat(7,30px);gap:8px}
+.dots i{width:30px;height:30px;border-radius:50%;background:var(--c)}
+.big{font-family:var(--display);font-weight:800;font-size:clamp(64px,8vw,110px);letter-spacing:-.05em;line-height:.9}
+.big small{font-size:.3em;letter-spacing:-.01em;display:block;color:var(--mute);font-weight:600;margin-top:8px}
+
+@media (max-width:860px){
+  .hero-top,.split,.sib,.pg,.rooms,.rec,.reflect{grid-template-columns:minmax(0,1fr)}
+  .strip{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .strip button{border-left:0;border-top:1px solid rgba(255,255,255,.15)}
+  .ncards{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .dots{grid-template-columns:repeat(7,24px)}.dots i{width:24px;height:24px}
+}
+</style>
+<style>body{animation:cnIn .45s ease both}@keyframes cnIn{from{opacity:0}}@media (prefers-reduced-motion:reduce){body{animation:none}}</style>
+<script src="case-nav.js" defer></script>
+</head>
+<body>
+<nav class="bar" aria-label="Case study">
+  <a href="../index.html#work" style="display:flex;align-items:center;gap:8px;padding:2px 12px 2px 2px"><img src="../work/avatar.webp" alt="" width="30" height="30"><span style="font-family:var(--display);font-weight:800;font-size:16px;letter-spacing:-.02em">Sarbesh</span></a>
+  <a href="../index.html#work">All work</a>
+  <a class="dark-btn" href="https://iic.edu.np" target="_blank" rel="noopener">Live site ↗</a>
+</nav>
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Case study · College website · 2024</div>
+    <div class="hero-top" style="margin-top:18px">
+      <div class="name"><h1>IIC<span>.</span></h1><small>Itahari International College</small></div>
+      <div>
+        <p class="statement">Herald's younger sibling, with a softer voice and a card on every photo.</p>
+        <div class="meta">
+          <div><span>What it is</span><strong>The website for an ING Group college in Itahari, partnered with London Metropolitan University</strong></div>
+          <div><span>Shown here</span><strong>The home page and 5 inner pages</strong></div>
+          <div><span>My role</span><strong><span class="tbc">UI/UX design</span></strong></div>
+        </div>
+      </div>
+    </div>
+    <div class="stage">
+      <div class="frame"><img src="iic/h-home.webp" alt="Home hero: Discover the IIC Lifestyle, Transform Your Future Today, with a strip of five tabs" width="1200" height="727"></div>
+    </div>
+  </div>
+</header>
+
+<section style="padding-top:clamp(40px,6vw,80px)">
+  <div class="wrap">
+    <div class="split" style="align-items:end">
+      <div class="stack rise">
+        <div class="eyebrow">The family</div>
+        <h2>Same skeleton, new voice.</h2>
+      </div>
+      <div class="stack rise">
+        <p class="lede">IIC and <a href="herald.html">Herald College</a> both belong to ING Group, and the two sites share a footer, a link list and a lot of page types. IIC changes the voice: thin display type instead of heavy capitals, and a white card laid on a full-bleed photo instead of a lime block.</p>
+      </div>
+    </div>
+    <div class="sib">
+      <figure class="rise"><img src="herald/t-uni.webp" alt="Herald College inner page header: lime block with heavy capitals" width="700" height="288"><figcaption>Herald College<small>A lime block, heavy capitals, a photo in the corner</small></figcaption></figure>
+      <figure class="rise"><img src="iic/t-schol.webp" alt="IIC inner page header: full-bleed photo with a white card and a red bar" width="800" height="385"><figcaption>Itahari International College<small>A full-bleed photo, a white card, a red bar on its edge</small></figcaption></figure>
+    </div>
+    <div class="cmp rise">
+      <table>
+        <thead><tr><th></th><th>Herald</th><th>IIC</th></tr></thead>
+        <tbody>
+          <tr><td>Headings</td><td>Heavy capitals, a new colour per home section</td><td>Light display face, mostly red and blue</td></tr>
+          <tr><td>Inner header</td><td>Lime block, offset photo, breadcrumb</td><td>Photo, white card, red bar, no breadcrumb</td></tr>
+          <tr><td>Page ending</td><td>Two versions</td><td>One, every time: graduates and "What's Your Next Step?" on olive</td></tr>
+          <tr><td>Nav</td><td>Five links in the header</td><td>Logo centred, links behind a menu</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section style="background:#fff">
+  <div class="wrap">
+    <div class="split" style="align-items:end">
+      <div class="stack rise">
+        <div class="eyebrow">Home</div>
+        <h2>The hero ends in a table of contents.</h2>
+      </div>
+      <div class="stack rise">
+        <p class="lede">With the links tucked into a menu, the home hero carries the navigation itself: five dark tabs along its bottom edge, with the active one lifted in red. Each tab names a page. Try the strip; the two greyed tabs don't have pages in this set.</p>
+        <span class="reading">The tab-to-page match is mine</span>
+      </div>
+    </div>
+    <div class="strip rise" id="strip" role="group" aria-label="Home hero tabs, rebuilt"></div>
+    <div class="pg rise">
+      <div class="scroll" id="ps" tabindex="0" aria-label="Selected page, scrollable"><img id="pimg" src="iic/p-home.webp" alt=""></div>
+      <div class="pnote" aria-live="polite"><h3 id="ph"></h3><p id="pp"></p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="split" style="align-items:end">
+      <div class="stack rise">
+        <div class="eyebrow">Infrastructure</div>
+        <h2>Six rooms, one sentence.</h2>
+      </div>
+      <div class="stack rise">
+        <p class="lede">The infrastructure page labels each space with a bold coloured tile laid over its photo. It's the liveliest layout on the site. Pick a room to read its tile.</p>
+      </div>
+    </div>
+    <div class="rooms">
+      <div class="tiles rise" id="tiles" role="group" aria-label="Room"></div>
+      <div class="copy rise" aria-live="polite"><q>Enjoy your lunch/snack time with your buddies along with a side of freshly brewed coffee in our open cafeteria.</q><span class="same" id="same"></span><p class="fit" id="fit"></p></div>
+    </div>
+  </div>
+</section>
+
+<section style="background:#fff">
+  <div class="wrap">
+    <div class="split" style="align-items:end">
+      <div class="stack rise">
+        <div class="eyebrow">News &amp; events</div>
+        <h2>Three tags, one headline.</h2>
+      </div>
+      <div class="stack rise">
+        <p class="lede">The news page filters by News, Events and Blogs, and each card carries a coloured tag, a date and a time. The artwork changes card to card. The headline doesn't. Try the filters.</p>
+      </div>
+    </div>
+    <div class="seg rise" id="nseg" role="group" aria-label="Filter" style="margin-top:36px"></div>
+    <div class="ncards rise" id="ncards" aria-live="polite"></div>
+  </div>
+</section>
+
+<section style="background:var(--paper-2)">
+  <div class="wrap">
+    <div class="split" style="align-items:end">
+      <div class="stack rise">
+        <div class="eyebrow">Scholarship</div>
+        <h2>Twenty-one places, seven names.</h2>
+      </div>
+      <div class="stack rise">
+        <p class="lede">The scholarship page shows the two schemes, two past winners with their photos, and a list of AAA 2022 recipients. The list has 21 rows in three columns. Each column repeats the same seven names, so I've left the names out and shown the pattern instead.</p>
+      </div>
+    </div>
+    <div class="rec rise">
+      <div class="dots" id="dots" role="img" aria-label="21 rows, seven names repeated three times"></div>
+      <div class="big">21<small>rows in the list, 7 different names</small></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap reflect">
+    <div class="stack rise">
+      <div class="eyebrow">Looking back</div>
+      <h2>What I'd tighten next.</h2>
+      <p class="lede">The card-on-photo header and the coloured room tiles give IIC its own look inside a shared family. Most of what's left is copy that came across from the sister sites.</p>
+    </div>
+    <ol class="rise">
+      <li><strong>Make the footer IIC's.</strong><span>It carries Herald's Naxal address and email, "© 2022 Herald College", and a Wolverhampton link on a site whose partner is London Met.</span></li>
+      <li><strong>Write IIC's own paragraphs.</strong><span>Both carnival sections describe Informatics College Pokhara. Every news card is "Islington Holi 2023". The scholarship criteria mention Islington College, and the winner stories still say [NAME].</span></li>
+      <li><strong>One sentence per room, one photo per event.</strong><span>All six rooms share the cafeteria line, two of the three bullets match, and Christmas and IIC Expo 2022 use the same photo. "Recepients" needs a fix too.</span></li>
+    </ol>
+  </div>
+</section>
+
+<section class="end">
+  <div class="wrap stack">
+    <div class="hand" style="color:var(--ind-ink)">thanks for reading</div>
+    <h2>Visit the site, or keep exploring.</h2>
+    <div class="cta">
+      <a class="solid" href="https://iic.edu.np" target="_blank" rel="noopener">Visit iic.edu.np ↗</a>
+      <a class="ghost" href="herald.html">See its sister site, Herald</a>
+      <a class="ghost" href="../index.html#work">Back to all work</a>
+    </div>
+  </div>
+</section>
+<footer><div class="wrap">© 2026 Sarbesh Lal Amatya · Kathmandu, Nepal</div></footer>
+
+<script>
+(function(){
+  function group(el,list,label,fn){list.forEach(function(x,n){var b=document.createElement('button');b.type='button';b.innerHTML=label(x);if(x.off)b.disabled=true;b.addEventListener('click',function(){[].forEach.call(el.children,function(c,i){c.setAttribute('aria-pressed',String(i===n));});fn(x,n);});el.appendChild(b);});}
+  // hero tabs and the pages they lead to
+  var S=[{t:'Home',i:'p-home',h:3315,c:'Home',p:'The page the strip sits on: courses, the university partner, Life at IIC, news, events, quotes and the ING Group block.'},{t:'Courses',off:1},{t:'International Exposure',off:1},{t:'Scholarship Opportunity',i:'p-schol',h:2133,c:'Scholarship',p:'Two schemes with their criteria, two past winners, and the AAA 2022 group photo and list.'},{t:'State-of-the-art Infrastructure',i:'p-infra',h:1753,c:'Infrastructure',p:'"Since 2017", then six spaces in a collage of coloured tiles and blue rooms.'},{t:'Life at IIC',i:'p-life',h:1357,c:'Life at IIC',p:'Seven events in three staggered columns, each photo underlined in red. A second version of the page archives the 2021 and 2022 carnivals.'}];
+  var st=document.getElementById('strip'),pi=document.getElementById('pimg'),ps=document.getElementById('ps');
+  group(st,S,function(s){return s.t;},function(s){pi.src='iic/'+s.i+'.webp';pi.width=520;pi.height=s.h;pi.alt=s.c+' page, top to bottom';ps.scrollTop=0;document.getElementById('ph').textContent=s.c;document.getElementById('pp').textContent=s.p;});
+  st.children[0].click();
+  // rooms
+  var R=[['Lecture Theatres','#F2C230'],['Computer Lab','#22A58E'],['Tutorial Halls','#A3B33E'],['Libraries','#E2524A'],['Cafeterias','#3B8FD6'],['Blocks','#12B5C2']];
+  var tl=document.getElementById('tiles');
+  group(tl,R,function(r){return r[0];},function(r,n){document.getElementById('same').textContent=n===4?'Written for this room':'Same sentence as Cafeterias';document.getElementById('fit').textContent=n===4?'The line fits here, and it was copied to the other five tiles.':'This is the tile for '+r[0]+'.';});
+  [].forEach.call(tl.children,function(b,i){b.style.setProperty('--c',R[i][1]);if(i===0)b.style.color='#1B1A17';});
+  tl.children[0].click();
+  // news cards, tags as in the design
+  var N=[['News','Holi artwork'],['Event','Yatra artwork'],['Blog','Alumni photo'],['News','Christmas artwork'],['Event','Spring Carnival artwork'],['Blog','Holi artwork'],['News','MOU signing photo'],['Event','Cyber Space artwork']];
+  var nc=document.getElementById('ncards');
+  function show(f){nc.innerHTML=N.map(function(n,i){return [n,i];}).filter(function(x){return f==='All'||x[0][0]===f;}).map(function(x){return '<div class="nc"><img src="iic/n'+x[1]+'.webp" alt="'+x[0][1]+'" width="300" height="353"><div><span class="t-'+x[0][0]+'">'+x[0][0]+'</span><b>Islington Holi 2023: A Colourful Explosion with Unmatched Holi Spirit!</b><small>14th March, 2023</small></div></div>';}).join('');}
+  var ns=document.getElementById('nseg');
+  group(ns,['All','News','Event','Blog'],function(f){return f==='Event'?'Events':f==='Blog'?'Blogs':f;},show);
+  ns.children[0].click();
+  // 21 rows, 7 names
+  var cs=['#D9534F','#F2C230','#22A58E','#3B8FD6','#A3B33E','#8E5BB5','#E08A3C'],d='';
+  for(var i=0;i<21;i++)d+='<i style="--c:'+cs[i%7]+'"></i>';
+  document.getElementById('dots').innerHTML=d;
+  // rise: content stays visible; below-the-fold blocks lift into place
+  if(!matchMedia('(prefers-reduced-motion: reduce)').matches && 'IntersectionObserver' in window){
+    var els=[].slice.call(document.querySelectorAll('.rise')).filter(function(el){return el.getBoundingClientRect().top>innerHeight;});
+    els.forEach(function(el){el.classList.add('pre');});
+    var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.remove('pre');io.unobserve(e.target);}});},{rootMargin:'0px 0px -8% 0px'});
+    els.forEach(function(el){io.observe(el);});
+  }
+})();
+</script>
+</body>
+</html>

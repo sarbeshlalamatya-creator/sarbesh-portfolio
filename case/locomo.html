@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Locomo</title>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&amp;family=Geist:wght@400;500;600;700&amp;family=Caveat:wght@500;700&amp;family=Instrument+Serif:ital@0;1&amp;family=Lato:wght@400;700&amp;display=swap" rel="stylesheet">
+<style>
+/* Layout: portfolio cream and ink with the blue card colour as signature; Locomo's own slate and green appear only where the app itself is on show. */
+:root{
+  --paper:#F3EEE4; --paper-2:#EAE3D5; --ink:#1B1A17; --ink-2:#3E3B35; --mute:#6F6A61; --line:rgba(27,26,23,.12);
+  --signal:#F2552C; --ind:#4A72E0; --ind-ink:#FFFFFF; --app:#233142; --go:#5FB83A; --sys:#774EA7; --sys-font:'Lato',system-ui,sans-serif;
+  --display:'Bricolage Grotesque',system-ui,sans-serif; --body:'Geist',system-ui,sans-serif; --hand:'Caveat',cursive; --serif:'Instrument Serif',Georgia,serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img{max-width:100%;height:auto;display:block}
+a{color:inherit}
+::selection{background:var(--signal);color:var(--ink)}
+:focus-visible{outline:2px solid var(--signal);outline-offset:3px;border-radius:6px}
+.wrap{max-width:1240px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.read{max-width:660px}
+section{padding-block:clamp(64px,10vw,128px)}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--mute)}
+h1,h2,h3{font-family:var(--display);letter-spacing:-.04em;line-height:1;margin:0;text-wrap:balance}
+h2{font-size:clamp(36px,5.4vw,72px);font-weight:800}
+h3{font-size:clamp(20px,2vw,26px);font-weight:800;letter-spacing:-.03em}
+p{margin:0}
+.lede{font-size:clamp(19px,1.7vw,22px);line-height:1.5;color:var(--ink-2)}
+.hand{font-family:var(--hand);font-weight:700;color:var(--signal);font-size:clamp(24px,2.4vw,30px);line-height:1.1}
+.stack{display:flex;flex-direction:column;gap:20px}
+.shot{border-radius:18px;overflow:hidden;box-shadow:0 30px 70px rgba(27,26,23,.14),0 2px 0 rgba(27,26,23,.04);background:#fff}
+.reading{display:inline-flex;align-items:center;gap:8px;align-self:flex-start;font-size:13px;font-weight:600;color:var(--ink-2);border:1.5px dashed rgba(27,26,23,.3);border-radius:999px;padding:5px 12px}
+.reading::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--signal)}
+.tbc{border-bottom:1.5px dashed var(--signal)}
+.split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:clamp(32px,6vw,88px);align-items:center}
+
+.bar{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:50;display:flex;align-items:center;gap:6px;padding:6px;background:rgba(255,255,255,.62);backdrop-filter:blur(16px) saturate(1.4);-webkit-backdrop-filter:blur(16px) saturate(1.4);border:1px solid rgba(27,26,23,.08);border-radius:999px;box-shadow:0 8px 30px rgba(27,26,23,.08);max-width:calc(100vw - 24px)}
+.bar a{text-decoration:none;font-size:14px;font-weight:600;padding:8px 14px;border-radius:999px;white-space:nowrap}
+.bar a:hover{background:rgba(27,26,23,.06)}
+.bar .dark-btn{background:var(--ink);color:var(--paper)}
+.bar .dark-btn:hover{background:var(--ink);color:var(--signal)}
+.bar img{width:30px;height:30px;border-radius:50%;object-fit:cover;background:var(--paper-2)}
+.meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:18px;border-top:1px solid var(--line);padding-top:20px;margin-top:36px}
+.meta div > span{display:block;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+.meta div > strong{display:block;margin-top:6px;font-weight:600;font-size:16px;line-height:1.4}
+.reflect{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(28px,5vw,72px)}
+.reflect ol{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:22px}
+.reflect li{display:flex;flex-direction:column;gap:6px;padding-left:18px;border-left:3px solid var(--ind)}
+.reflect li strong{font-weight:600}
+
+.end{background:var(--ind);color:var(--ind-ink);border-radius:32px 32px 0 0}
+.end h2{font-size:clamp(44px,7vw,104px)}
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:32px}
+.cta a{text-decoration:none;font-weight:600;font-size:15px;padding:13px 22px;border-radius:999px}
+.cta .solid{background:var(--ind-ink);color:var(--ind)}
+.cta .ghost{border:1.5px solid var(--ind-ink);color:var(--ind-ink)}
+footer{background:var(--ind);color:rgba(255,255,255,.75);font-size:13px;padding-block:0 32px}
+.rise{transition:transform .8s cubic-bezier(.2,.8,.2,1)}
+.rise.pre{transform:translateY(28px)}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.rise,.rise.pre,.ping::after{animation:none}.fleet-bar button{transition:none}.rise.pre{transform:none}}
+/* hero */
+.hero{padding-top:clamp(110px,14vh,150px);padding-bottom:clamp(40px,6vw,80px)}
+.hero-grid{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:clamp(24px,4vw,56px);align-items:end}
+.name{position:relative;display:inline-block}
+.name h1{font-size:clamp(64px,9vw,132px);font-weight:800;letter-spacing:-.07em;line-height:.86}
+.name h1 em{font-style:normal;color:var(--ind)}
+.ping{position:absolute;right:-26px;top:10px;width:18px;height:18px;border-radius:50%;background:var(--go)}
+.ping::after{content:"";position:absolute;inset:0;border-radius:50%;background:var(--go);animation:ping 2s ease-out infinite}
+@keyframes ping{from{transform:scale(1);opacity:.6}to{transform:scale(3.2);opacity:0}}
+.statement{font-family:var(--serif);font-size:clamp(28px,3.2vw,44px);line-height:1.08;max-width:19ch;margin-top:32px}
+.stage-h{position:relative;height:clamp(380px,40vw,540px)}
+.browser{position:absolute;left:0;right:6%;top:4%;border-radius:14px;overflow:hidden;background:#fff;box-shadow:0 30px 70px rgba(27,26,23,.22);transform:rotate(-2deg)}
+.browser::before{content:"";display:block;height:22px;background:radial-gradient(circle at 12px 11px,#F0979E 4px,transparent 5px),radial-gradient(circle at 26px 11px,#F2C07E 4px,transparent 5px),radial-gradient(circle at 40px 11px,#87D89D 4px,transparent 5px);background-color:#E8ECF2}
+.browser img{aspect-ratio:1600/1150;object-fit:cover;object-position:top}
+.hero-band{position:absolute;left:4%;right:0;bottom:-6%;height:50%;background:var(--ind);border-radius:28px;z-index:-1}
+
+/* fleet */
+.app{background:var(--app);color:#E8EDF3}
+.app .eyebrow{color:rgba(232,237,243,.55)}
+.app .lede{color:rgba(232,237,243,.82)}
+.app .reading{color:rgba(232,237,243,.85);border-color:rgba(232,237,243,.3)}
+.fleet{margin-top:44px}
+.fleet-bar{display:flex;height:64px;border-radius:14px;overflow:hidden;gap:3px}
+.fleet-bar button{border:0;cursor:pointer;display:flex;align-items:flex-end;padding:10px 12px;font:700 15px var(--body);color:#fff;transition:filter .2s}
+.fleet-bar button:hover,.fleet-bar button:focus-visible{filter:brightness(1.15)}
+.fleet-legend{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;margin-top:20px}
+.fleet-legend div{border-top:2px solid;padding-top:10px}
+.fleet-legend b{display:block;font-family:var(--display);font-size:clamp(40px,5vw,68px);letter-spacing:-.05em;line-height:1}
+.fleet-legend span{color:rgba(232,237,243,.72);font-size:15px}
+.kcards{margin-top:56px}
+.kcards img{border-radius:16px}
+.kcap{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px;margin-top:16px;list-style:none;padding:0}
+.kcap li{font-size:14px;color:rgba(232,237,243,.75)}
+.kcap b{display:block;color:#fff;font-weight:600;font-size:15px}
+
+/* three clocks */
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin-top:40px}
+.tabs button{border:1.5px solid var(--line);background:#fff;font:600 14px var(--body);color:var(--ink-2);padding:8px 16px;border-radius:999px;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.tabs button[disabled]{opacity:.45;cursor:not-allowed}
+.clock-stage{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:clamp(24px,4vw,56px);margin-top:24px;align-items:center}
+.clock-copy h3{font-size:clamp(26px,3vw,38px);margin-bottom:14px}
+.clock-copy p{color:var(--ink-2)}
+.clock-copy .who{margin-top:16px;display:inline-flex;gap:8px;align-items:center;font-size:14px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--mute)}
+.clock-copy .who i{width:10px;height:10px;border-radius:50%}
+
+/* morning */
+.morning{position:relative;margin-top:44px;background:#fff;border-radius:28px;padding:clamp(24px,4vw,44px);box-shadow:0 30px 70px rgba(27,26,23,.1)}
+.axis{position:relative;height:170px;margin:0 8px}
+.axis::before{content:"";position:absolute;left:0;right:0;top:74px;height:4px;border-radius:2px;background:linear-gradient(90deg,#E5E7EB 0,#E5E7EB 100%)}
+.seg-on{position:absolute;top:74px;height:4px;background:var(--go);border-radius:2px}
+.ev{position:absolute;top:11px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:6px;width:92px;text-align:center}
+.ev.dn{top:62px;flex-direction:column-reverse}
+.ev i{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-style:normal;font:800 12px var(--body);color:#fff;box-shadow:0 0 0 4px #fff}
+.ev span{min-height:30px;display:flex;align-items:flex-end;justify-content:center;font-size:12px;line-height:1.25;color:var(--ink-2)}
+.ev.dn span{align-items:flex-start}
+.ev time{font:600 11px ui-monospace,Menlo,monospace;color:var(--mute)}
+.ticks{display:flex;justify-content:space-between;margin:0 8px;font:600 12px ui-monospace,Menlo,monospace;color:var(--mute)}
+
+/* care */
+.care{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:36px;list-style:none;padding:0}
+.care li{background:#fff;border-radius:18px;padding:18px 20px;display:flex;flex-direction:column;gap:6px}
+.care b{font-family:var(--display);font-size:20px;letter-spacing:-.02em}
+.care span{color:var(--ink-2);font-size:15px}
+.care li.new{background:var(--ind);color:#fff}
+.care li.new span{color:rgba(255,255,255,.85)}
+
+.pair{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(24px,4vw,56px);margin-top:44px;align-items:start}
+.pair figure{margin:0;display:flex;flex-direction:column;gap:14px}
+.pair figcaption b{display:block;font-family:var(--display);font-size:22px;letter-spacing:-.02em}
+.pair figcaption span{color:var(--ink-2);font-size:16px}
+
+@media (max-width:860px){
+  .hero-grid,.split,.clock-stage,.pair,.reflect{grid-template-columns:minmax(0,1fr)}
+  .care,.kcap{grid-template-columns:minmax(0,1fr)}
+  .stage-h{height:300px}
+  .fleet-legend b{font-size:36px}
+  .morning{overflow-x:auto}
+  .axis{min-width:700px}
+}
+</style>
+<style>body{animation:cnIn .45s ease both}@keyframes cnIn{from{opacity:0}}@media (prefers-reduced-motion:reduce){body{animation:none}}</style>
+<script src="case-nav.js" defer></script>
+</head>
+<body>
+<nav class="bar" aria-label="Case study">
+  <a href="../index.html#work" style="display:flex;align-items:center;gap:8px;padding:2px 12px 2px 2px"><img src="../work/avatar.webp" alt="" width="30" height="30"><span style="font-family:var(--display);font-weight:800;font-size:16px;letter-spacing:-.02em">Sarbesh</span></a>
+  <a href="../index.html#work">All work</a>
+  <a class="dark-btn" href="https://www.figma.com/design/fv24RZAxU5w8MJahDDXXLQ/Locomo?node-id=0-1" target="_blank" rel="noopener">Figma ↗</a>
+</nav>
+<header class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="eyebrow">Case study · Admin web app · 2026</div>
+      <div class="name" style="margin-top:18px"><h1>Loco<em>mo</em></h1><span class="ping" aria-hidden="true"></span></div>
+      <p class="statement">Every vehicle is a timeline. The admin's job is to read them.</p>
+      <div class="meta">
+        <div><span>What it is</span><strong>The admin console for a vehicle tracking service: fleet, customers and their safety</strong></div>
+        <div><span>Shown here</span><strong>11 desktop screens: sign-in, dashboard, vehicles, customers</strong></div>
+        <div><span>My role</span><strong><span class="tbc">UI/UX design</span></strong></div>
+      </div>
+    </div>
+    <div class="stage-h" aria-label="Locomo admin dashboard">
+      <div class="browser"><img src="locomo/dashboard.webp" alt="Admin dashboard with customer, vehicle, sales and growth cards, a monthly sales chart and recent customers" width="1600" height="1508"></div>
+      <div class="hero-band" aria-hidden="true"></div>
+    </div>
+  </div>
+</header>
+
+<section class="app">
+  <div class="wrap">
+    <div class="split" style="align-items:end">
+      <div class="stack rise">
+        <div class="eyebrow">Dashboard</div>
+        <h2>72 vehicles, and where they stand.</h2>
+      </div>
+      <div class="stack rise">
+        <p class="lede">The vehicle card doesn't stop at a total. It splits the fleet into moving, stopped and offline, which is the first thing anyone watching a tracker wants to know.</p>
+        <p style="color:rgba(232,237,243,.6);font-size:15px">Figures are sample data in the design.</p>
+      </div>
+    </div>
+    <div class="fleet rise">
+      <div class="fleet-bar" role="group" aria-label="Fleet status, 72 vehicles">
+        <button type="button" style="flex:60;background:#5FB83A" aria-label="60 moving">60</button>
+        <button type="button" style="flex:9;background:#F29A1F" aria-label="9 stopped">9</button>
+        <button type="button" style="flex:3;background:#E5484D;padding-inline:6px" aria-label="3 offline">3</button>
+      </div>
+      <div class="fleet-legend">
+        <div style="border-color:#5FB83A"><b>60</b><span>Moving</span></div>
+        <div style="border-color:#F29A1F"><b>9</b><span>Stopped</span></div>
+        <div style="border-color:#E5484D"><b>3</b><span>Offline: the ones worth a phone call</span></div>
+      </div>
+    </div>
+    <div class="kcards rise">
+      <img src="locomo/kpis.webp" alt="Four summary cards: customers, vehicles, total sales, growth rate" width="1600" height="222">
+      <ul class="kcap">
+        <li><b>Customers</b>with the change since yesterday</li>
+        <li><b>Vehicles</b>with the moving, stopped, offline split</li>
+        <li><b>Total sales</b>with today's change</li>
+        <li><b>Growth</b>month on month</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="split" style="align-items:end">
+      <div class="stack rise">
+        <div class="eyebrow">The vehicle record</div>
+        <h2>Three clocks on one car.</h2>
+      </div>
+      <div class="stack rise">
+        <p class="lede">A vehicle's page keeps three separate histories under one tab bar: what the car did, what the system said about it, and what people changed. Keeping them apart stops a speeding alert being buried under a device update.</p>
+        <span class="reading">My reading of the Events, Notification and Activity tabs</span>
+      </div>
+    </div>
+    <div class="tabs rise" role="tablist" aria-label="Vehicle record tabs" id="tabs"></div>
+    <div class="clock-stage rise">
+      <img class="shot" id="cimg" src="locomo/t-details-crop.webp" alt="" width="1400" height="795">
+      <div class="clock-copy" role="tabpanel" aria-live="polite"><h3 id="ctitle"></h3><p id="ctext"></p><span class="who" id="cwho"></span></div>
+    </div>
+  </div>
+</section>
+
+<section style="background:var(--paper-2)">
+  <div class="wrap">
+    <div class="read stack rise">
+      <div class="eyebrow">Events</div>
+      <h2>Read one morning.</h2>
+      <p class="lede">The Events tab lists one car's morning on 31 December 2025, newest first. Laid out on a line, the same entries tell a story: left home, sped, parked, set off again.</p>
+    </div>
+    <div class="morning rise" tabindex="0" aria-label="Events from 07:48 to 10:30 on a time line">
+      <div class="axis" id="axis"></div>
+    </div>
+    <p class="rise" style="margin-top:14px;color:var(--mute);font-size:14px">Redrawn from the first eight entries in the Events list, oldest first and evenly spaced rather than to scale. Green marks when the car was running.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="split" style="align-items:end">
+      <div class="stack rise">
+        <div class="eyebrow">Customers</div>
+        <h2>Tracking that can call for help.</h2>
+      </div>
+      <div class="stack rise">
+        <p class="lede">The customer record goes further than a fleet tool needs to. Next to the vehicles, it keeps a safety-net contact, police mobilisations and a government document. The sidebar has a Police Request page too.</p>
+        <span class="reading">Interpretation: Locomo is a safety service as much as a tracker</span>
+      </div>
+    </div>
+    <img class="shot rise" src="locomo/customer-head.webp" alt="Customer header with tabs: Vehicles Assigned, Trips, Safety Net Contact, Police Mobilisations, Subscription and Invoices, Activity" width="1400" height="185" style="margin-top:40px">
+    <ul class="care">
+      <li class="rise"><b>Vehicles Assigned</b><span>One customer can own several vehicles, each with its identifier and plate.</span></li>
+      <li class="rise new"><b>Safety Net Contact</b><span>Someone to reach when something goes wrong.</span></li>
+      <li class="rise new"><b>Police Mobilisations</b><span>A record of when the police were called out for this customer.</span></li>
+      <li class="rise"><b>Subscription &amp; Invoices</b><span>Tracking is a paid service, billed per customer.</span></li>
+      <li class="rise"><b>Trips</b><span>Journeys across all of the customer's vehicles.</span></li>
+      <li class="rise"><b>Activity</b><span>Who changed this record, and when.</span></li>
+    </ul>
+    <div class="pair">
+      <figure class="rise"><img class="shot" src="locomo/add-vehicle-modal.webp" alt="Add New Vehicle form: branch, identifier, registration, engine, chassis and bill numbers, brand, model, variant, and colour cards" width="1100" height="760"><figcaption><b>Brand, model, variant, then the car itself</b><span>Each dropdown narrows the next, and the last step is a row of cards to pick the exact vehicle and colour. Placeholders show real formats, like "Ba 70 Pa 47XX".</span></figcaption></figure>
+      <figure class="rise"><img class="shot" src="locomo/add-customer-modal.webp" alt="Add New Customer form with profile avatar and governmental document uploads" width="1100" height="596"><figcaption><b>A document on file</b><span>New customers need a governmental document alongside their photo, which fits a service that can involve the police.</span></figcaption>
+        <img class="shot" src="locomo/range.webp" alt="Date range picker over the customers list" width="600" height="438" style="max-width:340px;margin-top:8px"><figcaption><span>The customer list filters by Active or Inactive and by a date range.</span></figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top:0">
+  <div class="wrap reflect">
+    <div class="stack rise">
+      <div class="eyebrow">Looking back</div>
+      <h2>What I'd tighten next.</h2>
+      <p class="lede">The fleet split, the three histories and the safety tabs are the ideas worth keeping. These are the next fixes.</p>
+    </div>
+    <ol class="rise">
+      <li><strong>Darken the action green.</strong><span>White text on the bright button green comes out around 2.3:1, under the 4.5:1 that small text needs. A deeper green would keep the brand and pass.</span></li>
+      <li><strong>Fill in the pictures.</strong><span>Vehicle photos and the colour cards in Add Vehicle are still grey boxes. A picker that chooses by colour needs to show the colour.</span></li>
+      <li><strong>Quiet the delete buttons.</strong><span>A customer's vehicle list shows a solid red Delete on every row. An overflow menu with a confirm step would make the dangerous action harder to hit by mistake.</span></li>
+    </ol>
+  </div>
+</section>
+
+<section class="end">
+  <div class="wrap stack">
+    <div class="hand" style="color:var(--ind-ink)">thanks for reading</div>
+    <h2>Open the file, or keep exploring.</h2>
+    <div class="cta">
+      <a class="solid" href="https://www.figma.com/design/fv24RZAxU5w8MJahDDXXLQ/Locomo?node-id=0-1" target="_blank" rel="noopener">Open in Figma ↗</a>
+      <a class="ghost" href="clms.html">Next: CLMS</a>
+      <a class="ghost" href="../index.html#work">Back to all work</a>
+    </div>
+  </div>
+</section>
+<footer><div class="wrap">© 2026 Sarbesh Lal Amatya · Kathmandu, Nepal</div></footer>
+
+<script>
+(function(){
+  // vehicle tabs
+  var T=[
+    ['Details','t-details','The basics','Model, category, registration, identifier and the tracker’s device ID, under a header that always shows whether the car is online.','',''],
+    ['Events','t-events','What the car did','Ignition on and off, parking, speeding and geofence entries, each with its own coloured icon.','The vehicle','#5FB83A'],
+    ['Trips','','','','',''],
+    ['Notification','t-notification','What the system said','Command results, overspeed and geofence exits: the messages sent out because of an event.','The system','#F29A1F'],
+    ['Activity','t-activity','What people changed','Every edit is written as a sentence with a name in bold, such as a staff member updating a device ID.','A person','#4A72E0']
+  ];
+  var tabs=document.getElementById('tabs');
+  T.forEach(function(t,i){var b=document.createElement('button');b.type='button';b.setAttribute('role','tab');b.textContent=t[0];if(!t[1]){b.disabled=true;b.title='Not in these screens';}else b.addEventListener('click',function(){pick(i);});tabs.appendChild(b);});
+  function pick(n){[].forEach.call(tabs.children,function(b,i){b.setAttribute('aria-selected',String(i===n));});var t=T[n],img=document.getElementById('cimg');img.src='locomo/'+t[1]+'-crop.webp';img.alt=t[0]+' tab';
+    document.getElementById('ctitle').textContent=t[2];document.getElementById('ctext').textContent=t[3];
+    document.getElementById('cwho').innerHTML=t[4]?'<i style="background:'+t[5]+'"></i>Written by: '+t[4]:'';}
+  pick(1);
+  // one morning: minutes after 07:45, axis spans 165 minutes
+  var E=[[3,'Ignition off','07:48','#E5484D','⏻'],[4,'Vehicle started','07:49','#4B5563','▶'],[5,'Geofence entered: Home','07:50','#F5B800','●'],[30,'Speeding alert 120 km/h','08:15','#F29A1F','!'],[119,'Ignition off','09:44','#E5484D','⏻'],[120,'Parking started','09:45','#2563EB','P'],[164,'Ignition on','10:29','#5FB83A','⏻'],[165,'Vehicle started','10:30','#4B5563','▶']];
+  var ax=document.getElementById('axis'),pc=function(i){return (4+i/7*92)+'%';};
+  [[1,4],[7,7]].forEach(function(r){var s=document.createElement('span');s.className='seg-on';s.style.left=pc(r[0]);s.style.width=(r[1]-r[0])/7*92+'%';if(r[0]===r[1])s.style.width='4%';ax.appendChild(s);});
+  E.forEach(function(e,i){var d=document.createElement('div');d.className='ev'+(i%2?' dn':'');d.style.left=pc(i);
+    d.innerHTML='<span>'+e[1]+'</span><time>'+e[2]+'</time><i style="background:'+e[3]+'" aria-hidden="true">'+e[4]+'</i>';ax.appendChild(d);});
+  // rise: content stays visible; below-the-fold blocks lift into place
+  if(!matchMedia('(prefers-reduced-motion: reduce)').matches && 'IntersectionObserver' in window){
+    var els=[].slice.call(document.querySelectorAll('.rise')).filter(function(el){return el.getBoundingClientRect().top>innerHeight;});
+    els.forEach(function(el){el.classList.add('pre');});
+    var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.remove('pre');io.unobserve(e.target);}});},{rootMargin:'0px 0px -8% 0px'});
+    els.forEach(function(el){io.observe(el);});
+  }
+})();
+</script>
+</body>
+</html>

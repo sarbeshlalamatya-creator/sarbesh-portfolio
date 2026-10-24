@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>NMST mySecondTeacher</title>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&amp;family=Geist:wght@400;500;600;700&amp;family=Caveat:wght@500;700&amp;family=Instrument+Serif:ital@0;1&amp;family=Lato:wght@400;700&amp;display=swap" rel="stylesheet">
+<style>
+/* Layout: portfolio cream and ink with the sand card colour as signature; mySecondTeacher's night purple and gold appear only where the site itself is on show. */
+:root{
+  --paper:#F3EEE4; --paper-2:#EAE3D5; --ink:#1B1A17; --ink-2:#3E3B35; --mute:#6F6A61; --line:rgba(27,26,23,.12);
+  --signal:#F2552C; --ind:#E9D8B8; --ind-ink:#1B1A17; --night:#1A0835; --gold:#F7C04A; --purple:#5B2A9D; --sys-font:'Lato',system-ui,sans-serif;
+  --display:'Bricolage Grotesque',system-ui,sans-serif; --body:'Geist',system-ui,sans-serif; --hand:'Caveat',cursive; --serif:'Instrument Serif',Georgia,serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img{max-width:100%;height:auto;display:block}
+a{color:inherit}
+::selection{background:var(--signal);color:var(--ink)}
+:focus-visible{outline:2px solid var(--signal);outline-offset:3px;border-radius:6px}
+.wrap{max-width:1240px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.read{max-width:660px}
+section{padding-block:clamp(64px,10vw,128px)}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--mute)}
+h1,h2,h3{font-family:var(--display);letter-spacing:-.04em;line-height:1;margin:0;text-wrap:balance}
+h2{font-size:clamp(36px,5.4vw,72px);font-weight:800}
+h3{font-size:clamp(20px,2vw,26px);font-weight:800;letter-spacing:-.03em}
+p{margin:0}
+.lede{font-size:clamp(19px,1.7vw,22px);line-height:1.5;color:var(--ink-2)}
+.hand{font-family:var(--hand);font-weight:700;color:var(--signal);font-size:clamp(24px,2.4vw,30px);line-height:1.1}
+.stack{display:flex;flex-direction:column;gap:20px}
+.shot{border-radius:18px;overflow:hidden;box-shadow:0 30px 70px rgba(27,26,23,.14),0 2px 0 rgba(27,26,23,.04);background:#fff}
+.reading{display:inline-flex;align-items:center;gap:8px;align-self:flex-start;font-size:13px;font-weight:600;color:var(--ink-2);border:1.5px dashed rgba(27,26,23,.3);border-radius:999px;padding:5px 12px}
+.reading::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--signal)}
+.tbc{border-bottom:1.5px dashed var(--signal)}
+.split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:clamp(32px,6vw,88px);align-items:center}
+
+.bar{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:50;display:flex;align-items:center;gap:6px;padding:6px;background:rgba(255,255,255,.62);backdrop-filter:blur(16px) saturate(1.4);-webkit-backdrop-filter:blur(16px) saturate(1.4);border:1px solid rgba(27,26,23,.08);border-radius:999px;box-shadow:0 8px 30px rgba(27,26,23,.08);max-width:calc(100vw - 24px)}
+.bar a{text-decoration:none;font-size:14px;font-weight:600;padding:8px 14px;border-radius:999px;white-space:nowrap}
+.bar a:hover{background:rgba(27,26,23,.06)}
+.bar .dark-btn{background:var(--ink);color:var(--paper)}
+.bar .dark-btn:hover{background:var(--ink);color:var(--signal)}
+.bar img{width:30px;height:30px;border-radius:50%;object-fit:cover;background:var(--paper-2)}
+.meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:18px;border-top:1px solid var(--line);padding-top:20px;margin-top:36px}
+.meta div > span{display:block;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+.meta div > strong{display:block;margin-top:6px;font-weight:600;font-size:16px;line-height:1.4}
+.reflect{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(28px,5vw,72px)}
+.reflect ol{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:22px}
+.reflect li{display:flex;flex-direction:column;gap:6px;padding-left:18px;border-left:3px solid var(--ind)}
+.reflect li strong{font-weight:600}
+
+.end{background:var(--ind);color:var(--ind-ink);border-radius:32px 32px 0 0}
+.end h2{font-size:clamp(44px,7vw,104px)}
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:32px}
+.cta a{text-decoration:none;font-weight:600;font-size:15px;padding:13px 22px;border-radius:999px}
+.cta .solid{background:var(--ind-ink);color:var(--ind)}
+.cta .ghost{border:1.5px solid var(--ind-ink);color:var(--ind-ink)}
+footer{background:var(--ind);color:rgba(27,26,23,.7);font-size:13px;padding-block:0 32px}
+.rise{transition:transform .8s cubic-bezier(.2,.8,.2,1)}
+.rise.pre{transform:translateY(28px)}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.rise,.rise.pre,.tech .loop{animation:none}.rise.pre{transform:none}}
+/* tan is too faint for the reflection rule on cream */
+.reflect li{border-left-color:var(--purple)}
+
+/* hero */
+.hero{padding-top:clamp(110px,14vh,150px);padding-bottom:clamp(40px,6vw,80px)}
+.hero-grid{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:clamp(24px,4vw,56px);align-items:end}
+.name h1{font-size:clamp(72px,11vw,160px);font-weight:800;letter-spacing:-.065em;line-height:.86;position:relative;display:inline-block}
+.name h1 i{position:absolute;right:-.28em;top:.02em;width:.2em;height:.2em;background:var(--gold);clip-path:polygon(50% 0,61% 39%,100% 50%,61% 61%,50% 100%,39% 61%,0 50%,39% 39%)}
+.name small{display:block;margin-top:16px;font:700 13px var(--body);letter-spacing:.16em;text-transform:uppercase;color:var(--mute)}
+.statement{font-family:var(--serif);font-size:clamp(28px,3.2vw,44px);line-height:1.08;max-width:17ch;margin-top:32px}
+.statement small{display:block;font:500 14px var(--body);color:var(--mute);margin-top:10px}
+.stage{position:relative;padding:0 0 clamp(24px,3vw,40px) clamp(24px,3vw,40px)}
+.stage::before{content:"";position:absolute;left:0;right:clamp(24px,3vw,40px);top:22%;bottom:0;background:var(--ind);border-radius:28px;z-index:-1}
+.browser{border-radius:14px;overflow:hidden;background:var(--night);box-shadow:0 30px 70px rgba(27,26,23,.25)}
+.browser .chrome{display:flex;gap:6px;padding:10px 12px;background:#120427}
+.browser .chrome i{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.22)}
+
+/* night to day */
+.nd{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:clamp(24px,5vw,72px);margin-top:44px;align-items:start}
+.strips{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:clamp(8px,1.4vw,16px)}
+.strips button{all:unset;cursor:pointer;display:flex;flex-direction:column;gap:10px;align-items:center}
+.strips span.c{display:block;width:100%;height:clamp(300px,38vw,520px);border-radius:999px;outline:2px solid transparent;outline-offset:4px;transition:outline-color .2s}
+.strips button[aria-pressed="true"] span.c{outline-color:var(--ink)}
+.strips button:focus-visible span.c{outline-color:var(--gold)}
+.strips b{font:600 13px var(--body);color:var(--ink-2);text-align:center;line-height:1.2}
+.window{height:clamp(420px,46vw,600px);overflow-y:auto;border-radius:16px;background:#fff;box-shadow:0 30px 70px rgba(27,26,23,.14);overscroll-behavior:contain}
+.window img{display:block;width:100%}
+.legend{display:flex;flex-wrap:wrap;gap:18px;margin-top:18px;font-size:14px;color:var(--ink-2)}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+
+/* orbit */
+.orb{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:clamp(24px,5vw,72px);align-items:center;margin-top:44px}
+.orb img{border-radius:24px;background:var(--night)}
+.who{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.who li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:baseline;padding:16px 0;border-top:1px solid var(--line)}
+.who li:last-child{border-bottom:1px solid var(--line)}
+.who b{font-family:var(--display);font-weight:700;font-size:clamp(20px,2vw,26px);letter-spacing:-.02em}
+.who small{display:block;color:var(--mute);font-size:14px}
+.tag{font-size:12px;font-weight:700;border-radius:999px;padding:3px 10px;white-space:nowrap}
+.tag.y{background:var(--night);color:var(--gold)}
+.tag.n{border:1.5px dashed rgba(27,26,23,.3);color:var(--ink-2)}
+
+/* pedagogy */
+.ped{margin-top:44px;background:#fff;border-radius:24px;padding:clamp(16px,3vw,40px)}
+.ped blockquote{margin:28px auto 0;max-width:34ch;text-align:center;font-family:var(--serif);font-size:clamp(26px,3vw,40px);line-height:1.12}
+.ped blockquote small{display:block;font:500 14px var(--body);color:var(--mute);margin-top:12px}
+.three{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(12px,2vw,24px);margin-top:24px}
+.three div{border-top:3px solid var(--purple);padding-top:14px}
+.three b{display:block;font-family:var(--display);font-weight:700;font-size:20px;letter-spacing:-.02em}
+.three span{color:var(--ink-2);font-size:15px}
+.tech{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(24px,5vw,72px);align-items:center;margin-top:72px}
+.tech svg{width:100%;height:auto;display:block}
+.tech .loop{fill:none;stroke:#8A8494;stroke-width:2;stroke-dasharray:8 8;animation:march 1.6s linear infinite}
+@keyframes march{to{stroke-dashoffset:-32}}
+.tech text{font:600 17px var(--body);fill:var(--ink-2)}
+
+/* arches */
+.arches{margin-top:44px}
+.arches img{border-radius:20px}
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:14px;text-align:center;font-size:14px;color:var(--mute)}
+.subj{margin-top:72px;background:#fff;border-radius:24px;padding:clamp(16px,3vw,32px)}
+.gtabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));background:#F2EEFB;border-radius:10px;padding:4px}
+.gtabs button{all:unset;cursor:pointer;text-align:center;padding:10px 6px;border-radius:8px;font:600 15px var(--body);color:var(--ink-2)}
+.gtabs button[aria-pressed="true"]{background:var(--purple);color:#fff}
+.gtabs button:focus-visible{outline:2px solid var(--purple);outline-offset:2px}
+.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:16px;min-height:200px}
+.tiles span{display:grid;place-items:center;text-align:center;border:1px solid #ECE8F3;border-radius:12px;padding:26px 8px;font-weight:600;color:var(--ink-2)}
+.tiles p{grid-column:1/-1;margin:0;display:grid;place-items:center;color:var(--mute);border:1.5px dashed #DCD5EA;border-radius:12px;text-align:center;padding:24px}
+
+/* told twice */
+.ftabs{display:flex;flex-wrap:wrap;gap:6px;margin-top:40px}
+.ftabs button{border:1.5px solid var(--line);background:#fff;font:600 14px var(--body);color:var(--ink-2);padding:8px 16px;border-radius:999px;cursor:pointer}
+.ftabs button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.twice{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(12px,2vw,24px);margin-top:20px}
+.voice{background:#fff;border-radius:20px;padding:clamp(20px,3vw,32px);display:flex;flex-direction:column;gap:12px}
+.voice .who-is{align-self:flex-start;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--purple)}
+.voice q{font-family:var(--serif);font-size:clamp(21px,2vw,26px);line-height:1.25;quotes:none}
+.voice small{color:var(--mute);font-size:13px}
+.same{margin-top:14px;font-weight:600;color:var(--ink-2);min-height:1.6em}
+.dash{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr);gap:clamp(24px,5vw,72px);align-items:center;margin-top:72px}
+
+/* plans */
+.plans{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(12px,2vw,20px);margin-top:44px;background:var(--night);border-radius:28px;padding:clamp(20px,4vw,48px)}
+.plan{background:#fff;border-radius:16px;padding:28px 16px;text-align:center;position:relative}
+.plan b{display:block;font-family:var(--display);font-weight:800;font-size:clamp(22px,2.4vw,30px);letter-spacing:.02em}
+.plan small{display:block;color:var(--mute);font-size:13px}
+.plan .p{font-family:var(--display);font-weight:600;font-size:clamp(30px,3.4vw,44px);margin-top:12px;color:var(--ink)}
+.plan .sv{display:inline-block;margin-top:6px;border:1.5px solid #2D8CF0;color:#2D8CF0;font-size:12px;font-weight:600;padding:1px 8px}
+.plan .bv{position:absolute;left:-6px;top:-12px;background:#2D8CF0;color:#fff;font-size:11px;font-weight:800;padding:4px 10px}
+.plan.all{background:#8A3FB8;color:#fff}.plan.all small,.plan.all .p{color:#fff}
+.maths{display:grid;grid-template-columns:auto minmax(0,1fr);gap:clamp(20px,4vw,56px);margin-top:28px;align-items:start}
+.seg{display:flex;flex-wrap:wrap;gap:6px;align-content:flex-start}
+.seg button{border:1.5px solid var(--line);background:#fff;font:600 14px var(--body);color:var(--ink-2);padding:8px 16px;border-radius:999px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.calc{background:#fff;border-radius:20px;padding:clamp(20px,3vw,32px)}
+.calc dl{margin:18px 0 0;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px 24px}
+.calc dt{color:var(--ink-2)}
+.calc dd{margin:0;font-weight:700;font-variant-numeric:tabular-nums;text-align:right}
+.calc dd.flag{color:#B0164E}
+
+@media (max-width:860px){
+  .hero-grid,.split,.nd,.orb,.tech,.dash,.maths,.reflect,.twice{grid-template-columns:minmax(0,1fr)}
+  .three{grid-template-columns:minmax(0,1fr)}
+  .tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .strips span.c{height:220px}
+  .plans{grid-template-columns:minmax(0,1fr);max-width:360px;margin-inline:auto}
+}
+</style>
+<style>body{animation:cnIn .45s ease both}@keyframes cnIn{from{opacity:0}}@media (prefers-reduced-motion:reduce){body{animation:none}}</style>
+<script src="case-nav.js" defer></script>
+</head>
+<body>
+<nav class="bar" aria-label="Case study">
+  <a href="../index.html#work" style="display:flex;align-items:center;gap:8px;padding:2px 12px 2px 2px"><img src="../work/avatar.webp" alt="" width="30" height="30"><span style="font-family:var(--display);font-weight:800;font-size:16px;letter-spacing:-.02em">Sarbesh</span></a>
+  <a href="../index.html#work">All work</a>
+  <a class="dark-btn" href="https://www.figma.com/design/ZXzgHSwjUXXcsBNagLhoYF/NMST-Website?node-id=0-1" target="_blank" rel="noopener">Figma ↗</a>
+</nav>
+<header class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="eyebrow">Case study · EdTech website · 2026</div>
+      <div class="name" style="margin-top:18px"><h1>NMST<i aria-hidden="true"></i></h1><small>mySecondTeacher website</small></div>
+      <p class="statement">“School teachers come first; we second that.”<small>Headline of the teachers page</small></p>
+      <div class="meta">
+        <div><span>What it is</span><strong>The public website for mySecondTeacher, an online learning platform for Nepal's SEE and NEB curriculum</strong></div>
+        <div><span>Shown here</span><strong>5 desktop pages</strong></div>
+        <div><span>My role</span><strong><span class="tbc">UI/UX design</span></strong></div>
+      </div>
+    </div>
+    <div class="stage">
+      <div class="browser"><div class="chrome" aria-hidden="true"><i></i><i></i><i></i></div><img src="nmst/home-top.webp" alt="The home page hero: Future of Learning, Future of Nepal, with five characters circling a globe" width="1400" height="1273"></div>
+    </div>
+  </div>
+</header>
+
+<section style="padding-top:clamp(40px,6vw,80px)">
+  <div class="wrap">
+    <div class="split" style="align-items:end">
+      <div class="stack rise">
+        <div class="eyebrow">The thread</div>
+        <h2>Night sky first, then daylight.</h2>
+      </div>
+      <div class="stack rise">
+        <p class="lede">Every page opens in the same purple night, with stars and the odd planet, then drops into white for the reading. Four pages end on the same mint footer. The home page stays in the night far longer and closes on a dawn over the hills, with a stupa and a school.</p>
+        <span class="reading">Colours averaged row by row from the five pages</span>
+      </div>
+    </div>
+    <div class="nd">
+      <div class="rise">
+        <div class="strips" id="strips" role="group" aria-label="Pick a page"></div>
+        <div class="legend"><span><i style="background:#1A0835"></i>Night</span><span><i style="background:#fff;border:1px solid var(--line)"></i>Reading</span><span><i style="background:#A2D8CD"></i>Footer</span></div>
+      </div>
+      <div class="window rise" tabindex="0" aria-label="Selected page, scrollable"><img id="pimg" src="nmst/p01.webp" alt="" width="480" height="2182"></div>
+    </div>
+  </div>
+</section>
+
+<section style="background:#fff">
+  <div class="wrap">
+    <div class="split" style="align-items:end">
+      <div class="stack rise">
+        <div class="eyebrow">Who it's for</div>
+        <h2>One globe, five people around it.</h2>
+      </div>
+      <div class="stack rise">
+        <p class="lede">The hero doesn't open with a product shot. It opens with the people the platform serves, each with an adjective: awesome students, caring parents, responsible teachers. Two of them get their own page in this set.</p>
+      </div>
+    </div>
+    <div class="orb">
+      <img class="rise" src="nmst/orbit.webp" alt="Five characters on a dotted orbit around a small globe with a school on it" width="800" height="728">
+      <ul class="who rise">
+        <li><div><b>Awesome Students</b><small>Learn anywhere, anytime</small></div><span class="tag y">Own page</span></li>
+        <li><div><b>Responsible Teachers</b><small>School teachers come first</small></div><span class="tag y">Own page</span></li>
+        <li><div><b>Caring Parents</b><small>Linked from the footer</small></div><span class="tag n">Not in this set</span></li>
+        <li><div><b>21st Century Schools</b><small>Not linked by this name</small></div><span class="tag n">Not in this set</span></li>
+        <li><div><b>Visionary School Leaders</b><small>Linked from the footer</small></div><span class="tag n">Not in this set</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="split" style="align-items:end">
+      <div class="stack rise">
+        <div class="eyebrow">Pedagogy</div>
+        <h2>A lecture, or a conversation?</h2>
+      </div>
+      <div class="stack rise">
+        <p class="lede">The platform page argues for the product before it lists a feature. It sets a lecture against a talk with an expert and asks you to pick. The illustrations carry the argument; the copy only confirms it.</p>
+      </div>
+    </div>
+    <div class="ped rise">
+      <img src="nmst/pedagogy.webp" alt="Two illustrations: students facing a chalkboard lecture, and a student at a laptop talking with a teacher on screen" width="1200" height="619">
+      <blockquote>“Learning occurs naturally when teaching is dialogic in nature.”<small>From the platform page</small></blockquote>
+    </div>
+    <div class="three rise">
+      <div><b>Natural Conversations</b><span>Student-teacher dialogue videos you can pause and rewind.</span></div>
+      <div><b>Shared diagnostics</b><span>Quiz answers shared with your school teachers, so the conversation carries on in class.</span></div>
+      <div><b>Online presence</b><span>Tutor support around the clock, booked ahead or on the spot.</span></div>
+    </div>
+    <div class="tech">
+      <div class="stack rise">
+        <h3>Three names on a loop.</h3>
+        <p style="color:var(--ink-2)">“Our technology” draws IVy, Apollo and Tutor Support as soft blobs joined by a dashed line. The copy says IVy and Apollo were invented for the platform. The page doesn't say what either one does, so I've kept them as names here too.</p>
+      </div>
+      <svg class="rise" viewBox="0 0 520 360" role="img" aria-label="IVy, Apollo and Tutor Support joined by a dashed loop">
+        <path class="loop" d="M120 250 C60 180 90 110 200 100 C260 95 300 60 360 120 C420 170 500 130 470 240 C450 300 350 270 300 300 C240 335 170 320 120 250 Z"/>
+        <g><circle cx="270" cy="95" r="52" fill="#fff" stroke="#EEE"/><path d="M252 70 L298 95 L252 120 Z" fill="#D9413A"/><text x="270" y="172" text-anchor="middle">IVy</text></g>
+        <g><circle cx="110" cy="245" r="52" fill="#fff" stroke="#EEE"/><rect x="86" y="221" width="46" height="46" rx="8" fill="none" stroke="#9BCB57" stroke-width="6"/><text x="110" y="322" text-anchor="middle">Apollo</text></g>
+        <g><circle cx="420" cy="245" r="52" fill="#fff" stroke="#EEE"/><text x="420" y="262" text-anchor="middle" style="font:800 italic 48px var(--display);fill:#5EC8BE">T</text><text x="420" y="322" text-anchor="middle">Tutor Support</text></g>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<section style="background:#fff">
+  <div class="wrap">
+    <div class="split" style="align-items:end">
+      <div class="stack rise">
+        <div class="eyebrow">Contents</div>
+        <h2>Confused, then confident.</h2>
+      </div>
+      <div class="stack rise">
+        <p class="lede">The contents page tells the whole pitch in three arches and eleven words. The same girl appears first and last; in between, she's at a book with a teacher. The colours warm from blue to yellow as she gets there.</p>
+        <span class="reading">My reading of the colour order</span>
+      </div>
+    </div>
+    <div class="arches rise">
+      <img src="nmst/arches.webp" alt="Three arches: Are you confused? Learn with our second teacher. And be confident." width="1200" height="614">
+      <div class="steps" aria-hidden="true"><span>The problem</span><span>The product</span><span>The promise</span></div>
+    </div>
+    <div class="subj rise">
+      <div class="gtabs" id="gtabs" role="group" aria-label="Grade"></div>
+      <div class="tiles" id="tiles"></div>
+    </div>
+    <p class="rise" style="margin-top:16px;color:var(--mute);font-size:14px">Rebuilt from the subject picker. Only the SEE tab is drawn; Grade 11 and 12 are labels in the file so far.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="split" style="align-items:end">
+      <div class="stack rise">
+        <div class="eyebrow">Two audiences</div>
+        <h2>The same feature, told twice.</h2>
+      </div>
+      <div class="stack rise">
+        <p class="lede">Students and teachers each get their own page, and several features appear on both. Where the copy is rewritten for the reader, it changes who does the verb. Pick a feature to compare the two versions.</p>
+      </div>
+    </div>
+    <div class="ftabs rise" id="ftabs" role="group" aria-label="Feature"></div>
+    <div class="twice rise" id="twice" aria-live="polite"></div>
+    <p class="same rise" id="same"></p>
+    <div class="dash">
+      <img class="shot rise" src="nmst/dashboard.webp" alt="Teacher's dashboard mock: classes, logins, testpapers generated, an activity log and a bar chart" width="1100" height="757">
+      <div class="stack rise">
+        <h3>Teachers get the product itself.</h3>
+        <p style="color:var(--ink-2)">The students page follows its hero with illustrations. The teachers page goes straight to a screen of the product: a dashboard with counts, an activity log and a comparison chart, and later a carousel of more. A teacher's first question is "what will I see?", and this answers it.</p>
+        <span class="reading">My reading of the choice of image</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="background:var(--paper-2)">
+  <div class="wrap">
+    <div class="split" style="align-items:end">
+      <div class="stack rise">
+        <div class="eyebrow">Plans</div>
+        <h2>Read the price twice.</h2>
+      </div>
+      <div class="stack rise">
+        <p class="lede">The plans card is rebuilt below as it appears. “Three” is marked best value and saves 20%. The card doesn't say whether $6.96 is per subject or for all three, and the maths reads differently each way.</p>
+        <span class="reading">Worked out from the prices on the card</span>
+      </div>
+    </div>
+    <div class="plans rise">
+      <div class="plan"><b style="color:#EC7C2C">SINGLE</b><small>Subject of your choice</small><div class="p">$9.99</div></div>
+      <div class="plan"><span class="bv">BEST VALUE</span><b style="color:#2D8CF0">THREE</b><small>Subjects of your choice</small><div class="p">$6.96</div><span class="sv">Save 20%</span></div>
+      <div class="plan all"><b>ALL</b><small>Subjects</small><div class="p">$19.99</div></div>
+    </div>
+    <div class="maths">
+      <div class="seg rise" id="mseg" role="group" aria-label="Read $6.96 as"></div>
+      <div class="calc rise" aria-live="polite"><strong id="mh"></strong><dl id="mdl"></dl></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap reflect">
+    <div class="stack rise">
+      <div class="eyebrow">Looking back</div>
+      <h2>What I'd tighten next.</h2>
+      <p class="lede">The night-to-day frame, the characters and the three arches give the site a voice of its own. These fixes would let the words match it.</p>
+    </div>
+    <ol class="rise">
+      <li><strong>Replace the stand-ins.</strong><span>The testimonial is signed John Doe and repeats the hero sentence. The footer blurb is lorem ipsum filler. All three news cards share one date, and the Interactive Videos preview on the home page is an empty frame.</span></li>
+      <li><strong>Say what the price buys.</strong><span>Per subject or in total, per month or per year. One line under each price would settle it, and the 20% badge could then match the maths.</span></li>
+      <li><strong>Write the teachers page for teachers.</strong><span>Its Group Chat card is word for word the students' version. The dashboard mock shows an IGCSE chemistry class from 2020, which reads oddly on a site for the Nepali curriculum.</span></li>
+    </ol>
+  </div>
+</section>
+
+<img src="nmst/dawn.webp" alt="" width="1400" height="366" style="display:block;width:100%;max-height:340px;object-fit:cover;object-position:top" aria-hidden="true">
+<section class="end" style="border-radius:0">
+  <div class="wrap stack">
+    <div class="hand" style="color:var(--ind-ink)">thanks for reading</div>
+    <h2>Open the file, or keep exploring.</h2>
+    <div class="cta">
+      <a class="solid" href="https://www.figma.com/design/ZXzgHSwjUXXcsBNagLhoYF/NMST-Website?node-id=0-1" target="_blank" rel="noopener">Open in Figma ↗</a>
+      <a class="ghost" href="attendease.html">Another student product</a>
+      <a class="ghost" href="../index.html#work">Back to all work</a>
+    </div>
+  </div>
+</section>
+<footer><div class="wrap">© 2026 Sarbesh Lal Amatya · Kathmandu, Nepal</div></footer>
+
+<script>
+(function(){
+  // row-averaged colours, 60 bands per page, sampled from the uploaded screens
+  var J={"01":["#1D0E38","#210A30","#2B1333","#220F35","#412E4D","#312143","#2F1E41","#867E92","#8E8496","#8C8499","#726F87","#584F6B","#18042F","#291333","#170430","#463659","#514265","#524366","#240F3E","#1F083B","#321D4D","#311947","#240C43","#625277","#C6C1CE","#DBD8E0","#DEDEE8","#8E7FA0","#371C5A","#381956","#43225C","#37185D","#37165D","#381760","#765F8E","#867299","#533F72","#421F6B","#47216C","#492170","#715097","#9977B1","#9B79B3","#9A79B1","#542279","#5C2878","#5D277B","#5B237E","#5A2682","#7B4B96","#9167A7","#C9B4D4","#EBEFF2","#ECF1F0","#F0EFF0","#CBDADB","#ACD9D1","#A2D4CA","#A1D6CB","#A2D8CD"],"02":["#1D0C3B","#241042","#230B41","#190531","#230E31","#230E33","#210C34","#220F36","#18062F","#685A7A","#FDFCFD","#F5F3F8","#FAFBFD","#EFF1F4","#C2C8D1","#BABCC3","#CED2E1","#F9FAFD","#FBFCFD","#F8F9FB","#FAFAFD","#FAFBFD","#F8F8FA","#F4F5F6","#FAFBFB","#EEEFF3","#EFF0F2","#F7F7F7","#F0F0F0","#FAFAFA","#FDFDFD","#F7F5F9","#F9FAFA","#FDFDFD","#FDFDFD","#FDFBFB","#FCF7F7","#FCFCFC","#FCFCFC","#FDFDFD","#F8FBF7","#F9FBF8","#FAFAFA","#FDFDFD","#FDFDFD","#FDFDFD","#FCFCFD","#FAFBFC","#DADBDF","#EFEFF1","#F5F7F8","#F6F8FA","#FDFDFD","#FDFDFD","#C8E7E1","#A2D8CD","#A2D3C8","#A1D6CC","#A2D7CC","#A1D7CC"],"03":["#1B0B34","#211137","#17052C","#2A1543","#321951","#3A2B62","#442A5F","#431F50","#371549","#5B3F69","#FFFFFF","#F4EFF8","#F5F1F9","#FCFCFD","#F9F9FA","#E0E9F2","#D1D6E1","#DBD7DB","#ECEFF5","#FFFFFF","#FAFAFA","#F6F8FA","#EEEEF1","#EEF0F1","#F4F5F7","#FFFFFF","#FEFEFE","#DEEAF5","#E2E6E5","#F4EFF2","#DCE9F7","#FFFFFF","#F9FBFD","#F1F3F6","#EDEDF0","#E9ECF0","#FCFCFC","#FFFFFF","#FCFBFB","#F5F5F7","#F7F7F7","#EFEDED","#EFF2F3","#FFFFFF","#FFFFFF","#FFFFFF","#FEFEFE","#DEEAEB","#DBE7E6","#E5ECF0","#D8E6F7","#F0F6FC","#ECF4FB","#E7F1FA","#BAE1DD","#A2D8CD","#A1D2C8","#A1D6CC","#A2D7CC","#A1D7CC"],"04":["#1E1039","#1F1039","#180730","#26112B","#220E31","#1F0A35","#2F1737","#210A3E","#2B1449","#FFFFFF","#F8F5FB","#F1EBF6","#FFFFFF","#EFF2F5","#DDE0E4","#F1F3F5","#F8F8F9","#F8F9F9","#FEFEFE","#FFFFFF","#ECDAD2","#E4CDC2","#DBC7BF","#C6BDC0","#D5BCB6","#DFC4C0","#FEFCFC","#FBFAFD","#F1EBF6","#FDFDFE","#EAE1F6","#F7F3FB","#F5F8F8","#FAFAFA","#FDFDFD","#F7F8FA","#FAFAFB","#FDFDFD","#FFFFFF","#E7C7BD","#D9BBB1","#CDBBB4","#DED3CF","#C8D5E0","#B7C5D3","#B3C2D1","#E8EDF2","#FFFFFF","#FFFFFF","#E4E4E8","#ECEDEF","#F8F9FA","#F8FAFB","#FFFFFF","#EEF8F6","#A2D8CD","#A1D4C9","#A3D6CC","#A0D6CB","#A2D7CC"],"05":["#1D0D35","#1D0D34","#17062E","#4A3B64","#665781","#584671","#4D3365","#411E49","#3C1B4D","#FFFFFF","#F2ECF6","#F6F2F9","#FCFCFD","#FFFFFF","#FAFAFA","#F7F7F9","#F9FAFA","#FDFEFE","#FFFFFF","#FFFFFF","#F4F5F7","#EBECEF","#EDEBEE","#FEFDFF","#F5F4F8","#F8F8FB","#FFFFFF","#F8F7F7","#F2F4F4","#EBEAE9","#E6EBEC","#F9F8FC","#F5F5F8","#FCFBFE","#FFFFFF","#FDFCFE","#F0EBF6","#FDFCFE","#FDFEFE","#FAFAFA","#F6F4FB","#F9F9FC","#FCFCFD","#FCFCFD","#F8F8F8","#FFFFFF","#FFFFFF","#FFFFFF","#E1ECED","#DBE6E6","#E7EEF2","#DAE7F8","#F0F7FC","#E9F3FB","#DAEDF3","#A2D8CD","#A1D4C9","#A3D6CC","#A0D6CB","#A2D7CD"]};
+  var P=[['01','Home',2182],['02','Platform',1456],['03','Students',1438],['04','Contents',1569],['05','Teachers',1573]];
+  var st=document.getElementById('strips'),pi=document.getElementById('pimg');
+  P.forEach(function(p,n){var b=document.createElement('button');b.type='button';b.innerHTML='<span class="c" style="background:linear-gradient(180deg,'+J[p[0]].join(',')+')"></span><b>'+p[1]+'</b>';b.addEventListener('click',function(){pick(n);});st.appendChild(b);});
+  function pick(n){[].forEach.call(st.children,function(b,i){b.setAttribute('aria-pressed',String(i===n));});var p=P[n];pi.src='nmst/p'+p[0]+'.webp';pi.height=p[2];pi.alt='The '+p[1]+' page, top to bottom';pi.parentNode.scrollTop=0;}
+  pick(0);
+  // subject picker
+  var G=[['SEE (Grade 10)',['Non-science','Science','Biology','Chemistry','Economics','English','Mathematics','Nepali']],['Grade 11',null],['Grade 12',null]];
+  var gt=document.getElementById('gtabs'),tl=document.getElementById('tiles');
+  G.forEach(function(g,n){var b=document.createElement('button');b.type='button';b.textContent=g[0];b.addEventListener('click',function(){grade(n);});gt.appendChild(b);});
+  function grade(n){[].forEach.call(gt.children,function(b,i){b.setAttribute('aria-pressed',String(i===n));});var g=G[n];tl.innerHTML=g[1]?g[1].map(function(s){return '<span>'+s+'</span>';}).join(''):'<p>Not drawn in this file yet.</p>';}
+  grade(0);
+  // features as written on each page
+  var F=[
+    ['Testpaper',['Students page','Students can attempt our instantly generated Testpapers to prepare for exams.'],['Teachers page','Teachers can generate custom Testpapers and marking schemes on different topics, chapter, or the whole syllabus, all with varying difficulty levels.'],'Rewritten: the student attempts, the teacher generates.'],
+    ['Interactive Videos',['Students page','Students will have access to Interactive Videos for Grade 10 and Grade 11.'],['Contents page','Teachers can use these videos to teach or revise basic concepts in the classroom.'],'Rewritten: the student watches, the teacher teaches with it.'],
+    ['Group Chat',['Students page','Students can connect with their teachers in separate Group Chats to exchange ideas and understand concepts better.'],['Teachers page','Students can connect with their teachers in separate Group Chats to exchange ideas and understand concepts better.'],'Identical on both pages, so the teacher reads about students.']
+  ];
+  var ft=document.getElementById('ftabs'),tw=document.getElementById('twice'),sm=document.getElementById('same');
+  F.forEach(function(f,n){var b=document.createElement('button');b.type='button';b.textContent=f[0];b.addEventListener('click',function(){feat(n);});ft.appendChild(b);});
+  function feat(n){[].forEach.call(ft.children,function(b,i){b.setAttribute('aria-pressed',String(i===n));});var f=F[n];tw.innerHTML=[f[1],f[2]].map(function(v){return '<div class="voice"><span class="who-is">'+v[0]+'</span><q>'+v[1]+'</q><small>Quoted from the design</small></div>';}).join('');sm.textContent=f[3];}
+  feat(0);
+  // plan maths
+  var M=[['Per subject',['Three subjects','$20.88'],['Saving vs Single','30%',1],['Compared with All','$0.89 more',1]],['For all three',['Per subject','$2.32'],['Saving vs Single','77%',1],['Compared with All','$13.03 less']]];
+  var ms=document.getElementById('mseg');
+  M.forEach(function(m,n){var b=document.createElement('button');b.type='button';b.textContent=m[0];b.addEventListener('click',function(){mth(n);});ms.appendChild(b);});
+  function mth(n){[].forEach.call(ms.children,function(b,i){b.setAttribute('aria-pressed',String(i===n));});var m=M[n];document.getElementById('mh').textContent='If $6.96 is '+m[0].toLowerCase();document.getElementById('mdl').innerHTML=m.slice(1).map(function(r){return '<dt>'+r[0]+'</dt><dd'+(r[2]?' class="flag"':'')+'>'+r[1]+'</dd>';}).join('');}
+  mth(0);
+  // rise: content stays visible; below-the-fold blocks lift into place
+  if(!matchMedia('(prefers-reduced-motion: reduce)').matches && 'IntersectionObserver' in window){
+    var els=[].slice.call(document.querySelectorAll('.rise')).filter(function(el){return el.getBoundingClientRect().top>innerHeight;});
+    els.forEach(function(el){el.classList.add('pre');});
+    var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.remove('pre');io.unobserve(e.target);}});},{rootMargin:'0px 0px -8% 0px'});
+    els.forEach(function(el){io.observe(el);});
+  }
+})();
+</script>
+</body>
+</html>

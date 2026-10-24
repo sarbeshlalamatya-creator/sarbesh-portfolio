@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dayworks</title>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&amp;family=Geist:wght@400;500;600;700&amp;family=Caveat:wght@500;700&amp;family=Instrument+Serif:ital@0;1&amp;family=Lato:wght@400;700&amp;family=Noto+Sans+JP:wght@400;500;700;900&amp;family=Fredoka:wght@600;700&amp;display=swap" rel="stylesheet">
+<style>
+/* Layout: portfolio cream and ink with the indigo card colour as signature; Dayworks green and yellow appear only where the app itself is on show. */
+:root{
+  --paper:#F3EEE4; --paper-2:#EAE3D5; --ink:#1B1A17; --ink-2:#3E3B35; --mute:#6F6A61; --line:rgba(27,26,23,.12);
+  --signal:#F2552C; --ind:#3A2F8F; --ind-ink:#EEF0FF; --dw:#3F8C76; --jp:'Noto Sans JP',system-ui,sans-serif; --sys-font:'Lato',system-ui,sans-serif;
+  --display:'Bricolage Grotesque',system-ui,sans-serif; --body:'Geist',system-ui,sans-serif; --hand:'Caveat',cursive; --serif:'Instrument Serif',Georgia,serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img{max-width:100%;height:auto;display:block}
+a{color:inherit}
+::selection{background:var(--signal);color:var(--ink)}
+:focus-visible{outline:2px solid var(--signal);outline-offset:3px;border-radius:6px}
+.wrap{max-width:1240px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.read{max-width:660px}
+section{padding-block:clamp(64px,10vw,128px)}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--mute)}
+h1,h2,h3{font-family:var(--display);letter-spacing:-.04em;line-height:1;margin:0;text-wrap:balance}
+h2{font-size:clamp(36px,5.4vw,72px);font-weight:800}
+h3{font-size:clamp(20px,2vw,26px);font-weight:800;letter-spacing:-.03em}
+p{margin:0}
+.lede{font-size:clamp(19px,1.7vw,22px);line-height:1.5;color:var(--ink-2)}
+.hand{font-family:var(--hand);font-weight:700;color:var(--signal);font-size:clamp(24px,2.4vw,30px);line-height:1.1}
+.stack{display:flex;flex-direction:column;gap:20px}
+.shot{border-radius:18px;overflow:hidden;box-shadow:0 30px 70px rgba(27,26,23,.14),0 2px 0 rgba(27,26,23,.04);background:#fff}
+.reading{display:inline-flex;align-items:center;gap:8px;align-self:flex-start;font-size:13px;font-weight:600;color:var(--ink-2);border:1.5px dashed rgba(27,26,23,.3);border-radius:999px;padding:5px 12px}
+.reading::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--signal)}
+.tbc{border-bottom:1.5px dashed var(--signal)}
+.split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:clamp(32px,6vw,88px);align-items:center}
+
+.bar{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:50;display:flex;align-items:center;gap:6px;padding:6px;background:rgba(255,255,255,.62);backdrop-filter:blur(16px) saturate(1.4);-webkit-backdrop-filter:blur(16px) saturate(1.4);border:1px solid rgba(27,26,23,.08);border-radius:999px;box-shadow:0 8px 30px rgba(27,26,23,.08);max-width:calc(100vw - 24px)}
+.bar a{text-decoration:none;font-size:14px;font-weight:600;padding:8px 14px;border-radius:999px;white-space:nowrap}
+.bar a:hover{background:rgba(27,26,23,.06)}
+.bar .dark-btn{background:var(--ink);color:var(--paper)}
+.bar .dark-btn:hover{background:var(--ink);color:var(--signal)}
+.bar img{width:30px;height:30px;border-radius:50%;object-fit:cover;background:var(--paper-2)}
+.meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:18px;border-top:1px solid var(--line);padding-top:20px;margin-top:36px}
+.meta div > span{display:block;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+.meta div > strong{display:block;margin-top:6px;font-weight:600;font-size:16px;line-height:1.4}
+.reflect{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(28px,5vw,72px)}
+.reflect ol{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:22px}
+.reflect li{display:flex;flex-direction:column;gap:6px;padding-left:18px;border-left:3px solid var(--ind)}
+.reflect li strong{font-weight:600}
+
+.end{background:var(--ind);color:var(--ind-ink);border-radius:32px 32px 0 0}
+.end h2{font-size:clamp(44px,7vw,104px)}
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:32px}
+.cta a{text-decoration:none;font-weight:600;font-size:15px;padding:13px 22px;border-radius:999px}
+.cta .solid{background:var(--ind-ink);color:var(--ind)}
+.cta .ghost{border:1.5px solid var(--ind-ink);color:var(--ind-ink)}
+footer{background:var(--ind);color:rgba(238,240,255,.75);font-size:13px;padding-block:0 32px}
+.rise{transition:transform .8s cubic-bezier(.2,.8,.2,1)}
+.rise.pre{transform:translateY(28px)}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.rise,.rise.pre,.slides img,.sw,.sw::after{transition:none}.phone.scr{scroll-behavior:auto}.rise.pre{transform:none}}
+/* hero */
+.hero{padding-top:clamp(110px,14vh,150px);padding-bottom:clamp(40px,6vw,80px)}
+.hero-top{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(24px,4vw,56px);align-items:end}
+.name h1{font-size:clamp(56px,7vw,104px);font-weight:800;letter-spacing:-.065em;line-height:.86}
+.name h1 span{color:var(--dw)}
+.name small{display:block;margin-top:16px;font:700 13px var(--body);letter-spacing:.16em;text-transform:uppercase;color:var(--mute)}
+.statement{font-family:var(--serif);font-size:clamp(28px,3.2vw,44px);line-height:1.08;max-width:19ch}
+.statement .jp{font-family:var(--jp);font-weight:900;color:var(--dw);font-size:.9em}
+.stage{position:relative;margin-top:clamp(36px,5vw,64px);padding:clamp(24px,4vw,56px) clamp(16px,3vw,40px);background:var(--dw);border-radius:28px;display:flex;justify-content:center;gap:clamp(10px,2.4vw,32px);overflow:hidden}
+.stage img{width:min(22%,240px);border-radius:clamp(14px,2vw,26px);box-shadow:0 24px 50px rgba(20,60,50,.3);background:#fff}
+.stage img:nth-child(2){transform:translateY(-14px)}
+.stage img:nth-child(4){transform:translateY(-14px)}
+.jp{font-family:var(--jp)}
+
+/* phone */
+.phone{width:300px;max-width:100%;aspect-ratio:414/800;border-radius:36px;border:10px solid #1B1A17;overflow:hidden;background:var(--dw);position:relative;box-shadow:0 30px 60px rgba(27,26,23,.2)}
+.phone.scr{aspect-ratio:auto;height:clamp(460px,52vw,620px);overflow-y:auto;overscroll-behavior:contain;background:#fff}
+.phone.scr img{display:block;width:100%}
+
+/* onboarding */
+.ob{display:grid;grid-template-columns:auto minmax(0,1fr);gap:clamp(28px,5vw,72px);margin-top:44px;align-items:center}
+.slides{position:absolute;inset:0}
+.slides img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .4s ease}
+.slides img.on{opacity:1}
+.obtn{all:unset;cursor:pointer;position:absolute;left:3.6%;right:3.6%;bottom:9.5%;height:6%;border-radius:8px;background:#F6F8F7;color:#5DAC96;font:500 14px var(--jp);text-align:center;display:grid;place-items:center}
+.obtn:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.odots{position:absolute;left:0;right:0;bottom:3.5%;display:flex;justify-content:center;gap:5px}
+.odots button{all:unset;cursor:pointer;width:14px;height:14px;border-radius:50%;background:#98D3C2}
+.odots button[aria-pressed="true"]{background:#6BB9C4}
+.odots button:focus-visible{outline:2px solid #fff}
+.tr{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;counter-reset:s}
+.tr li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:14px;padding:14px 16px;border-radius:14px;transition:background .25s;counter-increment:s}
+.tr li::before{content:counter(s);font:800 14px var(--display);color:var(--mute);padding-top:3px}
+.tr li.on{background:#fff;box-shadow:0 8px 24px rgba(27,26,23,.08)}
+.tr .jp{font-size:clamp(18px,1.8vw,22px);font-weight:900;color:#3E3B35}
+.tr .jp b{color:#C9A200;font-weight:900}
+.tr p{margin:4px 0 0;color:var(--ink-2);font-size:15px}
+
+/* promise to proof */
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{border:1.5px solid var(--line);background:#fff;font:600 14px var(--body);color:var(--ink-2);padding:8px 16px;border-radius:999px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--dw);border-color:var(--dw);color:#fff}
+.pp{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:clamp(24px,4vw,48px);margin-top:24px;align-items:start}
+.promise{background:var(--dw);color:#fff;border-radius:22px;padding:clamp(22px,3vw,36px);min-height:220px;display:flex;flex-direction:column;justify-content:space-between;gap:20px}
+.promise .jp{font-size:clamp(30px,3.4vw,46px);font-weight:900;line-height:1.1}
+.promise .jp b{color:#FBE97F}
+.promise p{margin:0;font-size:16px;opacity:.92}
+.proof figure{margin:0}
+.proof img{width:100%;border-radius:14px;background:#fff;box-shadow:0 14px 40px rgba(27,26,23,.1)}
+.proof figcaption{margin-top:12px;color:var(--ink-2)}
+.proof figcaption b{display:block;color:var(--ink);margin-bottom:2px}
+
+/* home rebuild */
+.homeb{display:grid;grid-template-columns:auto minmax(0,1fr);gap:clamp(28px,5vw,72px);margin-top:44px;align-items:start}
+.app{width:360px;max-width:100%;background:#fff;border-radius:24px;overflow:hidden;box-shadow:0 30px 60px rgba(27,26,23,.14);font-family:var(--jp);color:#333}
+.app .top{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-bottom:1px solid #ddd}
+.app .top b{font:700 22px 'Fredoka',var(--body);color:#5DAC96;letter-spacing:-.02em}
+.app .top span{font-size:11px;color:#555}
+.wk{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));text-align:center}
+.wk .dn{font-size:12px;padding:10px 0 6px;color:#444}
+.wk .dn:first-child{color:#E53935}.wk .dn:last-child{color:#1E88E5}
+.days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));background:#E9F3F0;padding:6px 0}
+.days button{all:unset;cursor:pointer;justify-self:center;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-size:15px;color:#333}
+.days button:disabled{color:#bbb;cursor:default}
+.days button[aria-pressed="true"]{background:#4C9E88;color:#fff}
+.days button:focus-visible{outline:2px solid #4C9E88;outline-offset:2px}
+.dl{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid #ddd;font-size:15px}
+.dl label{display:flex;align-items:center;gap:8px;font-size:12px;color:#555;cursor:pointer}
+.sw{appearance:none;width:44px;height:24px;border-radius:999px;background:#9E9E9E;position:relative;cursor:pointer;margin:0;transition:background .2s}
+.sw::after{content:"";position:absolute;left:3px;top:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left .2s}
+.sw:checked{background:#5DAC96}.sw:checked::after{left:23px}
+.sw:focus-visible{outline:2px solid #4C9E88;outline-offset:2px}
+.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:14px 10px 18px;min-height:250px;align-content:start}
+.jc{font-size:11px;line-height:1.45;transition:opacity .25s}
+.jc .im{position:relative;border-radius:8px;overflow:hidden;aspect-ratio:380/275}
+.jc .im img{width:100%;height:100%;object-fit:cover}
+.jc .clk{position:absolute;left:5px;top:5px;background:#4C9E88;color:#fff;border-radius:999px;padding:1px 7px;font-size:10px}
+.jc h5{margin:6px 0 8px;font-size:12px;font-weight:500;color:#333}
+.jc .pl{color:#5DAC96}
+.jc .rw{display:flex;justify-content:space-between;align-items:baseline}
+.jc .rw b{font-size:14px;font-weight:500}
+.none{grid-column:1/-1;text-align:center;color:#888;font-size:13px;padding:40px 10px}
+.hnote h3{font-size:clamp(22px,2.2vw,30px)}
+.hnote p{color:var(--ink-2)}
+.hnote dl{margin:18px 0 0;display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px 16px;font-size:15px}
+.hnote dt{font-family:var(--jp);font-weight:700}
+.hnote dd{margin:0;color:var(--ink-2)}
+
+/* maths */
+.math{margin-top:40px;background:#fff;border-radius:22px;padding:clamp(20px,3vw,36px)}
+.hours{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:4px;margin-top:18px}
+.hours i{height:46px;border-radius:6px;background:var(--dw)}
+.hours i.br{background:repeating-linear-gradient(135deg,#E8E2D6 0 6px,#F4EFE6 6px 12px)}
+.hticks{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin-top:8px;font-size:13px;color:var(--mute)}
+.eq{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px 16px;margin-top:22px;font:800 clamp(22px,3vw,40px)/1.1 var(--display);letter-spacing:-.03em}
+.eq span{color:var(--mute);font-weight:500}
+.eq b{color:var(--dw)}
+.mkey{display:flex;gap:18px;margin-top:12px;font-size:13px;color:var(--mute)}
+.mkey i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px;background:var(--dw)}
+.mkey i.br{background:repeating-linear-gradient(135deg,#E8E2D6 0 3px,#F4EFE6 3px 6px)}
+
+/* detail */
+.det{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:clamp(28px,5vw,72px);margin-top:44px;align-items:start}
+.jump{display:flex;flex-direction:column;gap:2px}
+.jump button{all:unset;cursor:pointer;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;padding:10px 14px;border-radius:10px;font-weight:600}
+.jump button small{font:500 13px var(--jp);color:var(--mute)}
+.jump button[aria-pressed="true"]{background:#fff;box-shadow:0 8px 24px rgba(27,26,23,.08)}
+.jump button:focus-visible{outline:2px solid var(--ind)}
+.jnote{margin-top:14px;padding:14px 16px;border-left:3px solid var(--dw);background:#fff;border-radius:0 12px 12px 0;color:var(--ink-2);min-height:3em}
+
+/* reviews */
+.both{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(16px,3vw,32px);margin-top:44px}
+.rv{background:#fff;border-radius:22px;padding:clamp(20px,3vw,32px);display:flex;flex-direction:column;gap:18px}
+.rv .who{font-weight:700}
+.rv .who small{display:block;font-weight:500;color:var(--mute);font-size:14px}
+.faces{display:flex;gap:clamp(24px,5vw,56px)}
+.faces div{display:flex;flex-direction:column;align-items:center;gap:6px;font:500 20px var(--body)}
+.faces svg{width:clamp(48px,6vw,64px);height:auto}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border-radius:14px;overflow:hidden;background:linear-gradient(90deg,#5F8A9C,#5DD69B);color:#fff;font-family:var(--jp);text-align:center}
+.stats div{padding:16px 8px}
+.stats div+div{border-left:1px solid rgba(255,255,255,.6)}
+.stats small{display:block;font-size:13px;font-weight:700}
+.stats b{font-size:clamp(20px,2.2vw,26px)}
+
+@media (max-width:860px){
+  .hero-top,.split,.ob,.pp,.homeb,.det,.both,.reflect{grid-template-columns:minmax(0,1fr)}
+  .ob .phone,.homeb .app,.det .phone{justify-self:center}
+  .stage img{width:30%}.stage img:nth-child(4){display:none}
+}
+</style>
+<style>body{animation:cnIn .45s ease both}@keyframes cnIn{from{opacity:0}}@media (prefers-reduced-motion:reduce){body{animation:none}}</style>
+<script src="case-nav.js" defer></script>
+</head>
+<body>
+<nav class="bar" aria-label="Case study">
+  <a href="../index.html#work" style="display:flex;align-items:center;gap:8px;padding:2px 12px 2px 2px"><img src="../work/avatar.webp" alt="" width="30" height="30"><span style="font-family:var(--display);font-weight:800;font-size:16px;letter-spacing:-.02em">Sarbesh</span></a>
+  <a href="../index.html#work">All work</a>
+  <a class="dark-btn" href="https://www.figma.com/design/KVljzwUJ8ClQ1Uzg83GopL/DayWorks?node-id=0-1&amp;t=3NmZJGtSE68mMJtd-1" target="_blank" rel="noopener">Figma file ↗</a>
+</nav>
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Case study · Mobile app · 2022</div>
+    <div class="hero-top" style="margin-top:18px">
+      <div class="name"><h1>Dayworks<span>.</span></h1><small>Day-work app for Japan</small></div>
+      <div>
+        <p class="statement">An app that says <span class="jp">すぐ</span>, right away, before it shows a single job.</p>
+        <div class="meta">
+          <div><span>What it is</span><strong>A mobile app for picking up single shifts, working them and getting paid</strong></div>
+          <div><span>Shown here</span><strong>5 onboarding slides and 3 app screens, in Japanese</strong></div>
+          <div><span>My role</span><strong><span class="tbc">UI/UX design</span></strong></div>
+        </div>
+      </div>
+    </div>
+    <div class="stage">
+      <img src="dayworks/ob1.webp" alt="Onboarding: work right away, get paid right away" width="414" height="800">
+      <img src="dayworks/p-home.webp" alt="Home: week strip and two job cards" width="414" height="800">
+      <img src="dayworks/ob2.webp" alt="Onboarding: confirmed the moment you apply" width="414" height="800">
+      <img src="dayworks/p-mypage.webp" alt="My Page: reviews, money received and hours worked" width="414" height="800">
+    </div>
+  </div>
+</header>
+
+<section style="padding-top:clamp(40px,6vw,80px)">
+  <div class="wrap">
+    <div class="split" style="align-items:end">
+      <div class="stack rise">
+        <div class="eyebrow">Onboarding</div>
+        <h2>Five slides, one yellow word each.</h2>
+      </div>
+      <div class="stack rise">
+        <p class="lede">Every slide has the same build: a white line, a flat icon with three ticks either side, and the promise in yellow. Three of the four promises are about speed. Tap through the slides as they work in the comp.</p>
+        <span class="reading">The English lines are my translation</span>
+      </div>
+    </div>
+    <div class="ob">
+      <div class="phone rise" role="region" aria-label="Onboarding slides, rebuilt">
+        <div class="slides" id="slides"></div>
+        <button class="obtn" id="obtn" type="button">次へ</button>
+        <div class="odots" id="odots" role="group" aria-label="Slide"></div>
+      </div>
+      <ol class="tr rise" id="tr">
+        <li><div><div class="jp"><b>すぐ</b>働いて <b>すぐ</b>お金がもらえる</div><p>Work right away, get paid right away.</p></div></li>
+        <li><div><div class="jp">応募したら <b>即確定</b></div><p>Apply and the job is yours on the spot. A small note adds that some jobs are exceptions.</p></div></li>
+        <li><div><div class="jp">働いたら <b>すぐ</b>お金を受け取れる</div><p>Once you've worked, collect your pay right away.</p></div></li>
+        <li><div><div class="jp">レビューも見れて <b>安心</b></div><p>You can read reviews too, so you can relax.</p></div></li>
+        <li><div><div class="jp">さあ、はじめよう</div><p>Let's get started. The button changes from Next to Start.</p></div></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section style="background:#fff">
+  <div class="wrap">
+    <div class="split" style="align-items:end">
+      <div class="stack rise">
+        <div class="eyebrow">Promise and proof</div>
+        <h2>Where each promise is kept.</h2>
+      </div>
+      <div class="stack rise">
+        <p class="lede">Onboarding makes four promises. Each one has a place in the app screens that backs it up. Pick a promise to see where.</p>
+        <span class="reading">The pairings are my reading</span>
+      </div>
+    </div>
+    <div class="seg rise" id="pseg" role="group" aria-label="Promise" style="margin-top:36px"></div>
+    <div class="pp rise">
+      <div class="promise" aria-live="polite"><div class="jp" id="pj"></div><p id="pe"></p></div>
+      <div class="proof"><figure><img id="pimg" src="dayworks/k-cards.webp" alt="" width="828" height="580"><figcaption id="pc"></figcaption></figure></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="split" style="align-items:end">
+      <div class="stack rise">
+        <div class="eyebrow">Home</div>
+        <h2>A week strip, not a search box.</h2>
+      </div>
+      <div class="stack rise">
+        <p class="lede">Home opens on a date, not a query. A week runs across the top with today circled, past days greyed, Sunday in red and Saturday in blue. Under it a switch narrows the list to jobs still taking people. I rebuilt it in Japanese so the day picker and the switch work.</p>
+        <span class="reading">The switch hiding the Shinjuku job is my reading</span>
+      </div>
+    </div>
+    <div class="homeb">
+      <div class="app rise" lang="ja">
+        <div class="top"><b>dayworks</b><span>ログイン　絞り込み</span></div>
+        <div class="wk"><div class="dn">日</div><div class="dn">月</div><div class="dn">火</div><div class="dn">水</div><div class="dn">木</div><div class="dn">金</div><div class="dn">土</div></div>
+        <div class="days" id="days" role="group" aria-label="Day"></div>
+        <div class="dl"><span id="dlab">2022年3月28日</span><label>募集中のみ <input type="checkbox" class="sw" id="sw" aria-label="Open jobs only"></label></div>
+        <div class="cards" id="cards" aria-live="polite"></div>
+      </div>
+      <div class="hnote rise">
+        <h3>What a card carries</h3>
+        <p>Each card fits a whole shift into a glance: photo, a clock chip, a title that names the area and the role, the plan, date, hours, pay and the nearest station.</p>
+        <dl>
+          <dt>デイワークスプラン</dt><dd>The Dayworks plan, in green on every card</dd>
+          <dt>募集中のみ</dt><dd>Open jobs only</dd>
+          <dt>締切</dt><dd>Closed. The Shinjuku job's detail page carries this tag and a grey button.</dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="background:var(--paper-2)">
+  <div class="wrap">
+    <div class="split" style="align-items:end">
+      <div class="stack rise">
+        <div class="eyebrow">Job detail</div>
+        <h2>The price reads both ways.</h2>
+      </div>
+      <div class="stack rise">
+        <p class="lede">The Shinjuku job shows ¥4,900 big and ¥1,400 an hour small. The overview lists 18:00 to 22:00 with a 30-minute break. Take the break out and the two numbers agree.</p>
+      </div>
+    </div>
+    <div class="math rise">
+      <div class="hours" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="br"></i></div>
+      <div class="hticks"><span>18:00</span><span>19:00</span><span>20:00</span><span>21:00 → 22:00</span></div>
+      <div class="mkey"><span><i></i>Paid half-hour</span><span><i class="br"></i>Break</span></div>
+      <div class="eq"><span>4 h − 30 min =</span>3.5 h <span>×</span> ¥1,400 <span>=</span> <b>¥4,900</b></div>
+      <p style="margin-top:14px;color:var(--mute);font-size:14px">Where the break falls is not shown. I drew it at the end.</p>
+    </div>
+  </div>
+</section>
+
+<section style="background:#fff">
+  <div class="wrap">
+    <div class="split" style="align-items:end">
+      <div class="stack rise">
+        <div class="eyebrow">Job detail</div>
+        <h2>Everything before you say yes.</h2>
+      </div>
+      <div class="stack rise">
+        <p class="lede">Applying confirms the job at once, so the detail page has to answer every question first. It runs from photo and pay through conditions, what to bring, a full overview, a map, pay rules and the company's reviews. Pick a part to jump to it.</p>
+      </div>
+    </div>
+    <div class="det">
+      <div class="rise">
+        <div class="jump" id="jump" role="group" aria-label="Parts of the detail page"></div>
+        <p class="jnote" id="jn" aria-live="polite"></p>
+      </div>
+      <div class="phone scr rise" id="ds" tabindex="0" aria-label="Job detail page, scrollable"><img src="dayworks/p-detail.webp" alt="Job detail page, top to bottom" width="414" height="3189"></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="split" style="align-items:end">
+      <div class="stack rise">
+        <div class="eyebrow">My Page</div>
+        <h2>Reviews run both ways.</h2>
+      </div>
+      <div class="stack rise">
+        <p class="lede">Companies get a smile or a frown from workers, and workers get the same from companies. The two faces appear on the job page and again on My Page, above the money received and the hours worked. Two sets of numbers from the comps, rebuilt side by side.</p>
+      </div>
+    </div>
+    <div class="both">
+      <div class="rv rise"><div class="who">The company<small>On the job page, with dated reviews by age and gender</small></div><div class="faces" id="f1"></div></div>
+      <div class="rv rise"><div class="who">The worker<small>On My Page, after 10 jobs</small></div><div class="faces" id="f2"></div>
+        <div class="stats" lang="ja"><div><small>もらったお金</small><b>18,463円</b></div><div><small>がんばった時間</small><b>11:38</b></div></div>
+        <p style="margin:0;color:var(--mute);font-size:14px">Money received, and time spent working hard.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap reflect">
+    <div class="stack rise">
+      <div class="eyebrow">Looking back</div>
+      <h2>What I'd tighten next.</h2>
+      <p class="lede">The onboarding sets up a clear promise and the three app screens follow through on it. These are the gaps I'd close.</p>
+    </div>
+    <ol class="rise">
+      <li><strong>Show closed jobs on the card.</strong><span>The Shinjuku card on Home looks open, but its detail page says 締切 and greys out the button. A closed tag on the card would save a tap.</span></li>
+      <li><strong>Say how fast pay is.</strong><span>The pay table says month-end close and payment on the 15th of the next month. Pay "right away" depends on the prepayment tab, and a line on the job page could say so.</span></li>
+      <li><strong>Lift the quiet parts and swap the test data.</strong><span>The pale label on the white Next button and the active dot sit close to their backgrounds. Test company names, a test station and "Test" reviews are still in the comps.</span></li>
+    </ol>
+  </div>
+</section>
+
+<section class="end">
+  <div class="wrap stack">
+    <div class="hand" style="color:var(--ind-ink)">thanks for reading</div>
+    <h2>Open the file, or keep exploring.</h2>
+    <div class="cta">
+      <a class="solid" href="https://www.figma.com/design/KVljzwUJ8ClQ1Uzg83GopL/DayWorks?node-id=0-1&amp;t=3NmZJGtSE68mMJtd-1" target="_blank" rel="noopener">Open in Figma ↗</a>
+      <a class="ghost" href="hippie-stay.html">See another mobile app, Hippie Stay</a>
+      <a class="ghost" href="../index.html#work">Back to all work</a>
+    </div>
+  </div>
+</section>
+<footer><div class="wrap">© 2026 Sarbesh Lal Amatya · Kathmandu, Nepal</div></footer>
+
+<script>
+(function(){
+  function group(el,list,label,fn){list.forEach(function(x,n){var b=document.createElement('button');b.type='button';b.innerHTML=label(x);if(x.off)b.disabled=true;b.addEventListener('click',function(){[].forEach.call(el.children,function(c,i){c.setAttribute('aria-pressed',String(i===n));});fn(x,n);});el.appendChild(b);});}
+  // onboarding
+  var sl=document.getElementById('slides'),dots=document.getElementById('odots'),ob=document.getElementById('obtn'),tr=document.getElementById('tr').children,cur=0;
+  var alts=['Work right away, get paid right away','Apply and it is confirmed on the spot','Once you have worked, collect your pay right away','Read reviews too, and relax','Let us get started'];
+  sl.innerHTML=alts.map(function(a,i){return '<img src="dayworks/ob'+(i+1)+'.webp" alt="'+a+'" width="414" height="800">';}).join('');
+  function go(n){cur=n;[].forEach.call(sl.children,function(im,i){im.classList.toggle('on',i===n);im.setAttribute('aria-hidden',String(i!==n));});[].forEach.call(tr,function(li,i){li.classList.toggle('on',i===n);});[].forEach.call(dots.children,function(d,i){d.setAttribute('aria-pressed',String(i===n));});ob.textContent=n===4?'始める':'次へ';ob.setAttribute('aria-label',n===4?'Start, back to the first slide':'Next slide');}
+  group(dots,[0,1,2,3,4],function(){return '';},function(x,n){go(n);});
+  [].forEach.call(dots.children,function(d,i){d.setAttribute('aria-label','Slide '+(i+1));});
+  ob.addEventListener('click',function(){go((cur+1)%5);});
+  go(0);
+  // promise to proof
+  var P=[{t:'すぐ働いて',j:'<b>すぐ</b>働いて',e:'Work right away.',i:'k-cards',h:580,c:'Home',p:'Jobs for a single evening, listed by date, with hours, pay and the nearest station on the card.'},{t:'即確定',j:'応募したら <b>即確定</b>',e:'Apply and the job is yours on the spot.',i:'k-confirm',h:170,c:'Job detail',p:'Under the Dayworks plan: "Applying for this work confirms it immediately. Please check the job details, then come and work."'},{t:'すぐお金',j:'働いたら <b>すぐ</b>お金を受け取れる',e:'Once you\'ve worked, collect your pay right away.',i:'k-money',h:156,c:'My Page and the tab bar',p:'A prepayment tab, 前払い, sits in the main navigation, and My Page totals the money received and hours worked.'},{t:'安心',j:'レビューも見れて <b>安心</b>',e:'Read reviews too, and relax.',i:'k-reviews',h:800,c:'Job detail',p:'The company\'s smiles and frowns, then each review with the reviewer\'s age band, gender and date.'}];
+  var pi=document.getElementById('pimg');
+  group(document.getElementById('pseg'),P,function(p){return '<span lang="ja">'+p.t+'</span>';},function(p){document.getElementById('pj').innerHTML=p.j;document.getElementById('pe').textContent=p.e;pi.src='dayworks/'+p.i+'.webp';pi.height=p.h;pi.alt=p.c+' screen detail';document.getElementById('pc').innerHTML='<b>'+p.c+'</b>'+p.p;});
+  document.getElementById('pseg').children[0].click();
+  // home rebuild, cards as in the comp
+  var J=[{im:'c-bar',t:'新宿で大人気！居酒屋優ちゃんでのホール接客業務！',y:'¥4,900',s:'テスト最寄り駅1',closed:1},{im:'c-store',t:'池袋で大人気！居酒屋慎ちゃんでのホール接客業務！',y:'¥5,250',s:'池袋駅'}];
+  var dy=document.getElementById('days'),cd=document.getElementById('cards'),sw=document.getElementById('sw'),day=28;
+  var D=[[27,3],[28,3],[29,3],[30,3],[31,3],[1,4],[2,4]];
+  function cards(){var list=day===28?J.filter(function(j){return !(sw.checked&&j.closed);}):[];
+    cd.innerHTML=list.length?list.map(function(j){return '<div class="jc"><div class="im"><img src="dayworks/'+j.im+'.webp" alt="" width="380" height="275"></div><h5>'+j.t+'</h5><div class="pl">デイワークスプラン</div><div class="rw"><span>3月28日 (月)<br>18:00〜22:00</span><b>'+j.y+'</b></div><div>📍 '+j.s+'</div></div>';}).join(''):'<p class="none">'+(day===28?'募集中の求人はありません<br><span lang="en">No open jobs in the comp for this day</span>':'<span lang="en">The comp only fills in the 28th</span>')+'</p>';}
+  group(dy,D.map(function(d){return {d:d,off:d[0]===27};}),function(x){return String(x.d[0]);},function(x){day=x.d[0];document.getElementById('dlab').textContent='2022年'+x.d[1]+'月'+x.d[0]+'日';cards();});
+  [].forEach.call(dy.children,function(b,i){b.setAttribute('aria-label',D[i][1]+'/'+D[i][0]+(i===0?', past':''));});
+  dy.children[1].click();
+  sw.addEventListener('change',cards);
+  // detail jump list: y is the part's top in the 6378px-tall comp
+  var T=[['Photo, title and pay','写真・タイトル',0,'Category, title, date and hours, the plan, ¥4,900 and ¥1,400 an hour, and the 締切 tag.'],['Instant confirmation','即確定',1090,'The note that applying confirms the job, then a message from the person in charge: ask anything, any time.'],['Conditions','こだわり条件',1560,'Five tiles: 5 minutes from the station, car OK, motorbike OK, bicycle OK, no overtime.'],['Bring and wear','持ち物・服装',1880,'A ballpoint pen and jeans.'],['Overview','概要',2150,'Role, duties, hours, break, late break, employment type, overtime, smoking rules, notes and requirements.'],['Workplace and map','就業場所',3100,'Workplace name, address, nearest station, directions, an embedded map and a link to Google Maps.'],['Pay','給与',4400,'Hourly, monthly close and paid on the 15th of the next month by bank transfer, no travel costs, and 25% extra for overtime and late nights.'],['Company and reviews','会社情報',5030,'30 smiles and 3 frowns, then reviews by age band and gender, with a See more.'],['Favourite and apply','締切',6150,'A fixed bar with a heart and the apply button, greyed and reading Closed for this job.']];
+  var ds=document.getElementById('ds');
+  group(document.getElementById('jump'),T,function(t){return '<span>'+t[0]+'</span><small lang="ja">'+t[1]+'</small>';},function(t,n){document.getElementById('jn').textContent=t[3];if(n||ds.dataset.ready)ds.scrollTop=Math.max(0,t[2]/6378*ds.scrollHeight-20);ds.dataset.ready=1;});
+  document.getElementById('jump').children[0].click();
+  // two-way reviews
+  function face(c,happy){return '<svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="21" fill="none" stroke="'+c+'" stroke-width="3.5"/><circle cx="17" cy="20" r="2.4" fill="'+c+'"/><circle cx="31" cy="20" r="2.4" fill="'+c+'"/><path d="'+(happy?'M15 29q9 8 18 0':'M16 33q8-6 16 0')+'" fill="none" stroke="'+c+'" stroke-width="3.5" stroke-linecap="round"/></svg>';}
+  function faces(el,a,b){document.getElementById(el).innerHTML='<div>'+face('#EE7A4A',1)+'<span>'+a+'</span><span class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">smiles</span></div><div>'+face('#4FA3C4',0)+'<span>'+b+'</span><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">frowns</span></div>';}
+  faces('f1',30,3);faces('f2',3,0);
+  // rise: content stays visible; below-the-fold blocks lift into place
+  if(!matchMedia('(prefers-reduced-motion: reduce)').matches && 'IntersectionObserver' in window){
+    var els=[].slice.call(document.querySelectorAll('.rise')).filter(function(el){return el.getBoundingClientRect().top>innerHeight;});
+    els.forEach(function(el){el.classList.add('pre');});
+    var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.remove('pre');io.unobserve(e.target);}});},{rootMargin:'0px 0px -8% 0px'});
+    els.forEach(function(el){io.observe(el);});
+  }
+})();
+</script>
+</body>
+</html>
