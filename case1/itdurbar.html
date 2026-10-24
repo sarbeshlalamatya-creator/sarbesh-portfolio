@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>IT Durbar</title>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&amp;family=Geist:wght@400;500;600;700&amp;family=Caveat:wght@500;700&amp;family=Instrument+Serif:ital@0;1&amp;family=Lato:wght@400;700&amp;family=Open+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+/* Layout: portfolio cream and ink with the rust card colour as signature; IT Durbar's blue appears only where the store itself is on show. */
+:root{
+  --paper:#F3EEE4; --paper-2:#EAE3D5; --ink:#1B1A17; --ink-2:#3E3B35; --mute:#6F6A61; --line:rgba(27,26,23,.12);
+  --signal:#F2552C; --ind:#A94808; --ind-ink:#FFF7ED; --blue:#1F6FE5; --sys-font:'Lato',system-ui,sans-serif;
+  --display:'Bricolage Grotesque',system-ui,sans-serif; --body:'Geist',system-ui,sans-serif; --hand:'Caveat',cursive; --serif:'Instrument Serif',Georgia,serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img{max-width:100%;height:auto;display:block}
+a{color:inherit}
+::selection{background:var(--signal);color:var(--ink)}
+:focus-visible{outline:2px solid var(--signal);outline-offset:3px;border-radius:6px}
+.wrap{max-width:1240px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.read{max-width:660px}
+section{padding-block:clamp(64px,10vw,128px)}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--mute)}
+h1,h2,h3{font-family:var(--display);letter-spacing:-.04em;line-height:1;margin:0;text-wrap:balance}
+h2{font-size:clamp(36px,5.4vw,72px);font-weight:800}
+h3{font-size:clamp(20px,2vw,26px);font-weight:800;letter-spacing:-.03em}
+p{margin:0}
+.lede{font-size:clamp(19px,1.7vw,22px);line-height:1.5;color:var(--ink-2)}
+.hand{font-family:var(--hand);font-weight:700;color:var(--signal);font-size:clamp(24px,2.4vw,30px);line-height:1.1}
+.stack{display:flex;flex-direction:column;gap:20px}
+.shot{border-radius:18px;overflow:hidden;box-shadow:0 30px 70px rgba(27,26,23,.14),0 2px 0 rgba(27,26,23,.04);background:#fff}
+.reading{display:inline-flex;align-items:center;gap:8px;align-self:flex-start;font-size:13px;font-weight:600;color:var(--ink-2);border:1.5px dashed rgba(27,26,23,.3);border-radius:999px;padding:5px 12px}
+.reading::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--signal)}
+.tbc{border-bottom:1.5px dashed var(--signal)}
+.split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:clamp(32px,6vw,88px);align-items:center}
+
+.bar{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:50;display:flex;align-items:center;gap:6px;padding:6px;background:rgba(255,255,255,.62);backdrop-filter:blur(16px) saturate(1.4);-webkit-backdrop-filter:blur(16px) saturate(1.4);border:1px solid rgba(27,26,23,.08);border-radius:999px;box-shadow:0 8px 30px rgba(27,26,23,.08);max-width:calc(100vw - 24px)}
+.bar a{text-decoration:none;font-size:14px;font-weight:600;padding:8px 14px;border-radius:999px;white-space:nowrap}
+.bar a:hover{background:rgba(27,26,23,.06)}
+.bar .dark-btn{background:var(--ink);color:var(--paper)}
+.bar .dark-btn:hover{background:var(--ink);color:var(--signal)}
+.bar img{width:30px;height:30px;border-radius:50%;object-fit:cover;background:var(--paper-2)}
+.meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:18px;border-top:1px solid var(--line);padding-top:20px;margin-top:36px}
+.meta div > span{display:block;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+.meta div > strong{display:block;margin-top:6px;font-weight:600;font-size:16px;line-height:1.4}
+.reflect{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(28px,5vw,72px)}
+.reflect ol{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:22px}
+.reflect li{display:flex;flex-direction:column;gap:6px;padding-left:18px;border-left:3px solid var(--ind)}
+.reflect li strong{font-weight:600}
+
+.end{background:var(--ind);color:var(--ind-ink);border-radius:32px 32px 0 0}
+.end h2{font-size:clamp(44px,7vw,104px)}
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:32px}
+.cta a{text-decoration:none;font-weight:600;font-size:15px;padding:13px 22px;border-radius:999px}
+.cta .solid{background:var(--ind-ink);color:var(--ind)}
+.cta .ghost{border:1.5px solid var(--ind-ink);color:var(--ind-ink)}
+footer{background:var(--ind);color:rgba(255,247,237,.75);font-size:13px;padding-block:0 32px}
+.rise{transition:transform .8s cubic-bezier(.2,.8,.2,1)}
+.rise.pre{transform:translateY(28px)}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.rise,.rise.pre,.scroll{scroll-behavior:auto}.rise.pre{transform:none}}
+/* hero */
+.hero{padding-top:clamp(110px,14vh,150px);padding-bottom:clamp(40px,6vw,80px)}
+.hero-top{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(24px,4vw,56px);align-items:end}
+.name h1{font-size:clamp(64px,9.5vw,140px);font-weight:800;letter-spacing:-.065em;line-height:.86}
+.name h1 span{color:var(--blue)}
+.name small{display:block;margin-top:16px;font:700 13px var(--body);letter-spacing:.16em;text-transform:uppercase;color:var(--mute)}
+.statement{font-family:var(--serif);font-size:clamp(28px,3.2vw,44px);line-height:1.08;max-width:18ch}
+.stage{position:relative;margin-top:clamp(36px,5vw,64px);padding:0 clamp(16px,3vw,40px) clamp(24px,3vw,40px)}
+.stage::before{content:"";position:absolute;left:0;right:0;top:35%;bottom:0;background:var(--ind);border-radius:28px;z-index:-1}
+.frame{border-radius:14px;overflow:hidden;background:#fff;box-shadow:0 30px 70px rgba(27,26,23,.22)}
+
+/* route */
+.route{display:flex;flex-wrap:wrap;gap:0;margin-top:40px;position:relative}
+.route button{all:unset;cursor:pointer;flex:1 1 0;min-width:110px;position:relative;padding:30px 8px 8px;font:600 14px var(--body);color:var(--mute);text-align:center}
+.route button::before{content:"";position:absolute;left:0;right:0;top:9px;height:3px;background:var(--line)}
+.route button::after{content:"";position:absolute;left:50%;top:2px;width:17px;height:17px;margin-left:-8.5px;border-radius:50%;background:#fff;border:3px solid #C9C4BA;box-sizing:border-box}
+.route button.done::before{background:var(--blue)}
+.route button.done::after{background:var(--blue);border-color:var(--blue)}
+.route button[aria-pressed="true"]{color:var(--ink)}
+.route button[aria-pressed="true"]::after{background:#fff;border-color:var(--blue);width:21px;height:21px;margin-left:-10.5px;top:0}
+.route button:focus-visible{outline:2px solid var(--ind);outline-offset:-2px;border-radius:8px}
+.pg{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr);gap:clamp(24px,4vw,48px);margin-top:24px;align-items:start}
+.scroll{height:clamp(420px,48vw,620px);overflow-y:auto;border-radius:14px;background:#fff;box-shadow:0 20px 50px rgba(27,26,23,.14);overscroll-behavior:contain;scroll-behavior:smooth}
+.scroll img{display:block;width:100%}
+.pnote h3{font-size:clamp(22px,2.2vw,30px)}
+.pnote p{color:var(--ink-2)}
+.pnote .k{display:block;font:700 12px var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--mute);margin-bottom:6px}
+
+/* home rhythm */
+.rhy{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:clamp(24px,4vw,48px);margin-top:44px;align-items:start}
+.bars{display:flex;flex-direction:column;gap:3px}
+.bars button{all:unset;cursor:pointer;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:0 12px;border-radius:6px;font:600 13px var(--body);min-height:24px;background:#fff;color:var(--ink-2)}
+.bars button.b{background:var(--blue);color:#fff}
+.bars button small{font-weight:500;opacity:.7}
+.bars button[aria-pressed="true"]{outline:2px solid var(--ink);outline-offset:1px}
+.bars button:focus-visible{outline:2px solid var(--ind)}
+.key{display:flex;gap:18px;margin-top:14px;font-size:13px;color:var(--mute)}
+.key i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px;background:#fff;box-shadow:inset 0 0 0 1px var(--line)}
+.key i.b{background:var(--blue);box-shadow:none}
+
+/* list / grid */
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{border:1.5px solid var(--line);background:#fff;font:600 14px var(--body);color:var(--ink-2);padding:8px 16px;border-radius:6px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--blue);border-color:var(--blue);color:#fff}
+.shelf{margin-top:20px;background:#fff;border-radius:14px;padding:clamp(12px,2vw,24px);font-family:'Open Sans',var(--body)}
+.shelf.list .it{display:grid;grid-template-columns:150px minmax(0,1fr) 190px;gap:20px;padding:18px 0;border-bottom:1px solid var(--line);align-items:start}
+.shelf.list .it:last-child{border-bottom:0}
+.shelf.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.shelf.grid .it{display:flex;flex-direction:column;gap:8px}
+.it .im{background:#F5F5F5;border-radius:8px;display:grid;place-items:center;aspect-ratio:1;padding:10px;position:relative}
+.it .im img{max-height:100%;object-fit:contain;mix-blend-mode:multiply}
+.shelf.list .it .im{background:none;aspect-ratio:auto;padding:0}
+.it .hot{position:absolute;right:8px;top:8px;background:#E8272C;color:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px}
+.shelf.list .hot{display:none}
+.it h4{font:500 15px/1.35 var(--body);color:#222}
+.shelf.grid .it h4{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:14px}
+.it .sp{font-size:11px;color:#999}
+.shelf.grid .sp,.shelf.grid .specs,.shelf.grid .extra{display:none}
+.it .rt{font-size:12px;color:#888}
+.it .rt b{display:inline-block;background:#1F6FE5;color:#fff;border-radius:3px;padding:0 5px;font-size:11px;margin-right:6px}
+.specs{list-style:none;padding:0;margin:6px 0 0;font-size:13px;color:#444;line-height:1.7}
+.pr strong{font:700 20px var(--body);color:#222;display:block}
+.shelf.grid .pr strong{font-size:16px;display:inline}
+.pr .off{font-size:12px;color:#2E9E4D}
+.pr .was{font-size:12px;color:#888}
+.shelf.grid .pr .was{display:none}
+.shelf.grid .pr .off{background:#DDF3DF;padding:1px 6px;margin-left:6px}
+.extra{font-size:12px;color:#444;line-height:1.6;margin-top:6px}
+.extra .bk{color:#2E9E4D}
+.cartb{display:inline-block;margin-top:10px;background:#1F6FE5;color:#fff;font-size:12px;font-weight:600;border-radius:4px;padding:6px 14px}
+.shelf.grid .cartb{display:none}
+
+/* upsells */
+.ups{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(16px,3vw,32px);margin-top:44px;align-items:start}
+.ups figure{margin:0}
+.ups img{border-radius:10px;background:#fff;box-shadow:0 14px 40px rgba(27,26,23,.1);width:100%}
+.ups figcaption{margin-top:10px;font-weight:600}
+.ups figcaption small{display:block;font-weight:500;color:var(--mute);font-size:14px}
+.ups .tag{display:inline-block;font:700 11px var(--body);letter-spacing:.12em;text-transform:uppercase;color:#fff;background:var(--ind);border-radius:4px;padding:3px 8px;margin-bottom:8px}
+
+/* tracker */
+.trk{margin-top:36px;background:#fff;border-radius:14px;padding:clamp(18px,3vw,32px);font-family:'Open Sans',var(--body)}
+.trk .route{margin-top:0}
+.log{margin-top:16px;background:#F4F4F4;border-radius:8px;padding:14px 18px;font-size:13px;color:#333;min-height:150px}
+.log div{display:grid;grid-template-columns:130px minmax(0,1fr);gap:12px;padding:3px 0}
+.log span{color:#888}
+
+/* orders */
+.ord{display:grid;grid-template-columns:220px minmax(0,1fr);gap:clamp(16px,3vw,32px);margin-top:28px;align-items:start;font-family:'Open Sans',var(--body)}
+.flt{background:#fff;border-radius:12px;padding:18px}
+.flt b{display:block;font-size:13px;letter-spacing:.06em;margin-bottom:8px}
+.flt label{display:flex;gap:10px;align-items:center;padding:5px 0;font-size:15px;cursor:pointer}
+.flt input{width:17px;height:17px;accent-color:#1F6FE5}
+.rows{display:flex;flex-direction:column;gap:10px}
+.rows .cnt{font-size:15px;color:#444}
+.row{display:grid;grid-template-columns:90px minmax(0,1fr) auto;gap:16px;align-items:center;background:#fff;border-radius:8px;padding:12px 16px}
+.row img{width:90px;height:auto}
+.row a{color:#1F6FE5;font-size:14px;text-decoration:none}
+.row small{display:block;color:#777;font-size:12px}
+.row .st{display:flex;gap:10px;align-items:center;font-size:14px;white-space:nowrap}
+.row .st i{width:14px;height:14px;border-radius:50%;background:var(--c);flex:none}
+.row .st i.hollow{background:none;border:2px solid #2E9E4D;box-sizing:border-box}
+
+/* builder */
+.rail{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));margin-top:40px}
+.rail div{position:relative;padding-top:30px;font:600 14px var(--body);color:var(--mute)}
+.rail div::before{content:"";position:absolute;left:0;right:0;top:9px;height:3px;background:var(--line)}
+.rail div::after{content:"";position:absolute;left:0;top:1px;width:19px;height:19px;border-radius:50%;background:#D6D1C7}
+.rail div.on{color:var(--ink)}
+.rail div.on::before,.rail div.on::after{background:var(--blue)}
+.parts{display:flex;flex-wrap:wrap;gap:8px;margin-top:24px}
+.parts button{all:unset;cursor:pointer;border:1.5px solid var(--line);background:#fff;border-radius:6px;padding:7px 12px;font:600 12px var(--body);letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2)}
+.parts button.req::after{content:" *";color:#E8272C}
+.parts button[aria-pressed="true"]{border-color:var(--blue);background:#EAF1FD;color:#1F4FA8}
+.parts button[aria-pressed="true"]::before{content:"✓ ";color:var(--blue)}
+.parts button:focus-visible{outline:2px solid var(--ind)}
+.bnote{margin-top:16px;color:var(--ink-2);min-height:1.6em}
+
+@media (max-width:860px){
+  .hero-top,.split,.pg,.rhy,.ups,.ord,.reflect{grid-template-columns:minmax(0,1fr)}
+  .route{flex-wrap:nowrap;overflow-x:auto}
+  .route button{min-width:84px;font-size:12px}
+  .shelf.list .it{grid-template-columns:100px minmax(0,1fr)}
+  .shelf.list .pr{grid-column:2}
+  .shelf.grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .row{grid-template-columns:70px minmax(0,1fr)}.row img{width:70px}.row .st{grid-column:2;white-space:normal}
+  .rail{grid-template-columns:repeat(3,minmax(0,1fr));row-gap:16px}
+  .log div{grid-template-columns:minmax(0,1fr);gap:0}
+}
+</style>
+<style>body{animation:cnIn .45s ease both}@keyframes cnIn{from{opacity:0}}@media (prefers-reduced-motion:reduce){body{animation:none}}</style>
+<script src="case-nav.js" defer></script>
+</head>
+<body>
+<nav class="bar" aria-label="Case study">
+  <a href="../index.html#work" style="display:flex;align-items:center;gap:8px;padding:2px 12px 2px 2px"><img src="../work/avatar.webp" alt="" width="30" height="30"><span style="font-family:var(--display);font-weight:800;font-size:16px;letter-spacing:-.02em">Sarbesh</span></a>
+  <a href="../index.html#work">All work</a>
+  <a class="dark-btn" href="https://www.figma.com/design/xCOBxrEOfWB1rOSotr2jpD/IT-Durbar-E-commerce?node-id=0-1&amp;t=dGByo5BbT4f0sEEf-1" target="_blank" rel="noopener">Figma file ↗</a>
+</nav>
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Case study · E-commerce · 2023</div>
+    <div class="hero-top" style="margin-top:18px">
+      <div class="name"><h1>IT Durbar<span>.</span></h1><small>Online IT and electronics store, Nepal</small></div>
+      <div>
+        <p class="statement">A whole store, from the first banner to the parcel on its way.</p>
+        <div class="meta">
+          <div><span>What it is</span><strong>An online store for laptops, printers, monitors and PC parts</strong></div>
+          <div><span>Shown here</span><strong>The home page and 7 pages after it</strong></div>
+          <div><span>My role</span><strong><span class="tbc">UI/UX design</span></strong></div>
+        </div>
+      </div>
+    </div>
+    <div class="stage">
+      <div class="frame"><img src="itdurbar/h-home.webp" alt="Home page top: search bar, trending searches, category nav and a Special New Year Sale banner" width="1200" height="421"></div>
+    </div>
+  </div>
+</header>
+
+<section style="padding-top:clamp(40px,6vw,80px)">
+  <div class="wrap">
+    <div class="split" style="align-items:end">
+      <div class="stack rise">
+        <div class="eyebrow">The route</div>
+        <h2>Seven screens, one order.</h2>
+      </div>
+      <div class="stack rise">
+        <p class="lede">Most store comps stop at the product page. This one keeps going: a category in two views, the product, the cart, the order confirmation, tracking, and a PC builder off to the side. Walk the route.</p>
+        <span class="reading">Names and addresses on the order pages are blurred by me</span>
+      </div>
+    </div>
+    <div class="route rise" id="route" role="group" aria-label="Pages in order"></div>
+    <div class="pg rise">
+      <div class="scroll" id="ps" tabindex="0" aria-label="Selected page, scrollable"><img id="pimg" src="itdurbar/p-list.webp" alt=""></div>
+      <div class="pnote" aria-live="polite"><span class="k" id="pk"></span><h3 id="ph"></h3><p id="pp"></p></div>
+    </div>
+  </div>
+</section>
+
+<section style="background:#fff">
+  <div class="wrap">
+    <div class="split" style="align-items:end">
+      <div class="stack rise">
+        <div class="eyebrow">Home</div>
+        <h2>Shelves, then a banner, then shelves.</h2>
+      </div>
+      <div class="stack rise">
+        <p class="lede">The home page is seventeen bands long. Product shelves do most of the work, and a full-width brand banner breaks them up every few rows so the scroll never turns into one long grid. Pick a band to jump to it.</p>
+      </div>
+    </div>
+    <div class="rhy">
+      <div class="rise">
+        <div class="bars" id="bars" role="group" aria-label="Home page bands, top to bottom"></div>
+        <div class="key"><span><i></i>Product shelf</span><span><i class="b"></i>Banner</span></div>
+      </div>
+      <div class="scroll rise" id="hs" tabindex="0" aria-label="Home page, scrollable"><img src="itdurbar/p-home.webp" alt="IT Durbar home page, top to bottom" width="600" height="3008"></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="split" style="align-items:end">
+      <div class="stack rise">
+        <div class="eyebrow">Category page</div>
+        <h2>Same shelf, two levels of detail.</h2>
+      </div>
+      <div class="stack rise">
+        <p class="lede">The Monitors category comes in a list view and a grid view. The list is for comparing: panel type, refresh rate, brightness, warranty, delivery and EMI. The grid is for browsing: photo, two lines of title, price, discount and rating. I rebuilt three list rows so you can flip them.</p>
+        <span class="reading">The grid version of these three is my rebuild</span>
+      </div>
+    </div>
+    <div class="seg rise" id="vseg" role="group" aria-label="View" style="margin-top:36px"></div>
+    <div class="shelf list rise" id="shelf"></div>
+  </div>
+</section>
+
+<section style="background:#fff">
+  <div class="wrap">
+    <div class="split" style="align-items:end">
+      <div class="stack rise">
+        <div class="eyebrow">Product and cart</div>
+        <h2>Four chances to add one more thing.</h2>
+      </div>
+      <div class="stack rise">
+        <p class="lede">Extras show up twice on the product page and twice in the cart: a protection plan with a running total, a bought-together bundle, an extended warranty and an installation service. Each one has its own button, so nothing is added for you.</p>
+      </div>
+    </div>
+    <div class="ups">
+      <figure class="rise"><span class="tag">Product page</span><img src="itdurbar/u-protect.webp" alt="Protect your product: two protection plans with checkboxes and a running total" width="900" height="366"><figcaption>Protect your product<small>Plans you tick, with item + add-on = total</small></figcaption></figure>
+      <figure class="rise"><span class="tag">Product page</span><img src="itdurbar/u-together.webp" alt="Frequently bought together: laptop plus keyboard plus mouse with a total" width="900" height="429"><figcaption>Frequently bought together<small>The same sum, drawn with product photos</small></figcaption></figure>
+      <figure class="rise"><span class="tag">Cart</span><img src="itdurbar/u-camera.webp" alt="Extended warranty offer inside the cart" width="900" height="239"><figcaption>Extended warranty<small>Tinted blue and tucked under the item it covers</small></figcaption></figure>
+      <figure class="rise"><span class="tag">Cart</span><img src="itdurbar/u-install.webp" alt="Installation and demo service with an Add Item button" width="900" height="117"><figcaption>Professional services<small>Installation and demo, after the last item</small></figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="split" style="align-items:end">
+      <div class="stack rise">
+        <div class="eyebrow">Tracking</div>
+        <h2>Four stops and a log.</h2>
+      </div>
+      <div class="stack rise">
+        <p class="lede">The track order page sums a package up in four stops, then lists every event underneath with a date and time. I've rebuilt it so the log grows as you move along the line.</p>
+        <span class="reading">Which log line belongs to which stop is my reading</span>
+      </div>
+    </div>
+    <div class="trk rise">
+      <div class="route" id="trk" role="group" aria-label="Delivery stage"></div>
+      <div class="log" id="log" aria-live="polite"></div>
+    </div>
+  </div>
+</section>
+
+<section style="background:var(--paper-2)">
+  <div class="wrap">
+    <div class="split" style="align-items:end">
+      <div class="stack rise">
+        <div class="eyebrow">My orders</div>
+        <h2>Four outcomes, four dots.</h2>
+      </div>
+      <div class="stack rise">
+        <p class="lede">Order history gives each outcome a coloured dot: an empty green ring while it's on the way, then solid green, red or orange. The filters on the left use the same four words, so in the rebuild they work.</p>
+      </div>
+    </div>
+    <div class="ord rise">
+      <div class="flt" id="flt"><b>ORDER STATUS</b></div>
+      <div class="rows" id="rows" aria-live="polite"></div>
+    </div>
+  </div>
+</section>
+
+<section style="background:#fff">
+  <div class="wrap">
+    <div class="split" style="align-items:end">
+      <div class="stack rise">
+        <div class="eyebrow">Build your own PC</div>
+        <h2>Twenty-one parts, six on the line.</h2>
+      </div>
+      <div class="stack rise">
+        <p class="lede">The PC builder lists twenty-one part types down the side. Six carry a red star, and those six are exactly the stops on the progress line across the top. Optional parts like the monitor sit in the list but never move the line. Tick the parts.</p>
+      </div>
+    </div>
+    <div class="rail rise" id="rail"></div>
+    <div class="parts rise" id="parts" role="group" aria-label="Part types"></div>
+    <p class="bnote" id="bnote" aria-live="polite"></p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap reflect">
+    <div class="stack rise">
+      <div class="eyebrow">Looking back</div>
+      <h2>What I'd fill in next.</h2>
+      <p class="lede">The structure is all here, from list view to order history. What's left is mostly sample content that needs to line up before it goes to development.</p>
+    </div>
+    <ol class="rise">
+      <li><strong>Pair every title with its photo.</strong><span>Grid cards put an HP Spectre title on an MSI laptop and a Toshiba laptop title on a monitor. The MSI product page has a Canon printer's spec table and offers AppleCare+ for iPhone 15. The cart calls a laptop warranty "Complete Camera Protection".</span></li>
+      <li><strong>Make the sums add up.</strong><span>The protection plan shows 2,30,999 + 13,000 = 2,33,499, which is the bundle's total. The confirmation says NPR 35,017, the total below it says Rs. 35896, and the four items are Rs 522 each. The cart's add-ons are all priced NPR 2,30,000.</span></li>
+      <li><strong>Fix the small copy.</strong><span>"Barcode and Lebal", "Advanced Serach" and "Referal". Best Selling Products appears twice on the home page, and the footer is still Lorem Ipsum.</span></li>
+    </ol>
+  </div>
+</section>
+
+<section class="end">
+  <div class="wrap stack">
+    <div class="hand" style="color:var(--ind-ink)">thanks for reading</div>
+    <h2>Open the file, or keep exploring.</h2>
+    <div class="cta">
+      <a class="solid" href="https://www.figma.com/design/xCOBxrEOfWB1rOSotr2jpD/IT-Durbar-E-commerce?node-id=0-1&amp;t=dGByo5BbT4f0sEEf-1" target="_blank" rel="noopener">Open in Figma ↗</a>
+      <a class="ghost" href="aura.html">See another store, Aura</a>
+      <a class="ghost" href="../index.html#work">Back to all work</a>
+    </div>
+  </div>
+</section>
+<footer><div class="wrap">© 2026 Sarbesh Lal Amatya · Kathmandu, Nepal</div></footer>
+
+<script>
+(function(){
+  function group(el,list,label,fn){list.forEach(function(x,n){var b=document.createElement('button');b.type='button';b.innerHTML=label(x);if(x.cls)b.className=x.cls;b.addEventListener('click',function(){[].forEach.call(el.children,function(c,i){c.setAttribute('aria-pressed',String(i===n));});fn(x,n);});el.appendChild(b);});}
+  function fill(el,n){[].forEach.call(el.children,function(c,i){c.classList.toggle('done',i<n);});}
+  // route
+  var P=[{t:'List',i:'list',h:1228,k:'Category',c:'Monitors, list view',p:'Filters down the left, sort tabs, then rows with specs in the middle and price, delivery and EMI on the right.'},{t:'Grid',i:'grid',h:685,k:'Category',c:'Monitors, grid view',p:'The same filters, plus round category shortcuts and a four-column grid of cards with a Hot tag.'},{t:'Product',i:'product',h:2042,k:'Product',c:'Product page',p:'Gallery and two buttons on the left. On the right: price, key features, EMI, a delivery check, store pick-up, payment, variants, protection plans, then specs and reviews.'},{t:'Cart',i:'cart',h:564,k:'Checkout',c:'Cart',p:'Items with steppers and delivery dates, a warranty and an installation offer, then price details and coupon fields.'},{t:'Placed',i:'placed',h:574,k:'Checkout',c:'Order placed',p:'Order number, a delivery date, addresses, rewards, and opt-ins for email and SMS updates. Every item can be rescheduled or cancelled from here.'},{t:'Track',i:'track',h:744,k:'After',c:'Track order and my orders',p:'A four-stop line with a log, addresses and totals, then order history with search and filters.'},{t:'Builder',i:'builder',h:1123,k:'Side route',c:'Build your own PC',p:'A six-stop progress line, a list of part types, a brand row and a product grid, with ready-built PCs underneath.'}];
+  var rt=document.getElementById('route'),pi=document.getElementById('pimg'),ps=document.getElementById('ps');
+  group(rt,P,function(p){return p.t;},function(p,n){fill(rt,n);pi.src='itdurbar/p-'+p.i+'.webp';pi.width=600;pi.height=p.h;pi.alt=p.c+', top to bottom';ps.scrollTop=0;document.getElementById('pk').textContent=p.k;document.getElementById('ph').textContent=p.c;document.getElementById('pp').textContent=p.p;});
+  rt.children[0].click();
+  // home bands: y is the band's top in the 8000px-tall comp
+  var B=[['Special New Year Sale',160,1],['Shop by top categories',580],['Best selling products',820],['Epson and Pantum',1600,1],['Trending laptops',1990],['Crazy deals on printers',2400],['Best selling products',2830],['Samsung and home accessories',3230,1],['Shop by brands',3550],['Popular products + Brother',3790,1],['Frequently bought',4220],['Deals for you + LX 310',4640,1],['Flash sale',5420],['ASUS ROG',5840,1],['Hot gaming products',6420],['Dell Vostro',6840,1],['Recently viewed',7180]];
+  var bs=document.getElementById('bars'),hs=document.getElementById('hs');
+  group(bs,B.map(function(b,i){return {b:b,cls:b[2]?'b':''};}),function(x){return '<span>'+x.b[0]+'</span><small>'+(x.b[2]?'banner':'shelf')+'</small>';},function(x){hs.scrollTop=Math.max(0,(x.b[1]-120)/8000*hs.scrollHeight);});
+  // list and grid, copy as in the list view
+  var I=[{im:'t-msi',w:300,h:178,sp:1,t:'MSI Core i7 13620H 13th Gen - (16 GB/1 TB SSD/Windows 11 Home/8 GB Graphics/NVIDIA GeForce RTX 4060) Katana 17 B13VFK-253IN Gaming Laptop',r:'2,261 Ratings &amp; 285 Reviews',s:['Panel Type: VA Panel','Screen Resolution Type: Full HD','Response Time: 4 ms | Refresh Rate: 75 Hz','3 Years Manufacturer Warranty'],p:'NPR. 2,30,000',wa:'NPR 14,290',o:'40% off',x:'Free delivery<br>Upto NPR 220 Off on Exchange<br>No Cost EMI from NPR 945/month'},{im:'t-hp',w:300,h:245,sp:1,t:'HP M Series 21.5 inch Full HD LED Backlit IPS Panel Monitor (M22f)',r:'2,502 Ratings &amp; 319 Reviews',s:['Panel Type: IPS Panel','Screen Resolution Type: Full HD','Brightness: 300 nits','Response Time: 5 ms | Refresh Rate: 75 Hz','HDMI Ports - 1'],p:'NPR. 83,000',wa:'NPR 14,876',o:'32% off',x:'Free delivery<br>Upto NPR 220 Off on Exchange<br><span class="bk">Bank Offer</span>'},{im:'t-len',w:300,h:245,t:'Lenovo 21.5 inch Full HD VA Panel Monitor (L22e-40)',r:'10 Ratings &amp; 2 Reviews',s:['Panel Type: VA Panel','Screen Resolution Type: Full HD','Response Time: 4 ms','3 Years Warranty'],p:'NPR. 1,12,000',wa:'NPR 9,990',o:'22% off',x:'Free delivery by 27 July, 2023<br>No Cost EMI from NPR 1,284/month<br><span class="bk">Bank Offer</span>'}];
+  var sh=document.getElementById('shelf');
+  sh.innerHTML=I.map(function(i){return '<div class="it"><div class="im"><img src="itdurbar/'+i.im+'.webp" alt="" width="'+i.w+'" height="'+i.h+'"><span class="hot">Hot</span></div><div>'+(i.sp?'<div class="sp">Sponsored</div>':'')+'<h4>'+i.t+'</h4><div class="rt"><b>4.3 ★</b>'+i.r+'</div><ul class="specs">'+i.s.map(function(s){return '<li>'+s+'</li>';}).join('')+'</ul></div><div class="pr"><strong>'+i.p+'</strong><span class="was">'+i.wa+'</span> <span class="off">'+i.o+'</span><div class="extra">'+i.x+'</div><span class="cartb">Add To Cart</span></div></div>';}).join('');
+  group(document.getElementById('vseg'),['List view','Grid view'],function(v){return v;},function(v,n){sh.className='shelf '+(n?'grid':'list');});
+  document.getElementById('vseg').children[0].click();
+  // tracker: log lines in the comp, oldest first
+  var Lg=[['12 May 2023 - 11:23','Thank you for shopping at ITDurbar! Your order is being verified.',0],['12 May 2023 - 11:23','Your order has been successfully verified.',0],['12 May 2023 - 11:23','Your package has been packed and is being handed over to a logistics partner.',1],['13 May 2023 - 11:23','Your package has been handed over to the delivery service',2],['13 May 2023 - 11:23','Your package has been shipped. Thank you for shopping at ITDurbar!',2]];
+  var tk=document.getElementById('trk');
+  group(tk,['Order Approved','Under Process','Out For Delivery','Delivered'],function(s){return s;},function(s,n){fill(tk,n);var l=Lg.filter(function(x){return x[2]<=n;}).reverse();document.getElementById('log').innerHTML=(n===3?'<div><span>Not drawn</span>The comp stops before delivery.</div>':'')+l.map(function(x){return '<div><span>'+x[0]+'</span>'+x[1]+'</div>';}).join('');});
+  tk.children[2].click();
+  // order history
+  var O=[['On The Way','t-tab',200,128,'Lenovo IdeaPad Slim 3 Intel Core i3 11th Gen','15.6 Inch, Platinum Grey, 2.43 kg, With MS Office','Delivery expected by Mar 12<br>Your Order has been placed','hollow',''],['Delivered','t-msi2',200,120,'MSI Core i7 13620H 13th Gen - (16 GB/1 TB SSD...','Panel Type: VA Panel Screen Resolution Type: Full HD...','Your Order has been delivered','','#2E9E4D'],['Cancelled','t-tab',200,128,'Lenovo IdeaPad Slim 3 Intel Core i3 11th Gen','15.6 Inch, Platinum Grey, 2.43 kg, With MS Office','Your Order has been cancelled','','#E8272C'],['Returned','t-tab',200,128,'Lenovo IdeaPad Slim 3 Intel Core i3 11th Gen','15.6 Inch, Platinum Grey, 2.43 kg, With MS Office','Your Order has been returned','','#F5A524']];
+  var fl=document.getElementById('flt'),rw=document.getElementById('rows');
+  O.forEach(function(o){var l=document.createElement('label');l.innerHTML='<input type="checkbox" value="'+o[0]+'"> '+o[0];fl.appendChild(l);});
+  function rows(){var on=[].slice.call(fl.querySelectorAll('input:checked')).map(function(c){return c.value;});var r=O.filter(function(o){return !on.length||on.indexOf(o[0])>-1;});rw.innerHTML='<div class="cnt">'+r.length+' result'+(r.length===1?'':'s')+' found</div>'+r.map(function(o){return '<div class="row"><img src="itdurbar/'+o[1]+'.webp" alt="" width="'+o[2]+'" height="'+o[3]+'"><div><a href="#" onclick="return false">'+o[4]+'</a><small>'+o[5]+'</small></div><div class="st"><i class="'+o[7]+'" style="--c:'+o[8]+'"></i><span>'+o[6]+'</span></div></div>';}).join('');}
+  fl.addEventListener('change',rows);rows();
+  // builder
+  var req=['CPU','Motherboard','RAM','Storage Devices','Case','Assembly Labour'];
+  var Pt=['CPU','Motherboard','RAM','Storage Devices','External Storage','Case','Case Accessory','Power Supply','Optical Drive','CPU Cooler','Monitor','Network Adapter','Graphics Card','Keyboard','Speaker','Input Devices','Sound Card','TV/Media Player','Card Reader','Operating System','Assembly Labour'];
+  var rl=document.getElementById('rail'),pa=document.getElementById('parts'),bn=document.getElementById('bnote');
+  rl.innerHTML=['CPU','Motherboard','RAM','Storage Device','Case','Assembly Labour'].map(function(s){return '<div>'+s+'</div>';}).join('');
+  function draw(){req.forEach(function(r,i){rl.children[i].classList.toggle('on',pa.children[Pt.indexOf(r)].getAttribute('aria-pressed')==='true');});}
+  Pt.forEach(function(p){var b=document.createElement('button');b.type='button';b.textContent=p;var rq=req.indexOf(p)>-1;if(rq)b.className='req';b.setAttribute('aria-pressed',String(['CPU','Motherboard','RAM','Storage Devices','Monitor'].indexOf(p)>-1));b.addEventListener('click',function(){var on=b.getAttribute('aria-pressed')!=='true';b.setAttribute('aria-pressed',String(on));draw();bn.textContent=rq?(on?p+' is required, so its stop on the line fills.':p+' is unticked, so its stop empties.'):p+' is optional. The line doesn\'t change.';});pa.appendChild(b);});
+  draw();bn.textContent='Ticked as in the comp: four required parts and the monitor.';
+  // rise: content stays visible; below-the-fold blocks lift into place
+  if(!matchMedia('(prefers-reduced-motion: reduce)').matches && 'IntersectionObserver' in window){
+    var els=[].slice.call(document.querySelectorAll('.rise')).filter(function(el){return el.getBoundingClientRect().top>innerHeight;});
+    els.forEach(function(el){el.classList.add('pre');});
+    var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.remove('pre');io.unobserve(e.target);}});},{rootMargin:'0px 0px -8% 0px'});
+    els.forEach(function(el){io.observe(el);});
+  }
+})();
+</script>
+</body>
+</html>

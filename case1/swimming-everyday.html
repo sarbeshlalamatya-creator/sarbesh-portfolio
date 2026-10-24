@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Swimming Everyday</title>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&amp;family=Geist:wght@400;500;600;700&amp;family=Caveat:wght@500;700&amp;family=Instrument+Serif:ital@0;1&amp;display=swap" rel="stylesheet">
+<style>
+/* Layout: portfolio cream and ink with the raspberry card colour as signature; Swimming Everyday's own yellow, navy and lime appear only where the site itself is on show. */
+:root{
+  --paper:#F3EEE4; --paper-2:#EAE3D5; --ink:#1B1A17; --ink-2:#3E3B35; --mute:#6F6A61; --line:rgba(27,26,23,.12);
+  --signal:#F2552C; --rasp:#B0164E; --rasp-ink:#FFF1F2;
+  --s-yellow:#FFC300; --s-navy:#02082C; --s-char:#1B2028; --s-cream:#FDFBF6; --s-lime:#B5E61D;
+  --display:'Bricolage Grotesque',system-ui,sans-serif; --body:'Geist',system-ui,sans-serif; --hand:'Caveat',cursive; --serif:'Instrument Serif',Georgia,serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img{max-width:100%;height:auto;display:block}
+a{color:inherit}
+::selection{background:var(--signal);color:var(--ink)}
+:focus-visible{outline:2px solid var(--signal);outline-offset:3px;border-radius:6px}
+.wrap{max-width:1240px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.read{max-width:660px}
+section{padding-block:clamp(64px,10vw,128px)}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--mute)}
+h1,h2,h3{font-family:var(--display);letter-spacing:-.04em;line-height:1;margin:0;text-wrap:balance}
+h2{font-size:clamp(36px,5.4vw,72px);font-weight:800}
+h3{font-size:clamp(20px,2vw,26px);font-weight:800;letter-spacing:-.03em}
+p{margin:0}
+.lede{font-size:clamp(19px,1.7vw,22px);line-height:1.5;color:var(--ink-2)}
+.hand{font-family:var(--hand);font-weight:700;color:var(--signal);font-size:clamp(24px,2.4vw,30px);line-height:1.1}
+.stack{display:flex;flex-direction:column;gap:20px}
+.shot{border-radius:18px;overflow:hidden;box-shadow:0 30px 70px rgba(27,26,23,.14),0 2px 0 rgba(27,26,23,.04);background:#fff}
+.reading{display:inline-flex;align-items:center;gap:8px;align-self:flex-start;font-size:13px;font-weight:600;color:var(--ink-2);border:1.5px dashed rgba(27,26,23,.3);border-radius:999px;padding:5px 12px}
+.reading::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--signal)}
+.tbc{border-bottom:1.5px dashed var(--signal)}
+.split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:clamp(32px,6vw,88px);align-items:center}
+
+.bar{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:50;display:flex;align-items:center;gap:6px;padding:6px;background:rgba(255,255,255,.62);backdrop-filter:blur(16px) saturate(1.4);-webkit-backdrop-filter:blur(16px) saturate(1.4);border:1px solid rgba(27,26,23,.08);border-radius:999px;box-shadow:0 8px 30px rgba(27,26,23,.08);max-width:calc(100vw - 24px)}
+.bar a{text-decoration:none;font-size:14px;font-weight:600;padding:8px 14px;border-radius:999px;white-space:nowrap}
+.bar a:hover{background:rgba(27,26,23,.06)}
+.bar .dark{background:var(--ink);color:var(--paper)}
+.bar .dark:hover{background:var(--ink);color:var(--signal)}
+.bar img{width:30px;height:30px;border-radius:50%;object-fit:cover;background:var(--paper-2)}
+
+/* hero: the name sits half under a waterline */
+.hero{padding-top:clamp(110px,14vh,150px);padding-bottom:clamp(40px,6vw,80px)}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:clamp(24px,4vw,56px);align-items:end}
+.name{position:relative}
+.name h1{font-size:clamp(52px,8.4vw,124px);font-weight:800;letter-spacing:-.065em;line-height:.86;color:var(--ink)}
+.name h1 span + span{background:linear-gradient(to bottom,var(--ink) 0 44%,#1E5AA8 44% 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.name h1 span{display:block}
+.wave{position:absolute;left:-2%;width:104%;height:18px;top:calc(44% - 9px);pointer-events:none}
+.statement{font-family:var(--serif);font-size:clamp(28px,3.2vw,44px);line-height:1.08;max-width:20ch;margin-top:36px}
+.meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:18px;border-top:1px solid var(--line);padding-top:20px;margin-top:36px}
+.meta div > span{display:block;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+.meta div > strong{display:block;margin-top:6px;font-weight:600;font-size:16px;line-height:1.4}
+.lane-wrap{position:relative;padding:0 6% 28px}
+.lane{position:relative;height:clamp(380px,46vw,600px);border-radius:18px;overflow:hidden;background:#fff;box-shadow:0 30px 70px rgba(27,26,23,.2);transform:rotate(2deg)}
+.lane img{width:100%;max-width:none;transition:transform 7s cubic-bezier(.45,0,.3,1)}
+.lane:hover img,.lane:focus-visible img{transform:translateY(calc(-100% + var(--lh,600px)))}
+.lane-band{position:absolute;left:0;right:0;bottom:0;height:48%;background:var(--rasp);border-radius:28px;z-index:-1}
+.lane-note{position:absolute;right:0;top:-34px;transform:rotate(-4deg)}
+
+/* two volumes */
+.volumes{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(20px,3vw,40px);margin-top:48px;align-items:start}
+.vol{display:flex;flex-direction:column;gap:16px}
+.vol .tag{display:flex;align-items:center;justify-content:space-between;gap:12px;font-weight:700}
+.meter{display:flex;gap:3px;align-items:flex-end;height:22px}
+.meter i{width:5px;border-radius:2px;background:var(--ink)}
+.meter i.off{background:rgba(27,26,23,.15)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:600;background:#fff;border-radius:999px;padding:5px 12px 5px 5px}
+.chip i{width:22px;height:22px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.1)}
+.chip code{font:500 12px ui-monospace,Menlo,monospace;color:var(--mute)}
+.vol ul{margin:0;padding-left:18px;color:var(--ink-2);display:flex;flex-direction:column;gap:6px}
+
+/* skyline */
+.skyline{display:flex;gap:clamp(10px,1.6vw,22px);align-items:flex-end;margin-top:48px;overflow-x:auto;padding:8px 4px 4px}
+.skyline figure{margin:0;flex:0 0 auto;width:clamp(84px,9vw,112px);display:flex;flex-direction:column;gap:10px}
+.skyline .pg{position:relative;border-radius:8px;overflow:hidden;box-shadow:0 10px 26px rgba(27,26,23,.14);background:#fff}
+.skyline .pg::after{content:"";position:absolute;left:0;right:0;bottom:0;top:var(--f);background:rgba(255,195,0,.32);box-shadow:inset 0 0 0 2px var(--s-yellow),0 -2px 0 var(--s-yellow)}
+.skyline figcaption{font-size:13px;font-weight:600;line-height:1.25}
+.skyline figcaption small{display:block;color:var(--mute);font-weight:500}
+.legend{display:flex;align-items:center;gap:10px;margin-top:22px;font-size:15px;color:var(--ink-2)}
+.legend i{width:18px;height:18px;border-radius:4px;background:rgba(255,195,0,.32);box-shadow:inset 0 0 0 2px var(--s-yellow)}
+
+/* turtles */
+.pond{background:#F4FBD8;border-radius:28px;padding:clamp(24px,4vw,48px);display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(16px,3vw,36px);margin-top:44px}
+.pond figure{margin:0;display:flex;flex-direction:column;gap:14px}
+.pond .pic{aspect-ratio:1;display:grid;place-items:center;background:#fff;border-radius:20px;overflow:hidden}
+.pond .pic img{width:86%;height:86%;object-fit:contain}
+.pond .pic.small img{width:auto;height:auto;image-rendering:auto}
+.pond figcaption b{display:block;font-family:var(--display);font-size:20px;letter-spacing:-.02em}
+.pond figcaption span{display:block;color:var(--ink-2);font-size:15px;margin-top:4px}
+.pond figcaption em{font-style:normal;font-family:var(--hand);font-size:22px;color:var(--rasp);line-height:1}
+
+/* checkout flow */
+.flow{margin-top:44px;background:#fff;border-radius:28px;box-shadow:0 30px 70px rgba(27,26,23,.12);overflow:hidden}
+.track{position:relative;padding:34px clamp(20px,4vw,48px) 6px}
+.track ol{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));position:relative}
+.track ol::before{content:"";position:absolute;left:10%;right:10%;top:13px;border-top:2px dashed rgba(27,26,23,.2)}
+.track li{display:flex;justify-content:center}
+.track button{position:relative;background:none;border:0;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;font:600 13px var(--body);color:var(--mute);padding:0 4px}
+.track button i{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font:800 12px var(--display);font-style:normal;background:var(--paper);border:2px solid rgba(27,26,23,.2);color:var(--ink-2)}
+.track button.done i{background:#3E7B5B;border-color:#3E7B5B;color:#fff}
+.track button[aria-current="step"]{color:var(--ink)}
+.track button[aria-current="step"] i{background:var(--s-yellow);border-color:var(--s-yellow);color:var(--ink)}
+.walker{position:absolute;top:0;left:0;width:40px;transition:transform .7s cubic-bezier(.3,1.4,.5,1);pointer-events:none}
+.flow-body{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:clamp(20px,3vw,40px);padding:24px clamp(20px,4vw,48px) clamp(24px,4vw,48px);align-items:start}
+.screen{border-radius:14px;overflow:hidden;box-shadow:0 0 0 1px var(--line);aspect-ratio:16/10;background:var(--s-cream)}
+.screen img{width:100%;height:100%;object-fit:cover;object-position:top}
+.flow-copy h3{margin-bottom:12px}
+.flow-copy p{color:var(--ink-2)}
+.flow-copy .facts{margin:16px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px}
+.flow-copy .facts li{display:flex;gap:10px;font-size:15px}
+.flow-copy .facts li::before{content:"✓";color:var(--signal);font-weight:700}
+
+/* vocabulary */
+.words{margin-top:44px;border-top:1px solid rgba(255,241,242,.25)}
+.word{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr) minmax(0,1fr);gap:20px;align-items:baseline;border-bottom:1px solid rgba(255,241,242,.25);padding-block:18px}
+.word s{color:rgba(255,241,242,.55);font-size:18px;text-decoration-thickness:2px}
+.word b{font-family:var(--display);font-weight:800;font-size:clamp(28px,3.6vw,48px);letter-spacing:-.04em;line-height:1}
+.word span{color:rgba(255,241,242,.8);font-size:15px}
+.closeups{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:clamp(20px,3vw,40px);margin-top:56px;align-items:start}
+.closeups figure{margin:0;display:flex;flex-direction:column;gap:14px}
+.closeups figcaption b{display:block;font-family:var(--display);font-size:22px;letter-spacing:-.02em}
+.closeups figcaption span{color:rgba(255,241,242,.8);font-size:16px}
+
+.reflect{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(28px,5vw,72px)}
+.reflect ol{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:22px}
+.reflect li{display:flex;flex-direction:column;gap:6px;padding-left:18px;border-left:3px solid var(--rasp)}
+.reflect li strong{font-weight:600}
+
+.end{background:var(--rasp);color:var(--rasp-ink);border-radius:32px 32px 0 0}
+.end h2{font-size:clamp(44px,7vw,104px)}
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:32px}
+.cta a{text-decoration:none;font-weight:600;font-size:15px;padding:13px 22px;border-radius:999px}
+.cta .solid{background:var(--rasp-ink);color:var(--rasp)}
+.cta .ghost{border:1.5px solid var(--rasp-ink);color:var(--rasp-ink)}
+footer{background:var(--rasp);color:rgba(255,241,242,.7);font-size:13px;padding-block:0 32px}
+.rise{transition:transform .8s cubic-bezier(.2,.8,.2,1)}
+.rise.pre{transform:translateY(28px)}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.rise,.rise.pre,.lane img,.walker{transition:none;transform:none}}
+@media (max-width:860px){
+  .hero-grid,.split,.volumes,.flow-body,.closeups,.reflect{grid-template-columns:minmax(0,1fr)}
+  .pond{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .word{grid-template-columns:minmax(0,1fr)}
+  .word{gap:4px}
+  .track button span{font-size:11px}
+  .lane{height:420px}
+}
+</style>
+<style>body{animation:cnIn .45s ease both}@keyframes cnIn{from{opacity:0}}@media (prefers-reduced-motion:reduce){body{animation:none}}</style>
+<script src="case-nav.js" defer></script>
+</head>
+<body>
+<nav class="bar" aria-label="Case study">
+  <a href="../index.html#work" style="display:flex;align-items:center;gap:8px;padding:2px 12px 2px 2px"><img src="../work/avatar.webp" alt="" width="30" height="30"><span style="font-family:var(--display);font-weight:800;font-size:16px;letter-spacing:-.02em">Sarbesh</span></a>
+  <a href="../index.html#work">All work</a>
+  <a class="dark" href="https://www.figma.com/design/xjcV2J5eXjL1fmBKzuGREa/Swimming-Everyday-Website?node-id=0-1" target="_blank" rel="noopener">Figma ↗</a>
+</nav>
+<header class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="eyebrow">Case study · Website and gear shop · 2026</div>
+      <div class="name" style="margin-top:18px">
+        <h1><span>Swimming</span><span style="position:relative">Everyday<svg class="wave" viewBox="0 0 400 18" preserveAspectRatio="none" aria-hidden="true"><path d="M0 9 Q 12.5 1 25 9 T 50 9 T 75 9 T 100 9 T 125 9 T 150 9 T 175 9 T 200 9 T 225 9 T 250 9 T 275 9 T 300 9 T 325 9 T 350 9 T 375 9 T 400 9" fill="none" stroke="#1E5AA8" stroke-width="2.5" vector-effect="non-scaling-stroke"/></svg></span></h1>
+      </div>
+      <p class="statement">Loud enough to get you in the water. Quiet enough to get you through checkout.</p>
+      <div class="meta">
+        <div><span>What it is</span><strong>Website and gear shop for a swimming academy in Nepal</strong></div>
+        <div><span>Shown here</span><strong>9 desktop pages, from the home page to the order confirmation</strong></div>
+        <div><span>My role</span><strong><span class="tbc">UI design</span></strong></div>
+      </div>
+    </div>
+    <div class="lane-wrap">
+      <div class="hand lane-note" aria-hidden="true">hover to swim a length ↓</div>
+      <div class="lane" id="lane" tabindex="0" aria-label="The full Swimming Everyday home page. Hover or focus to scroll through it.">
+        <img src="swim/home-lane.webp" alt="Swimming Everyday home page, from the surfing-turtle hero down to the sign-up form" width="720" height="2991">
+      </div>
+      <div class="lane-band" aria-hidden="true"></div>
+    </div>
+  </div>
+</header>
+
+<section style="padding-top:clamp(40px,6vw,80px)">
+  <div class="wrap">
+    <div class="split" style="align-items:end">
+      <div class="stack rise">
+        <div class="eyebrow">The idea</div>
+        <h2>Two volumes, one brand.</h2>
+      </div>
+      <div class="stack rise">
+        <p class="lede">The academy pages shout. Giant condensed capitals, full-bleed yellow, a cartoon turtle on a surfboard. That's the job: make a parent stop scrolling and think "my kid could learn here".</p>
+        <p>Then you walk into the gear shop and the volume drops. The background turns cream, the type shrinks to a size you can shop at, and yellow is kept for the one button that moves you forward.</p>
+        <span class="reading">My reading of the pages, side by side</span>
+      </div>
+    </div>
+    <div class="volumes">
+      <div class="vol rise">
+        <div class="tag"><span>Poster · academy pages</span><span class="meter" aria-hidden="true"><i style="height:30%"></i><i style="height:45%"></i><i style="height:60%"></i><i style="height:75%"></i><i style="height:90%"></i><i style="height:100%"></i></span></div>
+        <img class="shot" src="swim/home-headline.webp" alt="Home page hero: SWIMMING EVERYDAY in huge condensed capitals beside the surfing turtle" width="870" height="820" style="transform:rotate(-1.5deg)">
+        <div class="chips"><span class="chip"><i style="background:#FFC300"></i>Yellow <code>#FFC300</code></span><span class="chip"><i style="background:#02082C"></i>Navy <code>#02082C</code></span><span class="chip"><i style="background:#1B2028"></i>Charcoal <code>#1B2028</code></span></div>
+        <ul><li>Headlines fill the width of the screen</li><li>Section titles repeat as giant ghost words behind the content</li><li>The turtle appears at full size</li></ul>
+      </div>
+      <div class="vol rise">
+        <div class="tag"><span>Counter · shop pages</span><span class="meter" aria-hidden="true"><i style="height:30%"></i><i style="height:45%"></i><i class="off" style="height:60%"></i><i class="off" style="height:75%"></i><i class="off" style="height:90%"></i><i class="off" style="height:100%"></i></span></div>
+        <img class="shot" src="swim/product-top.webp" alt="Product page: SplashGuard Silicone Cap with price, colour swatches, quantity and an Add to Kit Bag button" width="1155" height="792" style="transform:rotate(1deg)">
+        <div class="chips"><span class="chip"><i style="background:#FDFBF6"></i>Cream <code>#FDFBF6</code></span><span class="chip"><i style="background:#fff"></i>White cards</span><span class="chip"><i style="background:#FFC300"></i>Yellow, one button</span></div>
+        <ul><li>Product titles at working size</li><li>White cards on cream, no ghost words</li><li>The turtle shrinks to a progress marker</li></ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="background:#fff">
+  <div class="wrap">
+    <div class="read stack rise">
+      <div class="eyebrow">Structure</div>
+      <h2>Every page ends at the pool's edge.</h2>
+      <p class="lede">Nine pages, nine different jobs, and the same ending on all of them: a "Ready to join us?" band and the "Learn to swim!" sign-up form. A parent who lands on the gear shop or the facilities gallery is still one scroll from enrolling.</p>
+    </div>
+    <div class="skyline rise" tabindex="0" aria-label="All nine pages, aligned at the bottom">
+      <figure><div class="pg" style="--f:88.5%"><img src="swim/page-home.webp" alt="Home page, full length" width="360" height="1495"></div><figcaption>Home<small>sign-up only</small></figcaption></figure>
+      <figure><div class="pg" style="--f:52.8%"><img src="swim/page-book.webp" alt="Book your class page" width="360" height="539"></div><figcaption>Book a class</figcaption></figure>
+      <figure><div class="pg" style="--f:67.6%"><img src="swim/page-fac.webp" alt="Our facilities page" width="360" height="786"></div><figcaption>Facilities</figcaption></figure>
+      <figure><div class="pg" style="--f:73.2%"><img src="swim/page-about.webp" alt="About our story page" width="360" height="963"></div><figcaption>About</figcaption></figure>
+      <figure><div class="pg" style="--f:53.1%"><img src="swim/page-shop.webp" alt="Gear shop page" width="360" height="543"></div><figcaption>Gear shop</figcaption></figure>
+      <figure><div class="pg" style="--f:53.1%"><img src="swim/page-product.webp" alt="Product detail page" width="360" height="545"></div><figcaption>Product</figcaption></figure>
+      <figure><div class="pg" style="--f:43.3%"><img src="swim/page-bag.webp" alt="Kit bag page" width="360" height="449"></div><figcaption>Kit bag</figcaption></figure>
+      <figure><div class="pg" style="--f:49.6%"><img src="swim/page-details.webp" alt="Your details page" width="360" height="505"></div><figcaption>Your details</figcaption></figure>
+      <figure><div class="pg" style="--f:41.9%"><img src="swim/page-allset.webp" alt="All set confirmation page" width="360" height="440"></div><figcaption>All set</figcaption></figure>
+    </div>
+    <div class="legend rise"><i aria-hidden="true"></i>The shared ending: the join band and the sign-up form</div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="split" style="align-items:end">
+      <div class="stack rise">
+        <div class="eyebrow">Character</div>
+        <h2>The turtle does the wayfinding.</h2>
+      </div>
+      <div class="stack rise">
+        <p class="lede">The mascot isn't decoration. Each pose sits next to the thing the page wants you to do, and it gets smaller as the pages get more serious.</p>
+      </div>
+    </div>
+    <div class="pond">
+      <figure class="rise"><div class="pic"><img src="swim/turtle-surf.webp" alt="Turtle in sunglasses surfing a wave beside the Book Now button" width="700" height="682"></div><figcaption><em>arrive</em><b>Surfing</b><span>Home hero. A sketched arrow points from the turtle to "Book Now!".</span></figcaption></figure>
+      <figure class="rise"><div class="pic"><img src="swim/turtle-snorkel.webp" alt="Turtle with a snorkel and mask among bubbles" width="700" height="608"></div><figcaption><em>commit</em><b>Snorkelling</b><span>Booking page, beside the class form: "Fill out the form to book your spot".</span></figcaption></figure>
+      <figure class="rise"><div class="pic"><img src="swim/turtle-dab.webp" alt="Turtle doing a dab" width="460" height="562"></div><figcaption><em>sign up</em><b>Dabbing</b><span>Every page's footer, next to the "Learn to swim!" form.</span></figcaption></figure>
+      <figure class="rise"><div class="pic small"><img src="swim/turtle-done.webp" alt="Small flat turtle icon" width="160" height="110"></div><figcaption><em>keep going</em><b>Walking</b><span>Checkout. A small flat turtle sits above the current step, then waits on "You're all set!".</span></figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<section style="background:var(--paper-2)">
+  <div class="wrap">
+    <div class="split" style="align-items:end">
+      <div class="stack rise">
+        <div class="eyebrow">The shop</div>
+        <h2>Pick it up where you swim.</h2>
+      </div>
+      <div class="stack rise">
+        <p class="lede">The shop has no shipping step. Gear is collected at the Pulchowk or Pokhara branch, so checkout asks for a branch and a pickup time instead of a delivery address.</p>
+        <span class="reading">Built around how the academy already works, as I read it</span>
+      </div>
+    </div>
+    <div class="flow rise">
+      <div class="track">
+        <ol id="steps"></ol>
+        <img class="walker" id="walker" src="swim/turtle-step.webp" alt="" width="80" height="50">
+      </div>
+      <div class="flow-body">
+        <div class="screen"><img id="fimg" src="swim/flow-shop.webp" alt="" width="1600" height="1266"></div>
+        <div class="flow-copy" aria-live="polite"><h3 id="ftitle"></h3><p id="ftext"></p><ul class="facts" id="ffacts"></ul></div>
+      </div>
+    </div>
+    <p class="rise" style="margin-top:16px;color:var(--mute);font-size:14px">Tap a step to move the turtle. Prices and the order number are sample content in the design.</p>
+  </div>
+</section>
+
+<section style="background:var(--s-navy);color:var(--rasp-ink)">
+  <div class="wrap">
+    <div class="read stack rise">
+      <div class="eyebrow" style="color:rgba(255,241,242,.6)">Language</div>
+      <h2>The shop speaks swimmer.</h2>
+      <p class="lede" style="color:rgba(255,241,242,.8)">Generic shop words were swapped for words from the pool deck. It costs nothing to build and it keeps the shop feeling like part of the academy rather than a bolted-on store.</p>
+    </div>
+    <div class="words">
+      <div class="word rise"><s>Cart</s><b>Kit Bag</b><span>Also "Add to Kit Bag" on every product</span></div>
+      <div class="word rise"><s>You may also like</s><b>Complete the kit</b><span>The cross-sell row under each product</span></div>
+      <div class="word rise"><s>All products</s><b>Pool-ready essentials</b><span>The shop's collection heading</span></div>
+      <div class="word rise"><s>Shipping</s><b>Free pickup</b><span>"No shipping wait" at Pulchowk and Pokhara</span></div>
+      <div class="word rise"><s>Order confirmed</s><b>You're all set!</b><span>"…and you're off to the pool"</span></div>
+    </div>
+    <div class="closeups">
+      <figure class="rise">
+        <img class="shot" src="swim/pickup-pay.webp" alt="Pickup branch choice of Pulchowk or Pokhara, pickup date and time, and payment by eSewa, Khalti or cash on pickup" width="701" height="572">
+        <figcaption><b>Local by default</b><span>eSewa and Khalti, Nepal's common wallets, sit beside "Cash on Pickup". Each branch card carries its own phone numbers.</span></figcaption>
+      </figure>
+      <figure class="rise">
+        <img class="shot" src="swim/summary.webp" alt="Order summary with a loyalty member checkbox, promo code field and Proceed to Checkout button" width="381" height="527">
+        <figcaption><b>Loyalty in plain sight</b><span>Members tick a box for 10% off instead of hunting for a code.</span></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap reflect">
+    <div class="stack rise">
+      <div class="eyebrow">Looking back</div>
+      <h2>What I'd tighten next.</h2>
+      <p class="lede">The two volumes and the shared ending hold the site together. These are the places I'd take another pass.</p>
+    </div>
+    <ol class="rise">
+      <li><strong>One form per page.</strong><span>The booking page has its own class form and then the shared "Learn to swim!" form below it. Two identical forms on one page asks people to guess which one counts.</span></li>
+      <li><strong>Make the numbers agree.</strong><span>The same stats carry different labels on different pages: "10K+" is a success rate on Home and students trained on About. Each number should mean one thing everywhere.</span></li>
+      <li><strong>Design the phone version.</strong><span>Every page here is desktop. Most parents will meet the sign-up form and the checkout on a phone, so those come first.</span></li>
+    </ol>
+  </div>
+</section>
+
+<section class="end">
+  <div class="wrap stack">
+    <div class="hand" style="color:var(--rasp-ink)">thanks for reading</div>
+    <h2>Open the file, or keep exploring.</h2>
+    <div class="cta">
+      <a class="solid" href="https://www.figma.com/design/xjcV2J5eXjL1fmBKzuGREa/Swimming-Everyday-Website?node-id=0-1" target="_blank" rel="noopener">Open in Figma ↗</a>
+      <a class="ghost" href="ticketing.html">Next: TicketING</a>
+      <a class="ghost" href="../index.html#work">Back to all work</a>
+    </div>
+  </div>
+</section>
+<footer><div class="wrap">© 2026 Sarbesh Lal Amatya · Kathmandu, Nepal</div></footer>
+
+<script>
+(function(){
+  // hero lane: scroll distance depends on the frame height
+  var lane=document.getElementById('lane');
+  var setLh=function(){lane.style.setProperty('--lh',lane.clientHeight+'px');};
+  setLh(); addEventListener('resize',setLh);
+  // checkout walk-through
+  var S=[
+    ['Browse','shop','Gear shop','Ten products under one filter row: caps, goggles, swim suits, training and accessories. Badges flag bestsellers and new stock.',['Price and colour dots on every card','"View" on each card opens the product']],
+    ['Product','product','Pick a colour','Swatches, quantity and one yellow button. Description, features and care fold into an accordion.',['Free pickup, 7-day size exchange and the loyalty discount sit right under the button','"Complete the kit" row underneath']],
+    ['Kit bag','bag','Your kit bag','Line items with quantity steppers, then an order summary that already shows pickup as free.',['Loyalty checkbox and promo code','A turtle marks step 1 on the progress line']],
+    ['Details','details','Your details','Contact, pickup branch and payment, each in its own card. The summary on the right repeats every item.',['Pulchowk or Pokhara, with a preferred date and time','eSewa, Khalti or cash on pickup']],
+    ['All set','allset','You’re all set!','The confirmation tells you exactly what happens next: go to your branch, show the order ID, go swim.',['Order ID shown as a pill','One way out: back to the gear shop']]
+  ];
+  var ol=document.getElementById('steps'), walker=document.getElementById('walker'), cur=0;
+  S.forEach(function(s,i){var li=document.createElement('li');li.innerHTML='<button type="button"><i>'+(i+1)+'</i><span>'+s[0]+'</span></button>';ol.appendChild(li);});
+  var btns=ol.querySelectorAll('button');
+  function go(n){
+    cur=n; var s=S[n];
+    btns.forEach(function(b,i){b.classList.toggle('done',i<n);b.querySelector('i').textContent=i<n?'✓':i+1;if(i===n)b.setAttribute('aria-current','step');else b.removeAttribute('aria-current');});
+    var b=btns[n].querySelector('i'), r=b.getBoundingClientRect(), t=walker.parentNode.getBoundingClientRect();
+    walker.style.transform='translate('+(r.left-t.left+r.width/2-20)+'px,7px)';
+    var img=document.getElementById('fimg'); img.src='swim/flow-'+s[1]+'.webp'; img.alt=s[2]+' screen';
+    document.getElementById('ftitle').textContent=s[2]; document.getElementById('ftext').textContent=s[3];
+    document.getElementById('ffacts').innerHTML=s[4].map(function(f){return '<li>'+f+'</li>';}).join('');
+  }
+  btns.forEach(function(b,i){b.addEventListener('click',function(){go(i);});});
+  go(0); addEventListener('resize',function(){go(cur);});
+  // rise: content stays visible; below-the-fold blocks lift into place
+  if(!matchMedia('(prefers-reduced-motion: reduce)').matches && 'IntersectionObserver' in window){
+    var els=[].slice.call(document.querySelectorAll('.rise')).filter(function(el){return el.getBoundingClientRect().top>innerHeight;});
+    els.forEach(function(el){el.classList.add('pre');});
+    var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.remove('pre');io.unobserve(e.target);}});},{rootMargin:'0px 0px -8% 0px'});
+    els.forEach(function(el){io.observe(el);});
+  }
+})();
+</script>
+</body>
+</html>

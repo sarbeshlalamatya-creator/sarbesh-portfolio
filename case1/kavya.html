@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kavya School</title>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&amp;family=Geist:wght@400;500;600;700&amp;family=Caveat:wght@500;700&amp;family=Instrument+Serif:ital@0;1&amp;family=Lato:wght@400;700&amp;display=swap" rel="stylesheet">
+<style>
+/* Layout: portfolio cream and ink with the indigo card colour as signature; Kavya's four logo colours appear only where the school's own system is on show. */
+:root{
+  --paper:#F3EEE4; --paper-2:#EAE3D5; --ink:#1B1A17; --ink-2:#3E3B35; --mute:#6F6A61; --line:rgba(27,26,23,.12);
+  --signal:#F2552C; --ind:#3A2F8F; --ind-ink:#EEF0FF; --k-or:#F59E1B; --k-bl:#0B63B3; --k-gr:#3A8F3A; --k-rd:#C8102E; --sys-font:'Lato',system-ui,sans-serif;
+  --display:'Bricolage Grotesque',system-ui,sans-serif; --body:'Geist',system-ui,sans-serif; --hand:'Caveat',cursive; --serif:'Instrument Serif',Georgia,serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img{max-width:100%;height:auto;display:block}
+a{color:inherit}
+::selection{background:var(--signal);color:var(--ink)}
+:focus-visible{outline:2px solid var(--signal);outline-offset:3px;border-radius:6px}
+.wrap{max-width:1240px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.read{max-width:660px}
+section{padding-block:clamp(64px,10vw,128px)}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--mute)}
+h1,h2,h3{font-family:var(--display);letter-spacing:-.04em;line-height:1;margin:0;text-wrap:balance}
+h2{font-size:clamp(36px,5.4vw,72px);font-weight:800}
+h3{font-size:clamp(20px,2vw,26px);font-weight:800;letter-spacing:-.03em}
+p{margin:0}
+.lede{font-size:clamp(19px,1.7vw,22px);line-height:1.5;color:var(--ink-2)}
+.hand{font-family:var(--hand);font-weight:700;color:var(--signal);font-size:clamp(24px,2.4vw,30px);line-height:1.1}
+.stack{display:flex;flex-direction:column;gap:20px}
+.shot{border-radius:18px;overflow:hidden;box-shadow:0 30px 70px rgba(27,26,23,.14),0 2px 0 rgba(27,26,23,.04);background:#fff}
+.reading{display:inline-flex;align-items:center;gap:8px;align-self:flex-start;font-size:13px;font-weight:600;color:var(--ink-2);border:1.5px dashed rgba(27,26,23,.3);border-radius:999px;padding:5px 12px}
+.reading::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--signal)}
+.tbc{border-bottom:1.5px dashed var(--signal)}
+.split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:clamp(32px,6vw,88px);align-items:center}
+
+.bar{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:50;display:flex;align-items:center;gap:6px;padding:6px;background:rgba(255,255,255,.62);backdrop-filter:blur(16px) saturate(1.4);-webkit-backdrop-filter:blur(16px) saturate(1.4);border:1px solid rgba(27,26,23,.08);border-radius:999px;box-shadow:0 8px 30px rgba(27,26,23,.08);max-width:calc(100vw - 24px)}
+.bar a{text-decoration:none;font-size:14px;font-weight:600;padding:8px 14px;border-radius:999px;white-space:nowrap}
+.bar a:hover{background:rgba(27,26,23,.06)}
+.bar .dark-btn{background:var(--ink);color:var(--paper)}
+.bar .dark-btn:hover{background:var(--ink);color:var(--signal)}
+.bar img{width:30px;height:30px;border-radius:50%;object-fit:cover;background:var(--paper-2)}
+.meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:18px;border-top:1px solid var(--line);padding-top:20px;margin-top:36px}
+.meta div > span{display:block;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+.meta div > strong{display:block;margin-top:6px;font-weight:600;font-size:16px;line-height:1.4}
+.reflect{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(28px,5vw,72px)}
+.reflect ol{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:22px}
+.reflect li{display:flex;flex-direction:column;gap:6px;padding-left:18px;border-left:3px solid var(--ind)}
+.reflect li strong{font-weight:600}
+
+.end{background:var(--ind);color:var(--ind-ink);border-radius:32px 32px 0 0}
+.end h2{font-size:clamp(44px,7vw,104px)}
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:32px}
+.cta a{text-decoration:none;font-weight:600;font-size:15px;padding:13px 22px;border-radius:999px}
+.cta .solid{background:var(--ind-ink);color:var(--ind)}
+.cta .ghost{border:1.5px solid var(--ind-ink);color:var(--ind-ink)}
+footer{background:var(--ind);color:rgba(238,240,255,.7);font-size:13px;padding-block:0 32px}
+.rise{transition:transform .8s cubic-bezier(.2,.8,.2,1)}
+.rise.pre{transform:translateY(28px)}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.rise,.rise.pre,.slant .band,.slant h3{transition:none}.rise.pre{transform:none}}
+/* hero */
+.hero{padding-top:clamp(110px,14vh,150px);padding-bottom:clamp(40px,6vw,80px)}
+.hero-top{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(24px,4vw,56px);align-items:end}
+.name h1{font-size:clamp(72px,11vw,160px);font-weight:800;letter-spacing:-.065em;line-height:.86}
+.name h1 span:nth-child(1){color:var(--k-or)}.name h1 span:nth-child(2){color:var(--k-bl)}.name h1 span:nth-child(3){color:var(--k-gr)}.name h1 span:nth-child(4){color:var(--k-rd)}.name h1 span:nth-child(5){color:var(--ink)}
+.name small{display:block;margin-top:16px;font:700 13px var(--body);letter-spacing:.16em;text-transform:uppercase;color:var(--mute)}
+.statement{font-family:var(--serif);font-size:clamp(28px,3.2vw,44px);line-height:1.08;max-width:18ch}
+.stage{position:relative;margin-top:clamp(36px,5vw,64px);padding:0 clamp(16px,3vw,40px) clamp(24px,3vw,40px)}
+.stage::before{content:"";position:absolute;left:0;right:0;top:35%;bottom:0;background:var(--ind);border-radius:28px;z-index:-1}
+.frame{border-radius:14px;overflow:hidden;background:#fff;box-shadow:0 30px 70px rgba(27,26,23,.22)}
+
+/* page colours */
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{border:1.5px solid var(--line);background:#fff;font:600 14px var(--body);color:var(--ink-2);padding:8px 16px 8px 10px;border-radius:999px;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.seg button i{width:14px;height:14px;border-radius:3px;background:var(--c)}
+.seg button[aria-pressed="true"]{border-color:var(--ink);color:var(--ink)}
+.seg.plain button{padding:8px 16px}
+.seg.plain button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.slant{position:relative;margin-top:20px;height:clamp(200px,24vw,280px);background:#fff;border-radius:20px;overflow:hidden}
+.slant .band{position:absolute;left:4%;right:0;top:38%;bottom:12%;background:var(--c);clip-path:polygon(7% 0,100% 0,100% 100%,0 100%);transition:background .3s}
+.slant h3{position:absolute;left:9%;top:12%;margin:0;font-family:var(--display);font-weight:800;font-size:clamp(34px,5vw,64px);letter-spacing:-.04em;color:var(--c);transition:color .3s}
+.slant p{position:absolute;left:12%;right:42%;top:54%;margin:0;color:#fff;font-size:clamp(13px,1.3vw,16px)}
+.slant .cut{position:absolute;right:6%;top:0;bottom:0;width:30%;background:var(--c);opacity:.25;clip-path:polygon(40% 0,100% 0,60% 100%,0 100%)}
+.cshot{margin-top:16px}
+
+/* why */
+.cols4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:44px}
+.cols4 div{border-radius:999px 999px 14px 14px;padding:64px 24px 24px;color:#fff;background:var(--c);min-height:200px;display:flex;flex-direction:column;gap:8px}
+.cols4 b{font-family:var(--display);font-size:clamp(17px,1.6vw,21px);line-height:1.15}
+.cols4 span{font-size:14px;opacity:.9}
+.aaa{display:grid;grid-template-columns:auto minmax(0,1fr);gap:clamp(24px,5vw,72px);align-items:center;margin-top:72px}
+.aaa .big{display:flex;align-items:center;gap:14px}
+.aaa .big b{font-family:var(--display);font-weight:800;font-size:clamp(80px,10vw,140px);letter-spacing:-.04em;line-height:.85;color:#1FA39A}
+.aaa .big ul{list-style:none;margin:0;padding:0;font-weight:600;color:#1FA39A;line-height:1.3}
+.aaa .big ul li::first-letter{font-size:1.3em}
+.aaa h3{font-size:clamp(34px,4vw,52px);margin-top:6px}
+
+/* streams */
+.streams{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(24px,4vw,56px);margin-top:20px;align-items:start}
+.subj{background:#fff;border-radius:20px;padding:clamp(20px,3vw,32px)}
+.subj h4{margin:0 0 10px;font:700 13px var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+.subj ul{list-style:none;margin:0 0 18px;padding:0;display:flex;flex-wrap:wrap;gap:6px}
+.subj li{font-weight:600;font-size:15px;border-radius:999px;padding:6px 14px;background:var(--paper)}
+.subj li.core{background:#E5F2E5;color:#256B25}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips span{font-size:14px;border:1.5px solid var(--line);padding:5px 12px;border-radius:6px}
+
+/* news */
+.news{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(16px,3vw,40px);margin-top:44px;align-items:start}
+.scroll{height:clamp(420px,50vw,620px);overflow-y:auto;border-radius:14px;background:#fff;box-shadow:0 20px 50px rgba(27,26,23,.14);overscroll-behavior:contain;margin-top:12px}
+.scroll img{display:block;width:100%}
+.k{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+.tally{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.tally span{font-size:14px;font-weight:600;background:#fff;border-radius:999px;padding:6px 14px}
+
+/* apply */
+.apply{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,.7fr);gap:clamp(24px,4vw,56px);margin-top:44px;align-items:start}
+.where{background:#fff;border-radius:20px;padding:clamp(20px,3vw,32px)}
+.where table{width:100%;border-collapse:collapse;font-size:14px}
+.where th{text-align:left;color:var(--mute);font-weight:500;padding:8px 0;border-bottom:1px solid var(--line)}
+.where td{padding:10px 8px 10px 0;border-bottom:1px solid var(--line);vertical-align:top}
+.where td:first-child{font-weight:600;white-space:nowrap}
+
+@media (max-width:860px){
+  .hero-top,.split,.aaa,.streams,.news,.apply,.reflect{grid-template-columns:minmax(0,1fr)}
+  .cols4{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .slant p{right:6%}
+}
+</style>
+<style>body{animation:cnIn .45s ease both}@keyframes cnIn{from{opacity:0}}@media (prefers-reduced-motion:reduce){body{animation:none}}</style>
+<script src="case-nav.js" defer></script>
+</head>
+<body>
+<nav class="bar" aria-label="Case study">
+  <a href="../index.html#work" style="display:flex;align-items:center;gap:8px;padding:2px 12px 2px 2px"><img src="../work/avatar.webp" alt="" width="30" height="30"><span style="font-family:var(--display);font-weight:800;font-size:16px;letter-spacing:-.02em">Sarbesh</span></a>
+  <a href="../index.html#work">All work</a>
+  <a class="dark-btn" href="https://kavyaschool.edu.np" target="_blank" rel="noopener">Live site ↗</a>
+</nav>
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Case study · School website · 2024</div>
+    <div class="hero-top" style="margin-top:18px">
+      <div class="name"><h1><span>K</span><span>A</span><span>V</span><span>Y</span><span>A</span></h1><small>Kavya School, Kathmandu</small></div>
+      <div>
+        <p class="statement">One logo with four colours, and a page for each of them.</p>
+        <div class="meta">
+          <div><span>What it is</span><strong>The website for a Plus 2 school: why it's different, what you can study, news, and how to apply</strong></div>
+          <div><span>Shown here</span><strong>6 desktop pages</strong></div>
+          <div><span>My role</span><strong><span class="tbc">UI/UX design</span></strong></div>
+        </div>
+      </div>
+    </div>
+    <div class="stage">
+      <div class="frame"><img src="kavya/h-home.webp" alt="Home page: Welcome to Kavya, Nepal's Future-proof Smart School, on an orange slanted band beside the building" width="1400" height="717"></div>
+    </div>
+  </div>
+</header>
+
+<section style="padding-top:clamp(40px,6vw,80px)">
+  <div class="wrap">
+    <div class="split" style="align-items:end">
+      <div class="stack rise">
+        <div class="eyebrow">The system</div>
+        <h2>Every page takes a letter's colour.</h2>
+      </div>
+      <div class="stack rise">
+        <p class="lede">The KAVYA wordmark is drawn in orange, blue, green and red. Each page header borrows one of them for a slanted band, with a photo cut to the same angle on the right. One shape, five colours. Pick a page.</p>
+        <span class="reading">My reading of the colour choice</span>
+      </div>
+    </div>
+    <div class="seg rise" id="pseg" role="group" aria-label="Page" style="margin-top:36px"></div>
+    <div class="slant rise" id="slant" aria-hidden="true"><div class="cut"></div><div class="band"></div><h3 id="st"></h3><p id="sp"></p></div>
+    <img class="shot cshot rise" id="pimg" src="kavya/h-home.webp" alt="" width="1400" height="717">
+    <p class="rise" style="margin-top:12px;color:var(--mute);font-size:14px">The band above is rebuilt in CSS; the screenshot under it is the page's own header.</p>
+  </div>
+</section>
+
+<section style="background:#fff">
+  <div class="wrap">
+    <div class="split" style="align-items:end">
+      <div class="stack rise">
+        <div class="eyebrow">Why Kavya</div>
+        <h2>Four arches, four promises.</h2>
+      </div>
+      <div class="stack rise">
+        <p class="lede">The home page answers "why this school" with four tall columns, each topped with a coloured arch that carries one claim. Photos fill the rest of the column, so the claim and the proof stand together.</p>
+      </div>
+    </div>
+    <div class="cols4">
+      <div class="rise" style="--c:var(--k-or)"><b>First time in Nepal, advanced pedagogy with industry attachment</b><span>Context, content and real-life application</span></div>
+      <div class="rise" style="--c:var(--k-rd)"><b>Learn with two teachers</b><span>Experienced teaching, and tech at your service</span></div>
+      <div class="rise" style="--c:var(--k-bl)"><b>Full time study with full time teachers</b></div>
+      <div class="rise" style="--c:var(--k-gr)"><b>Experience a vibrant and ultra-modern facilities</b></div>
+    </div>
+    <img class="shot rise" src="kavya/why.webp" alt="The four Why Kavya columns with photos" width="1400" height="689" style="margin-top:20px">
+    <div class="aaa">
+      <div class="big rise"><b>AAA</b><ul><li>Academic</li><li>Attitude</li><li>Attendance</li></ul></div>
+      <div class="rise"><h3>Scholarship</h3><p style="color:var(--ink-2)">The page says 10% of students each year are eligible, with the full college fee waived. Three words that start with the same letter, so the rule is easy to repeat.</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="split" style="align-items:end">
+      <div class="stack rise">
+        <div class="eyebrow">Courses</div>
+        <h2>Subjects, then where they lead.</h2>
+      </div>
+      <div class="stack rise">
+        <p class="lede">The courses page lists compulsory subjects, then two columns of optional ones, each ending in career tags. The columns aren't titled on the page; the home page calls them Science and Management pathways, so I've used those names. Pick one.</p>
+      </div>
+    </div>
+    <div class="seg plain rise" id="sseg" role="group" aria-label="Stream" style="margin-top:36px"></div>
+    <div class="streams rise">
+      <div class="subj"><h4>Compulsory</h4><ul><li class="core">English</li><li class="core">Nepali</li><li class="core">Social Studies &amp; Life Skill Education or Mathematics</li></ul><h4>Optional</h4><ul id="opt"></ul></div>
+      <div class="subj"><h4>Career pathways you can take</h4><div class="chips" id="car"></div></div>
+    </div>
+  </div>
+</section>
+
+<section style="background:#fff">
+  <div class="wrap">
+    <div class="split" style="align-items:end">
+      <div class="stack rise">
+        <div class="eyebrow">News &amp; events</div>
+        <h2>A big date, then the story.</h2>
+      </div>
+      <div class="stack rise">
+        <p class="lede">News cards lead with the day and month in large type, coloured by kind: orange for events, blue for news. The article page drops the card onto the hero photo and then lets the pictures run long.</p>
+      </div>
+    </div>
+    <div class="news">
+      <div class="rise"><span class="k">Listing</span><div class="scroll" tabindex="0" aria-label="News listing page, scrollable"><img src="kavya/p-news.webp" alt="News and Events listing" width="600" height="1640"></div></div>
+      <div class="rise"><span class="k">Article</span><div class="scroll" tabindex="0" aria-label="Article page, scrollable"><img src="kavya/p-article.webp" alt="Alumni Meet 2022 article" width="600" height="2614"></div></div>
+    </div>
+    <div class="tally rise"><span>8 cards on the listing</span><span>2 stories</span><span>Each repeated 4 times</span></div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="split" style="align-items:end">
+      <div class="stack rise">
+        <div class="eyebrow">Apply</div>
+        <h2>Two forms, two addresses.</h2>
+      </div>
+      <div class="stack rise">
+        <p class="lede">Apply Now pairs a short form with "Find us by other means". Below it, the footer adds its own Contact Us form, the one every page carries. The two blocks don't give the same details.</p>
+      </div>
+    </div>
+    <div class="apply">
+      <img class="shot rise" src="kavya/form.webp" alt="Reach out to us form and Find us by other means" width="1200" height="505">
+      <div class="where rise">
+        <table>
+          <thead><tr><th></th><th>Apply page</th><th>Footer</th></tr></thead>
+          <tbody>
+            <tr><td>Address</td><td>Buddhanagar, Kathmandu</td><td>New Baneshwor, Kathmandu</td></tr>
+            <tr><td>Phone</td><td>4 landlines</td><td>2 mobiles</td></tr>
+            <tr><td>Form</td><td>Name, email, phone, an option, query</td><td>Name, email, contact, school</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top:0">
+  <div class="wrap reflect">
+    <div class="stack rise">
+      <div class="eyebrow">Looking back</div>
+      <h2>What I'd tighten next.</h2>
+      <p class="lede">The slanted header and the colour per page give a six-page site a real system. The content inside it needs the same care.</p>
+    </div>
+    <ol class="rise">
+      <li><strong>Write each message once.</strong><span>The chairman, the principal and the mission all reuse one paragraph, word for word. The News hero is lorem ipsum, and the Apply hero repeats the Courses line about subject choices.</span></li>
+      <li><strong>Check the stories.</strong><span>The alumni article is an Islington College event dated 16 May, held in December, with a subtitle about a festival of colours. The listing shows its two stories four times each.</span></li>
+      <li><strong>One contact, one form.</strong><span>Settle the address and phone numbers, label the dropdown that's currently called "Email Address", and drop the footer form on the page that is already a form.</span></li>
+    </ol>
+  </div>
+</section>
+
+<section class="end">
+  <div class="wrap stack">
+    <div class="hand" style="color:var(--ind-ink)">thanks for reading</div>
+    <h2>Visit the site, or keep exploring.</h2>
+    <div class="cta">
+      <a class="solid" href="https://kavyaschool.edu.np" target="_blank" rel="noopener">Visit kavyaschool.edu.np ↗</a>
+      <a class="ghost" href="nmst.html">Another school project</a>
+      <a class="ghost" href="../index.html#work">Back to all work</a>
+    </div>
+  </div>
+</section>
+<footer><div class="wrap">© 2026 Sarbesh Lal Amatya · Kathmandu, Nepal</div></footer>
+
+<script>
+(function(){
+  function group(el,list,label,fn){list.forEach(function(x,n){var b=document.createElement('button');b.type='button';b.innerHTML=label(x);b.addEventListener('click',function(){[].forEach.call(el.children,function(c,i){c.setAttribute('aria-pressed',String(i===n));});fn(x,n);});el.appendChild(b);});el.children[0].click();}
+  // page header colours
+  var P=[['Home','var(--k-or)','Smart School for Smart Students','h-home',717],['About','var(--k-rd)','We are different and we want to do things differently.','h-about',683],['Courses','var(--k-gr)','There are a lot of subject choices for you to choose from.','h-courses',696],['News & Events','var(--k-bl)','Lorem ipsum, still, in the design.','h-news',669],['Apply Now','var(--k-bl)','The same line as Courses.','h-apply',695]];
+  var sl=document.getElementById('slant'),pi=document.getElementById('pimg');
+  group(document.getElementById('pseg'),P,function(p){return '<i style="--c:'+p[1]+'"></i>'+p[0];},function(p){sl.style.setProperty('--c',p[1]);document.getElementById('st').textContent=p[0];document.getElementById('sp').textContent=p[2];pi.src='kavya/'+p[3]+'.webp';pi.height=p[4];pi.alt=p[0]+' page header';});
+  // streams, from the courses page
+  var S=[['Management',['Economics','Principles of Accounting','Business Studies','Computer Science','Hotel Management*'],['Entrepreneur','Hotelier','Economist','Researcher','Manager','Software Engineer']],['Science',['Biology','Physics','Chemistry','Computer Science'],['Doctor','Engineer','Scientist','Mathematician','Nutritionist','Geologist']]];
+  group(document.getElementById('sseg'),S,function(s){return s[0];},function(s){document.getElementById('opt').innerHTML=s[1].map(function(x){return '<li>'+x+'</li>';}).join('');document.getElementById('car').innerHTML=s[2].map(function(x){return '<span>'+x+'</span>';}).join('')+'<span style="border-style:dashed">many more…</span>';});
+  // rise: content stays visible; below-the-fold blocks lift into place
+  if(!matchMedia('(prefers-reduced-motion: reduce)').matches && 'IntersectionObserver' in window){
+    var els=[].slice.call(document.querySelectorAll('.rise')).filter(function(el){return el.getBoundingClientRect().top>innerHeight;});
+    els.forEach(function(el){el.classList.add('pre');});
+    var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.remove('pre');io.unobserve(e.target);}});},{rootMargin:'0px 0px -8% 0px'});
+    els.forEach(function(el){io.observe(el);});
+  }
+})();
+</script>
+</body>
+</html>
