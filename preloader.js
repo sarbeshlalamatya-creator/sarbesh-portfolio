@@ -1,5 +1,6 @@
 (function () {
   if (window.__preloaderBooted) return; window.__preloaderBooted = true;
+  if (window.__skipPreloader) return;
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   var SITE_BG = '#F3EEE4';
   var fonts = document.createElement('link');
