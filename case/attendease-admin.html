@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AttendEase Staff System</title>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&amp;family=Geist:wght@400;500;600;700&amp;family=Caveat:wght@500;700&amp;family=Instrument+Serif:ital@0;1&amp;family=Lato:wght@400;700&amp;display=swap" rel="stylesheet">
+<style>
+/* Layout: portfolio cream and ink with the sand card colour as signature; AttendEase purple and the status colours appear only where the system itself is on show. */
+:root{
+  --paper:#F3EEE4; --paper-2:#EAE3D5; --ink:#1B1A17; --ink-2:#3E3B35; --mute:#6F6A61; --line:rgba(27,26,23,.12);
+  --signal:#F2552C; --ind:#E9D8B8; --ind-ink:#1B1A17; --ae:#6B3FB0; --sys-font:'Lato',system-ui,sans-serif;
+  --display:'Bricolage Grotesque',system-ui,sans-serif; --body:'Geist',system-ui,sans-serif; --hand:'Caveat',cursive; --serif:'Instrument Serif',Georgia,serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img{max-width:100%;height:auto;display:block}
+a{color:inherit}
+::selection{background:var(--signal);color:var(--ink)}
+:focus-visible{outline:2px solid var(--signal);outline-offset:3px;border-radius:6px}
+.wrap{max-width:1240px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.read{max-width:660px}
+section{padding-block:clamp(64px,10vw,128px)}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--mute)}
+h1,h2,h3{font-family:var(--display);letter-spacing:-.04em;line-height:1;margin:0;text-wrap:balance}
+h2{font-size:clamp(36px,5.4vw,72px);font-weight:800}
+h3{font-size:clamp(20px,2vw,26px);font-weight:800;letter-spacing:-.03em}
+p{margin:0}
+.lede{font-size:clamp(19px,1.7vw,22px);line-height:1.5;color:var(--ink-2)}
+.hand{font-family:var(--hand);font-weight:700;color:var(--signal);font-size:clamp(24px,2.4vw,30px);line-height:1.1}
+.stack{display:flex;flex-direction:column;gap:20px}
+.shot{border-radius:18px;overflow:hidden;box-shadow:0 30px 70px rgba(27,26,23,.14),0 2px 0 rgba(27,26,23,.04);background:#fff}
+.reading{display:inline-flex;align-items:center;gap:8px;align-self:flex-start;font-size:13px;font-weight:600;color:var(--ink-2);border:1.5px dashed rgba(27,26,23,.3);border-radius:999px;padding:5px 12px}
+.reading::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--signal)}
+.tbc{border-bottom:1.5px dashed var(--signal)}
+.split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:clamp(32px,6vw,88px);align-items:center}
+
+.bar{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:50;display:flex;align-items:center;gap:6px;padding:6px;background:rgba(255,255,255,.62);backdrop-filter:blur(16px) saturate(1.4);-webkit-backdrop-filter:blur(16px) saturate(1.4);border:1px solid rgba(27,26,23,.08);border-radius:999px;box-shadow:0 8px 30px rgba(27,26,23,.08);max-width:calc(100vw - 24px)}
+.bar a{text-decoration:none;font-size:14px;font-weight:600;padding:8px 14px;border-radius:999px;white-space:nowrap}
+.bar a:hover{background:rgba(27,26,23,.06)}
+.bar .dark-btn{background:var(--ink);color:var(--paper)}
+.bar .dark-btn:hover{background:var(--ink);color:var(--signal)}
+.bar img{width:30px;height:30px;border-radius:50%;object-fit:cover;background:var(--paper-2)}
+.meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:18px;border-top:1px solid var(--line);padding-top:20px;margin-top:36px}
+.meta div > span{display:block;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+.meta div > strong{display:block;margin-top:6px;font-weight:600;font-size:16px;line-height:1.4}
+.reflect{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(28px,5vw,72px)}
+.reflect ol{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:22px}
+.reflect li{display:flex;flex-direction:column;gap:6px;padding-left:18px;border-left:3px solid var(--ind)}
+.reflect li strong{font-weight:600}
+
+.end{background:var(--ind);color:var(--ind-ink);border-radius:32px 32px 0 0}
+.end h2{font-size:clamp(44px,7vw,104px)}
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:32px}
+.cta a{text-decoration:none;font-weight:600;font-size:15px;padding:13px 22px;border-radius:999px}
+.cta .solid{background:var(--ind-ink);color:var(--ind)}
+.cta .ghost{border:1.5px solid var(--ind-ink);color:var(--ind-ink)}
+footer{background:var(--ind);color:rgba(27,26,23,.7);font-size:13px;padding-block:0 32px}
+.rise{transition:transform .8s cubic-bezier(.2,.8,.2,1)}
+.rise.pre{transform:translateY(28px)}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.rise,.rise.pre,.blk,.swap .f{transition:none}.rise.pre{transform:none}}
+/* hero */
+.hero{padding-top:clamp(110px,14vh,150px);padding-bottom:clamp(40px,6vw,80px)}
+.hero-grid{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:clamp(24px,4vw,56px);align-items:end}
+.name h1{font-size:clamp(56px,7.4vw,112px);font-weight:800;letter-spacing:-.065em;line-height:.88}
+.name h1 em{font-style:normal;color:var(--ae)}
+.name small{display:block;margin-top:14px;font:700 13px var(--body);letter-spacing:.16em;text-transform:uppercase;color:var(--mute)}
+.statement{font-family:var(--serif);font-size:clamp(28px,3.2vw,44px);line-height:1.08;max-width:18ch;margin-top:32px}
+.pile{position:relative;padding:clamp(20px,3vw,40px) clamp(14px,2.4vw,32px) 0;background:var(--ae);border-radius:28px;overflow:hidden}
+.pile img{border-radius:12px 12px 0 0;box-shadow:0 -10px 40px rgba(30,10,70,.35)}
+.pile .back{position:absolute;width:56%;right:-6%;top:8%;transform:rotate(4deg);border-radius:12px}
+.pile .front{position:relative;width:88%}
+
+.chipnote{font-size:14px;color:var(--mute);margin-top:16px}
+.sec-head{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:clamp(32px,6vw,88px);align-items:end}
+.btn{border:1.5px solid var(--line);background:#fff;font:600 14px var(--body);color:var(--ink-2);padding:7px 14px;border-radius:999px;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.btn[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.btn i{width:10px;height:10px;border-radius:50%}
+
+/* two sides */
+.sides{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr);gap:clamp(16px,3vw,32px);margin-top:44px}
+.side{background:#fff;border-radius:24px;padding:clamp(22px,3vw,36px);display:flex;flex-direction:column;gap:12px}
+.side b{font-family:var(--serif);font-weight:400;font-size:clamp(26px,2.8vw,38px);line-height:1.08}
+.side span{color:var(--ink-2)}
+.side .tag{align-self:flex-start;font:700 12px var(--body);letter-spacing:.12em;text-transform:uppercase;padding:5px 12px;border-radius:999px;background:var(--paper-2)}
+.side.here{background:var(--ae);color:#fff}.side.here span{color:#EDE6FA}.side.here .tag{background:rgba(255,255,255,.18)}
+.side a{font-weight:600}
+
+/* schedule */
+.sched{margin-top:36px;background:#fff;border-radius:20px;padding:14px;overflow-x:auto;overscroll-behavior-x:contain}
+.tl{min-width:880px;font-family:var(--sys-font);position:relative}
+.tl-h,.tl-r{display:grid;grid-template-columns:150px minmax(0,1fr)}
+.tl-h{background:#F3EEFB;border-radius:10px;font-size:12px;color:#6F6A61}
+.tl-h .hrs,.tl-r .lane{display:grid;grid-template-columns:repeat(22,minmax(0,1fr))}
+.tl-h .hrs span{padding:8px 0;text-align:center;border-left:1px solid #E6DFF3}
+.tl-h > span{padding:8px 12px}
+.tl-r{border-bottom:1px solid #EEE9F5;min-height:62px}
+.tl-r > div:first-child{padding:10px 12px;font-size:14px;font-weight:700;line-height:1.25}
+.tl-r small{display:block;font-weight:400;font-style:italic;color:var(--mute);font-size:12px}
+.lane{position:relative;background-image:linear-gradient(90deg,#EEE9F5 1px,transparent 1px);background-size:calc(100%/22) 100%}
+.blk{all:unset;cursor:pointer;margin:7px 2px;border-left:4px solid var(--c);background:color-mix(in srgb,var(--c) 10%,#fff);color:var(--c);font-size:12px;line-height:1.3;padding:5px 7px;border-radius:3px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;transition:opacity .2s}
+.blk b{display:block;font-weight:700;overflow:hidden;text-overflow:ellipsis}
+.blk:focus-visible{outline:2px solid var(--ink)}
+.blk[aria-pressed="true"]{box-shadow:0 0 0 2px var(--c)}
+.blk.off{opacity:.12}
+.now{position:absolute;top:0;bottom:0;width:2px;background:#7B4CB3;pointer-events:none}
+.now span{position:absolute;top:6px;left:50%;transform:translateX(-50%);background:#fff;border:1px solid #CFC4E6;border-radius:4px;font:600 11px var(--sys-font);color:#6F6A61;padding:1px 5px;white-space:nowrap}
+.legend{display:flex;flex-wrap:wrap;gap:6px;margin-top:24px}
+.pop{margin-top:16px;background:#F7F4FB;border-radius:16px;padding:18px 20px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 18px;font-size:15px;max-width:640px}
+.pop h4{grid-column:1/-1;margin:0 0 6px;font:800 18px var(--display);letter-spacing:-.02em}
+.pop dt{color:var(--mute)}.pop dd{margin:0}
+.pop p{grid-column:1/-1;margin-top:6px;font-size:13px;color:var(--mute)}
+
+/* planner */
+.counts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:40px}
+.counts div{background:#fff;border-radius:16px;padding:16px 18px;font-family:var(--sys-font)}
+.counts b{display:block;font:800 clamp(30px,3.6vw,48px)/1 var(--display);letter-spacing:-.04em}
+.counts span{font-size:14px;color:var(--ink-2)}
+.tools{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(16px,3vw,32px);margin-top:28px}
+.tool{background:#fff;border-radius:20px;padding:clamp(18px,2.4vw,28px);font-family:var(--sys-font);display:flex;flex-direction:column;gap:14px}
+.tool h4{margin:0;font:800 20px var(--display);letter-spacing:-.02em}
+.days{display:flex;border:1px solid #DDD5EA;border-radius:8px;padding:3px;gap:2px;align-self:flex-start;flex-wrap:wrap}
+.days button{all:unset;cursor:pointer;font-size:13px;padding:5px 10px;border-radius:5px;color:#55505A}
+.days button[aria-pressed="true"]{background:var(--ae);color:#fff}
+.days button:focus-visible{outline:2px solid var(--ink)}
+.step{display:flex;gap:14px;align-items:flex-end;flex-wrap:wrap}
+.clock{display:grid;grid-template-columns:repeat(2,44px);gap:4px 6px;text-align:center;border:1px solid #E6DFF3;border-radius:10px;padding:10px}
+.clock h5{grid-column:1/-1;margin:0 0 4px;font-size:13px;font-weight:700}
+.clock button{all:unset;cursor:pointer;border:1px solid #CFC4E6;border-radius:4px;height:22px;line-height:20px;font-size:15px;color:#55505A}
+.clock button:focus-visible{outline:2px solid var(--ink)}
+.clock output{font-weight:700;font-size:17px}
+.clock small{font-size:11px;color:var(--mute)}
+.hours{border:1px solid #E6DFF3;background:#F5F3F8;border-radius:8px;padding:8px 14px;min-width:90px}
+.hours small{display:block;font-size:12px;color:var(--mute)}.hours b{font-size:22px}
+.spec{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start}
+.spec fieldset{border:1px solid #E6DFF3;border-radius:10px;margin:0;padding:8px 12px;display:flex;flex-direction:column;gap:2px}
+.spec legend{font-size:13px;font-weight:700;padding:0 4px}
+.spec label{font-size:14px;display:flex;gap:8px;align-items:center;cursor:pointer}
+.spec input{accent-color:var(--ae)}
+.tags{display:flex;flex-wrap:wrap;gap:6px;min-height:30px;border:1px solid #DDD5EA;border-radius:8px;padding:6px}
+.tags span{font-size:12px;background:#F1EDF7;border-radius:4px;padding:2px 7px}
+.tags em{font-style:normal;color:var(--mute);font-size:13px}
+.add{all:unset;cursor:pointer;align-self:flex-start;background:var(--ae);color:#fff;font-size:14px;font-weight:700;padding:7px 16px;border-radius:6px}
+.add:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+
+/* import flow */
+.flow{display:flex;gap:6px;overflow-x:auto;margin-top:40px;padding-bottom:4px}
+.flow button{all:unset;cursor:pointer;flex:0 0 auto;display:inline-flex;align-items:center;gap:8px;font:600 14px var(--body);padding:8px 14px 8px 8px;border-radius:999px;background:#fff;color:var(--ink-2);border:1.5px solid var(--line)}
+.flow button span{display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--paper-2);font-size:12px}
+.flow button[aria-pressed="true"]{background:var(--ae);border-color:var(--ae);color:#fff}
+.flow button[aria-pressed="true"] span{background:rgba(255,255,255,.2)}
+.flow button.bad span{background:#FBD9DB;color:#B3263A}
+.flow button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.fview{margin:16px 0 0;display:flex;flex-direction:column;gap:14px}
+.fview figcaption{max-width:760px;color:var(--ink-2)}
+.hcheck{background:#fff;border-radius:20px;padding:clamp(18px,2.4vw,26px);font-family:var(--sys-font)}
+.hdrs{display:flex;flex-wrap:wrap;gap:6px}
+.hdrs label{display:inline-flex;align-items:center;gap:6px;font-size:13px;border:1px solid #DDD5EA;border-radius:6px;padding:4px 9px;cursor:pointer}
+.hdrs input{accent-color:var(--ae)}
+.hmsg{margin-top:16px;border-radius:10px;padding:12px 14px;font-size:14px}
+.hmsg.ok{background:#E7F7EC;color:#1F6B3A}.hmsg.no{background:#FDECEE;color:#9E2133}
+.wiz{display:grid;grid-template-columns:220px minmax(0,1fr);gap:clamp(16px,3vw,40px);margin-top:36px;align-items:start}
+.wsteps{display:flex;flex-direction:column;gap:4px}
+.wsteps button{all:unset;cursor:pointer;display:flex;gap:10px;align-items:center;font:600 14px var(--body);padding:8px 12px;border-radius:10px;color:var(--ink-2)}
+.wsteps button span{font:700 12px var(--sys-font);color:var(--mute);width:22px}
+.wsteps button[aria-pressed="true"]{background:#fff;color:var(--ink)}
+.wsteps button.gone{opacity:.55}
+.wsteps button:focus-visible{outline:2px solid var(--ink)}
+.wview{margin:0;display:flex;flex-direction:column;gap:14px;align-items:flex-start}
+.wview img{width:600px;max-width:100%;border-radius:14px;box-shadow:0 24px 50px rgba(27,26,23,.14)}
+.wview figcaption{max-width:600px;color:var(--ink-2)}
+
+.mview img{width:auto;max-width:100%}
+.swap{display:grid;grid-template-columns:minmax(0,1fr) 44px minmax(0,1fr);gap:8px 6px;margin-top:28px;font-family:var(--sys-font);align-items:stretch}
+.swap h5{margin:0;font-size:14px;font-weight:700;display:flex;gap:8px;align-items:center;padding:4px 0}
+.swap h5 span{white-space:nowrap;flex:0 0 auto;background:var(--ae);color:#fff;font-size:12px;border-radius:4px;padding:2px 7px;font-weight:600}
+.swap .f{background:#F5F3F8;border-radius:8px;padding:9px 12px;font-size:14px;display:flex;justify-content:space-between;gap:12px;transition:background .25s}
+.swap .f small{color:var(--mute);font-size:13px;white-space:nowrap}
+.swap .f b{font-weight:600;text-align:right}
+.swap .f.chg{background:#DDF4E4}
+.swap .sx{all:unset;cursor:pointer;display:grid;place-items:center;border:1px solid #CFC4E6;border-radius:6px;font-size:16px;color:#55505A;background:#fff}
+.swap .sx:hover,.swap .sx:focus-visible{border-color:var(--ae);color:var(--ae)}
+.swap .sx:focus-visible{outline:2px solid var(--ink)}
+.swapmsg{margin-top:14px;font-size:15px;color:var(--ink-2)}
+@media (max-width:620px){.swap .f{flex-direction:column;gap:2px}.swap .f b{text-align:left}}
+
+/* grid tabs */
+.gtabs{display:flex;gap:2px;overflow-x:auto;background:#fff;border-radius:12px;padding:6px;margin-top:36px;font-family:var(--sys-font)}
+.gtabs button{all:unset;cursor:pointer;white-space:nowrap;font-size:14px;padding:8px 14px;border-radius:6px;color:#55505A}
+.gtabs button[aria-pressed="true"]{background:var(--ae);color:#fff}
+.gtabs button:focus-visible{outline:2px solid var(--ink)}
+.gtabs .sep{width:1px;flex:0 0 1px;background:#DDD5EA;margin:4px 8px}
+.gtabs .st{color:#B23A48}
+.gview{margin-top:14px;position:relative}
+.gview .none{aspect-ratio:16/9;border-radius:18px;background:repeating-linear-gradient(135deg,#fff 0 14px,#F6F2FB 14px 28px);display:grid;place-items:center;text-align:center;padding:20px;color:var(--ink-2);font-size:17px}
+
+/* record */
+.rec{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(16px,3vw,32px);margin-top:40px;align-items:start}
+.card{background:#fff;border-radius:20px;padding:clamp(18px,2.4vw,26px);font-family:var(--sys-font)}
+.card h4{margin:0;font:800 20px var(--display);letter-spacing:-.02em;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.badge{font:600 13px var(--sys-font);letter-spacing:0;color:#fff;border-radius:4px;padding:3px 9px}
+.kv{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 16px;margin:14px 0 0;font-size:14px}
+.kv dt{color:var(--mute)}.kv dd{margin:0}
+.menu{display:flex;flex-direction:column;margin-top:18px;border:1px solid #E6DFF3;border-radius:10px;overflow:hidden}
+.menu button{all:unset;cursor:pointer;padding:10px 14px;font-size:14px;color:#3E3B35;border-bottom:1px solid #F0ECF6}
+.menu button:last-child{border-bottom:0}
+.menu button:hover,.menu button:focus-visible{background:#F5F1FB}
+.feed{display:flex;flex-direction:column;gap:10px;max-height:420px;overflow-y:auto;overscroll-behavior:contain;margin-top:14px;padding-right:4px}
+.cmt{border:1px solid #E6DFF3;border-radius:10px;padding:10px 12px;font-size:14px}
+.cmt b{font-weight:700}.cmt small{color:var(--mute);margin-left:6px;font-size:12px}
+.cmt p{color:var(--ink-2);margin-top:4px}
+.sys{border:1.5px dashed #9B7CC9;background:#F6F1FC;border-radius:8px;padding:8px 12px;font-size:13px;text-align:center;color:#55505A}
+.sys strong{color:var(--ink)}
+.sys.new{animation:pop .5s ease}
+@keyframes pop{from{background:#E4D6F7}}
+
+/* attendance maths */
+.att{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:clamp(28px,5vw,72px);align-items:center;margin-top:44px}
+.sess{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px}
+.sess div{border-radius:10px;padding:10px 6px;text-align:center;font:600 12px var(--sys-font);line-height:1.25;background:#F7F4FB;border-top:5px solid var(--c);min-height:76px;display:flex;flex-direction:column;justify-content:center;gap:4px}
+.sess div span{font-weight:400;color:var(--mute);font-size:11px}
+.big{font-family:var(--display);font-weight:800;font-size:clamp(84px,12vw,170px);letter-spacing:-.06em;line-height:.85;color:var(--ae)}
+.sum{font-family:var(--display);font-weight:700;font-size:clamp(19px,2vw,26px);letter-spacing:-.02em;margin-top:18px}
+.sum span{padding:0 4px;border-radius:6px}
+.sw{display:inline-flex;align-items:center;gap:10px;margin-top:22px;cursor:pointer;font-weight:600}
+.sw input{width:20px;height:20px;accent-color:var(--ae)}
+
+/* reports */
+.rtabs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:40px;font-family:var(--sys-font)}
+.rtabs button{all:unset;cursor:pointer;text-align:center;font-weight:700;padding:10px;border-radius:8px;border:1.5px solid var(--ae);background:#fff}
+.rtabs button[aria-pressed="true"]{background:var(--ae);color:#fff}
+.rtabs button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.pair{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(12px,2vw,24px);margin-top:14px}
+.filter{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;margin-top:28px;font-family:var(--sys-font)}
+.filter label{display:flex;flex-direction:column;font-size:12px;color:var(--mute);gap:3px}
+.filter .pct{display:flex;align-items:center;border:1px solid #DDD5EA;border-radius:8px;background:#fff;padding:0 10px}
+.filter input{width:44px;border:0;font:600 16px var(--sys-font);padding:8px 0;background:none}
+.filter .pct span{color:var(--mute)}
+.tbl{margin-top:14px;background:#fff;border-radius:16px;overflow-x:auto}
+.tbl table{width:100%;min-width:560px;border-collapse:collapse;font:14px var(--sys-font)}
+.tbl th{font-size:12px;font-weight:700;color:#55505A;background:#F3EEFB;text-align:left;padding:9px 12px}
+.tbl td{padding:8px 12px;border-top:1px solid #F0ECF6}
+.tbl td.p{font-weight:700}
+.tbl tfoot td{font-weight:600;background:#FBFAFD}
+.codes{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px;margin-top:16px}
+.code{background:#fff;border-radius:12px;padding:12px 14px;display:grid;grid-template-columns:42px minmax(0,1fr);gap:10px;align-items:center;font-size:14px}
+.code b{display:grid;place-items:center;height:32px;border-radius:6px;font:700 13px var(--sys-font);background:var(--bg)}
+.code small{display:block;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--mute)}
+.code.q small{color:#B23A48}
+.strip{display:grid;grid-template-columns:repeat(19,minmax(0,1fr));gap:3px;margin-top:14px;min-width:600px}
+.strip span{display:grid;place-items:center;height:34px;border-radius:4px;font:700 12px var(--sys-font);background:var(--bg)}
+.stripbox{overflow-x:auto;background:#fff;border-radius:14px;padding:4px 12px 14px;margin-top:28px}
+.stripbox p{font-size:13px;color:var(--mute);margin-top:10px}
+
+/* gallery */
+.gal{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(16px,3vw,32px);margin-top:44px}
+.gal figure{margin:0;display:flex;flex-direction:column;gap:12px}
+.gal figcaption{font-size:15px;color:var(--ink-2)}
+.gal figcaption b{color:var(--ink)}
+
+@media (max-width:860px){
+  .hero-grid,.split,.sec-head,.reflect,.sides,.tools,.rec,.att,.pair,.gal{grid-template-columns:minmax(0,1fr)}
+  .counts{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .sess{grid-template-columns:repeat(4,minmax(0,1fr))}
+}
+@media (prefers-reduced-motion:reduce){.sys.new{animation:none}}
+</style>
+<style>body{animation:cnIn .45s ease both}@keyframes cnIn{from{opacity:0}}@media (prefers-reduced-motion:reduce){body{animation:none}}</style>
+<script src="case-nav.js" defer></script>
+</head>
+<body>
+<nav class="bar" aria-label="Case study">
+  <a href="../index.html#work" style="display:flex;align-items:center;gap:8px;padding:2px 12px 2px 2px"><img src="../work/avatar.webp" alt="" width="30" height="30"><span style="font-family:var(--display);font-weight:800;font-size:16px;letter-spacing:-.02em">Sarbesh</span></a>
+  <a href="../index.html#work">All work</a>
+  <a class="dark-btn" href="https://www.figma.com/design/2UHCuJr8vwC1LPnTVyMPCt/Attendance?node-id=0-1" target="_blank" rel="noopener">Figma ↗</a>
+</nav>
+<header class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="eyebrow">Case study · Staff &amp; admin system</div>
+      <div class="name" style="margin-top:18px"><h1>Attend<em>Ease</em></h1><small>Student Attendance System</small></div>
+      <p class="statement">Every class, every group, every absence, from the office side.</p>
+      <div class="meta">
+        <div><span>What it is</span><strong>The staff side of AttendEase: routines, student groups, records and reports</strong></div>
+        <div><span>Shown here</span><strong>41 desktop screens, from the routine import to weekly analysis</strong></div>
+        <div><span>My role</span><strong><span class="tbc">UI/UX design</span></strong></div>
+      </div>
+    </div>
+    <div class="pile">
+      <img class="back" src="attendease-admin/weekly.webp" alt="" width="1600" height="900">
+      <img class="front" src="attendease-admin/schedule.webp" alt="Routine schedule: rooms down the side, half-hour columns across, coloured class blocks" width="1600" height="900">
+    </div>
+  </div>
+</header>
+
+<section style="padding-top:clamp(40px,6vw,80px)">
+  <div class="wrap">
+    <div class="read stack rise">
+      <div class="eyebrow">Two sides of one product</div>
+      <h2>Students get two tabs. Staff get the rest.</h2>
+      <p class="lede">The dashboard greets staff with "Welcome to IIC Student Attendance System", and the header carries the Islington College crest next to the ING logo. Sign-in takes an email and password, or an Outlook account. Behind it is a long rail of tools for the people who plan classes, sort students into groups and answer for the numbers.</p>
+    </div>
+    <div class="sides">
+      <div class="side rise"><span class="tag">Student portal</span><b>Where do I need to be, and am I keeping up?</b><span>Routine and attendance, on desktop and phone. <a href="attendease.html">Read that case study</a>.</span></div>
+      <div class="side here rise"><span class="tag">This page</span><b>Who is in which room, and who hasn't turned up?</b><span>Importing the routine, watching the day's classes, keeping each student's record, and pulling reports by group, module and week.</span></div>
+    </div>
+  </div>
+</section>
+
+<section style="background:#fff">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="stack rise"><div class="eyebrow">Routine schedule</div><h2>Rooms down the side, the day across.</h2></div>
+      <div class="stack rise"><p class="lede">Each row is a room, each column half an hour, and a purple line marks the time now. Four colours carry the state: regular, substitute, and a cancelled version of each. Switch a state off, or pick a block to see what it says.</p></div>
+    </div>
+    <div class="legend rise" id="legend" role="group" aria-label="Show class states"></div>
+    <div class="sched rise"><div class="tl" id="tl"></div></div>
+    <div class="pop rise" id="pop" aria-live="polite"></div>
+    <p class="chipnote rise">Rebuilt from the 23 December 2024 screen. Blocks sit where they sit in the design, and their text is copied as it appears.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="stack rise"><div class="eyebrow">Routine import</div><h2>Check the spreadsheet before it goes live.</h2></div>
+      <div class="stack rise"><p class="lede">A whole term's timetable arrives as one Excel file, and every attendance figure depends on it. So the planner doesn't take the sheet on trust. It passes through an agreement, a format check and a review before anyone can press Import. Step through it.</p></div>
+    </div>
+    <div class="flow rise" id="flow" role="group" aria-label="Import steps"></div>
+    <figure class="fview rise"><img class="shot" id="fimg" src="attendease-admin/routine-list.webp" alt="" width="1600" height="900"><figcaption id="fcap" aria-live="polite"></figcaption></figure>
+
+    <div class="sec-head" style="margin-top:88px">
+      <div class="stack rise"><h3>Fourteen headers, or nothing.</h3><p style="color:var(--ink-2)">The failure message names the column headers the system expects. They are the same fourteen columns the review table shows, one for one. Untick a few to see the message my version gives.</p><span class="reading">The design's message lists all fourteen; naming only the missing ones is my version</span></div>
+      <div class="hcheck rise"><div class="hdrs" id="hdrs" role="group" aria-label="Column headers in the uploaded sheet"></div><p class="hmsg" id="hmsg" aria-live="polite"></p></div>
+    </div>
+
+    <div class="sec-head" style="margin-top:88px">
+      <div class="stack rise"><h3>Nine issues, one at a time.</h3><p style="color:var(--ink-2)">A good sheet lands in review with four counts. Each problem then gets its own dialog, with a nine-part progress bar: green for fixed, amber for the current step. The dialog names the row and what's wrong, then offers a fix. Values can be picked from what the system already knows. Modules, groups, rooms and teachers can also be created on the spot. "Apply this action to all 20 similar rows" turns one fix into a batch.</p></div>
+      <div class="counts rise" aria-label="Import summary, as in the design">
+        <div><b style="color:#2E6BD8">250</b><span>Rows detected</span></div>
+        <div><b style="color:#3E9A57">240</b><span>Ready</span></div>
+        <div><b style="color:#C77812">08</b><span>Warnings</span></div>
+        <div><b style="color:#D23C3C">02</b><span>Collisions</span></div>
+      </div>
+    </div>
+    <div class="wiz rise">
+      <div class="wsteps" id="wsteps" role="group" aria-label="Resolve Issues steps"></div>
+      <figure class="wview"><img id="wimg" src="attendease-admin/fix-1-course.webp" alt="" width="600" height="383"><figcaption id="wcap" aria-live="polite"></figcaption></figure>
+    </div>
+
+    <div class="sec-head" style="margin-top:88px;align-items:center">
+      <div class="stack rise"><h3>A clash, shown from both sides.</h3><p style="color:var(--ink-2)">A collision isn't only counted. The Conflicting Routines dialog sets the imported row beside what it clashes with and names the cause. Here it's overlaps in time, room, teacher and group across 2 rows. It checks two places: the routine already in the system, and the rest of the same Excel file, so two rows in one upload can collide with each other. The fields behind the clash are in red.</p></div>
+      <img class="shot rise" src="attendease-admin/conflicts.webp" alt="Conflicting Routines dialog for row 15: the imported routine beside an existing routine in the system and one in the Excel file" width="960" height="600" loading="lazy">
+    </div>
+
+    <div class="read stack rise" style="margin-top:88px">
+      <h3>When does it start?</h3>
+      <p style="color:var(--ink-2)">Before the import is final, every row gets an effective date. Defaults are set per level, alongside a routine batch name. Rows can be ticked in bulk and given a custom date. A preview then lists every date, level by level and row by row, before Confirm Dates &amp; Import.</p>
+    </div>
+    <div class="pair rise" style="align-items:start;margin-top:28px">
+      <img class="shot" src="attendease-admin/dates-set.webp" alt="Set Effective Date dialog: default dates for Level 4 and Level 5, a routine batch field, and a table of imported rows with bulk select" width="1000" height="540" loading="lazy">
+      <img class="shot" src="attendease-admin/dates-preview.webp" alt="All Effective Dates Preview: default dates for levels 4 to 7, the batch Summer Routine Enrichment - 2023, and custom dates per row" width="1000" height="705" loading="lazy">
+    </div>
+
+    <div class="sec-head" style="margin-top:88px;align-items:center">
+      <div class="stack rise"><h3>One import at a time.</h3><p style="color:var(--ink-2)">If another admin is mid-import, the planner says who and locks the page: "The routine is currently being imported by Aayush Bhakta Pradhananga. All actions are temporarily disabled until the import process is completed." Two people can't load two timetables over each other.</p></div>
+      <img class="shot rise" style="max-width:340px" src="attendease-admin/lock.webp" alt="Routine Import in Progress notice" width="340" height="265" loading="lazy">
+    </div>
+
+    <div class="read stack rise" style="margin-top:88px">
+      <h3>Inside a row.</h3>
+      <p style="color:var(--ink-2)">Any row can also be opened in Update Routine and edited directly. One version of the dialog starts with "Notify students about the changes via email", which emails every student on that routine. Two of its fields are worth trying.</p>
+    </div>
+    <div class="pair rise" style="grid-template-columns:minmax(0,2.4fr) minmax(0,1fr);align-items:start;margin-top:28px">
+      <img class="shot" src="attendease-admin/planner.webp" alt="Routine planner with the Update Routine dialog open, showing the specialisation picker and the time stepper" width="1600" height="900" loading="lazy">
+      <img class="shot" src="attendease-admin/update-notify-dialog.webp" alt="Update Routine dialog with the Notify students via email checkbox at the top" width="600" height="680" loading="lazy">
+    </div>
+    <div class="tools">
+      <div class="tool rise">
+        <h4>Day and time</h4>
+        <div class="days" id="days" role="group" aria-label="Class day"></div>
+        <div class="step">
+          <div class="clock" id="c0"></div>
+          <div class="clock" id="c1"></div>
+          <div class="hours"><small>Hours</small><b id="hrs">1.5</b></div>
+        </div>
+        <span class="reading">The Hours field is greyed out in the design, so I read it as calculated</span>
+      </div>
+      <div class="tool rise">
+        <h4>Specialisation</h4>
+        <div class="spec">
+          <fieldset id="ac"><legend>Acronym</legend></fieldset>
+          <fieldset id="se"><legend>Semester</legend></fieldset>
+        </div>
+        <button class="add" type="button" id="addspec">Add</button>
+        <div class="tags" id="tags" aria-live="polite"></div>
+        <p style="font-size:14px;color:var(--mute)">One class can serve several specialisations in different semesters, so the field collects pairs like "C [S1]". The file doesn't spell out what C, N, AI, M and MAD stand for.</p>
+      </div>
+    </div>
+    <p class="chipnote rise">The day picker runs Sunday to Friday, as in the design.</p>
+  </div>
+</section>
+
+<section style="background:#fff">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="stack rise"><div class="eyebrow">Merge and swap</div><h2>Rework two classes without retyping either.</h2></div>
+      <div class="stack rise"><p class="lede">Once a routine is live, two actions on the Academic Routine page change classes in pairs. Merge folds two classes into one. Swap trades their times, days and rooms. Both end on a verify step that marks in green what is about to change.</p></div>
+    </div>
+    <div class="read stack rise" style="margin-top:56px">
+      <h3>Swap, field by field.</h3>
+      <p style="color:var(--ink-2)">Each row between the two routines has its own swap button, so an admin can trade just the room, or the day and the time together. Try it on the pair from the design.</p>
+    </div>
+    <div class="swap rise" id="swap"></div>
+    <p class="swapmsg rise" id="swapmsg" aria-live="polite"></p>
+    <div class="pair rise" style="align-items:start;margin-top:40px">
+      <img class="shot" src="attendease-admin/swap-1.webp" alt="Regular Routine Swap, step 1: two routines with a swap button on each row" width="880" height="345" loading="lazy">
+      <img class="shot" src="attendease-admin/swap-2.webp" alt="Verify Routine Swap, step 2: the swapped values highlighted in green" width="894" height="317" loading="lazy">
+    </div>
+    <p class="chipnote rise">The two steps as designed. A wider version, below, adds teacher and group rows, a third routine, start and end dates and a required remark, and outlines the fields that will change in teal.</p>
+    <img class="shot rise" style="margin-top:20px" src="attendease-admin/swap-3col.webp" alt="Regular Routine Swap with three routine columns, start and end dates, and remarks" width="1310" height="590" loading="lazy">
+
+    <div class="read stack rise" style="margin-top:88px">
+      <h3>Merge in three steps.</h3>
+      <p style="color:var(--ink-2)">Preview puts the two classes side by side. Update Routine Details sets the merged class: lecturer, module, group, type, day, time and room, with the block filled in from the room and a required remark. Verify shows the result, with the new values in green.</p>
+    </div>
+    <div class="flow rise" id="mflow" role="group" aria-label="Merge steps"></div>
+    <figure class="wview mview rise"><img id="mimg" src="attendease-admin/merge-1.webp" alt="" width="1000" height="430"></figure>
+  </div>
+</section>
+
+<section style="background:var(--paper-2)">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="stack rise"><div class="eyebrow">Student grid</div><h2>A student's whole time at college is a tab.</h2></div>
+      <div class="stack rise"><p class="lede">New students land in an Unsorted list and are assigned to groups from there. Each cohort tab lays its groups side by side, L1C1, L1C2, L1C3, with transfer, graduate and email actions on each. The last four tabs aren't cohorts at all: Graduation, Withdrawn, Intermission and Force Withdrawn hold the students who have left the timetable.</p></div>
+    </div>
+    <div class="gtabs rise" id="gtabs" role="group" aria-label="Student grid tabs, as in the design"></div>
+    <div class="gview rise" id="gview"></div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="stack rise"><div class="eyebrow">Student information</div><h2>Every change leaves a note.</h2></div>
+      <div class="stack rise"><p class="lede">A student's record holds their details, attendance and a comment thread. The thread also logs what staff did: "sent this student to Intermission", "transferred from L1C1 to L1C2", each with a name and a time, in a dashed box so it reads apart from people's comments. Try the actions below.</p><span class="reading">A working sketch of the pattern, with personal details left out</span></div>
+    </div>
+    <div class="rec">
+      <div class="card rise">
+        <h4>Student Details <span class="badge" id="badge"></span></h4>
+        <dl class="kv"><dt>Specialization</dt><dd>BSc (Hons) Computing</dd><dt>Group</dt><dd id="grp">L1C1</dd><dt>Intake</dt><dd>Autumn</dd><dt>Enrolled</dt><dd>2022</dd></dl>
+        <div class="menu" id="menu"></div>
+      </div>
+      <div class="card rise">
+        <h4>Comments Section</h4>
+        <div class="feed" id="feed" aria-live="polite"></div>
+      </div>
+    </div>
+    <img class="shot rise" style="margin-top:32px" src="attendease-admin/student-personal.webp" alt="Student information screen with the actions menu open; personal details blurred" width="1600" height="900" loading="lazy">
+    <p class="chipnote rise">Photo, contact details and family details are blurred here. The fourth action in my sketch, back to Active, isn't in the design's menu.</p>
+  </div>
+</section>
+
+<section style="background:#fff">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="stack rise"><div class="eyebrow">Attendance details</div><h2>Late counts here too.</h2></div>
+      <div class="stack rise"><p class="lede">The student's attendance tab lists 14 classes and totals them: 5 present, 2 late, 7 absent, and a present rate of 50%. Fifty per cent is 7 of 14, which only works if both late classes count as present, the same rule the student portal follows.</p><span class="reading">Worked out from the figures on the screen</span></div>
+    </div>
+    <div class="att rise">
+      <div class="sess" id="sess" role="img" aria-label="14 classes: 5 present, 2 late, 7 absent"></div>
+      <div>
+        <div class="big" id="pct">50%</div>
+        <p class="sum" id="sum"></p>
+        <label class="sw"><input type="checkbox" id="latesw" checked> Count late as present</label>
+      </div>
+    </div>
+    <img class="shot rise" style="margin-top:40px" src="attendease-admin/student-attendance.webp" alt="Attendance Details tab of a student's record, listing 14 classes with present, late and absent columns; personal details blurred" width="1600" height="900" loading="lazy">
+    <p class="chipnote rise">Two absences carry their own label, "Early Punch-In" and "Late Punch-In". The student did punch in, outside the window, and the class still counts as missed. The detail report agrees with the rule: 5 present and 1 late out of 13 is shown as 46%.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="stack rise"><div class="eyebrow">Reports</div><h2>Summary or detail, one form at a time.</h2></div>
+      <div class="stack rise"><p class="lede">The report page has two forms side by side. Picking one blurs the other, so it's always clear which filters will be used. Both open a grid per group: the summary gives totals per module, and the detail shows every class day.</p></div>
+    </div>
+    <div class="rtabs rise" id="rtabs" role="group" aria-label="Report type"></div>
+    <div class="pair rise">
+      <img class="shot" id="r0" src="attendease-admin/report-summary.webp" alt="" width="1600" height="900" loading="lazy">
+      <img class="shot" id="r1" src="attendease-admin/report-summary-grid.webp" alt="" width="1600" height="900" loading="lazy">
+    </div>
+    <p class="chipnote rise">Contact numbers are blurred in both grids.</p>
+
+    <div class="read stack rise" style="margin-top:72px">
+      <h3>Who's under 50%?</h3>
+      <p style="color:var(--ink-2)">Both grids open with a Range From and Range To filter on the present rate. That's the question a coordinator brings to this page. Here is group L3MAD12 from the detail report, with the filter working.</p>
+    </div>
+    <div class="filter rise">
+      <label>Range From<span class="pct"><input id="rf" type="number" min="0" max="100" value="0" inputmode="numeric" aria-label="Range from, per cent"><span>%</span></span></label>
+      <label>Range To<span class="pct"><input id="rt" type="number" min="0" max="100" value="100" inputmode="numeric" aria-label="Range to, per cent"><span>%</span></span></label>
+      <button class="btn" type="button" id="u50">Under 50%</button>
+      <button class="btn" type="button" id="rall">Reset</button>
+    </div>
+    <div class="tbl rise"><table><thead><tr><th>S. No.</th><th>Student ID</th><th>Total Class</th><th>Present</th><th>Absent</th><th>Late</th><th>Present %</th></tr></thead><tbody id="rows"></tbody><tfoot><tr><td colspan="7" id="rcount" aria-live="polite"></td></tr></tfoot></table></div>
+
+    <div class="read stack rise" style="margin-top:72px">
+      <h3>Ten codes in a cell.</h3>
+      <p style="color:var(--ink-2)">The detail grid fits each class into a code of one or two letters on a green, amber or red cell. Most match statuses spelled out in the student portal. Two don't appear in full anywhere in the files.</p>
+    </div>
+    <div class="stripbox rise">
+      <div class="strip" id="strip"></div>
+      <p>Student 01's row, 19 February to 10 March 2024: 13 classes, 7 present, 6 absent, 53%.</p>
+    </div>
+    <div class="codes rise" id="codes"></div>
+  </div>
+</section>
+
+<section style="background:var(--paper-2)">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="stack rise"><div class="eyebrow">Overview</div><h2>The week, and the day.</h2></div>
+      <div class="stack rise"><p class="lede">Two screens look across the whole college rather than one student. They are shown as designed.</p></div>
+    </div>
+    <div class="gal">
+      <figure class="rise"><img class="shot" src="attendease-admin/weekly.webp" alt="Weekly progress analysis line chart for groups L1C1 to L1C4 across 12 weeks" width="1600" height="900" loading="lazy"><figcaption><b>Weekly progress.</b> One line per group across twelve weeks. A point's tooltip names the teachers and the dates of that week, so a dip can be traced to who was teaching.</figcaption></figure>
+      <figure class="rise"><img class="shot" src="attendease-admin/dashboard.webp" alt="Dashboard with student totals, release notes, routine updates and teacher punch-in times" width="1600" height="900" loading="lazy"><figcaption><b>Dashboard.</b> Student totals by year, release notes, temporary-class updates, and a teacher attendance list where a 10:00 punch-in shows in red.</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap reflect">
+    <div class="stack rise">
+      <div class="eyebrow">Looking back</div>
+      <h2>What I'd tighten next.</h2>
+      <p class="lede">The structure holds: a timeline for the day, a review step for imports, tabs for every stage of a student's time, and a log on every record. These are the fixes I'd make next.</p>
+    </div>
+    <ol class="rise">
+      <li><strong>Make the sample numbers agree.</strong><span>In a tool built on counting, people check the numbers. The year cards add to 3,865 but the total reads 3,856. Planner rows run 12:30 to 14:00 and say 2.5 hours. A schedule block sitting at 1 pm is labelled 11:00 to 13:00. One report cell reads "7&amp;", and the grid has two IT2 tabs. In the import dialogs, a module missing in 06 rows offers to fix "all 20 similar rows", the level picker is labelled Course, and a conflict card labels the day as Time.</span></li>
+      <li><strong>Give red fewer jobs.</strong><span>Red means absent, cancelled, early punch-in, late punch-in and a planner collision. Only some of those need someone to act. A cancelled class is news, and could take a neutral colour.</span></li>
+      <li><strong>Put the key on the grid.</strong><span>The detail report leans on ten codes, and LA and EP aren't spelled out anywhere. There's an info icon in the report header, and it should open a legend.</span></li>
+    </ol>
+  </div>
+</section>
+
+<section class="end">
+  <div class="wrap stack">
+    <div class="hand" style="color:var(--ind-ink)">thanks for reading</div>
+    <h2>Open the file, or keep exploring.</h2>
+    <div class="cta">
+      <a class="solid" href="https://www.figma.com/design/2UHCuJr8vwC1LPnTVyMPCt/Attendance?node-id=0-1" target="_blank" rel="noopener">Open in Figma ↗</a>
+      <a class="ghost" href="attendease.html">See the student portal</a>
+      <a class="ghost" href="../index.html#work">Back to all work</a>
+    </div>
+  </div>
+</section>
+<footer><div class="wrap">© 2026 Sarbesh Lal Amatya · Kathmandu, Nepal</div></footer>
+
+<script>
+(function(){
+  function $(id){return document.getElementById(id);}
+  function el(t,c,h){var e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;}
+  function press(box,btn){[].forEach.call(box.querySelectorAll('button'),function(b){if(b.hasAttribute('aria-pressed'))b.setAttribute('aria-pressed',String(b===btn));});}
+  function pad(n){return (n<10?'0':'')+n;}
+
+  // ---- schedule, transcribed from the routine schedule screen (s = half-hours from 07:00)
+  var S={reg:['Regular Classes','#0E9A72'],sub:['Substitute Classes','#C77812'],regx:['Regular Class Cancelled','#D7334E'],subx:['Substitute Class Cancelled','#6A5DE0']};
+  var R=[['Chiya Chautari','--',[[1,4,'reg','CH1(2023) - Chemistry','10:00 - 11:00',1],[8,4,'subx','Fundamentals of Computing - L1M…','Lecture (11:00 - 13:00)']]],
+    ['Lab 11 - York','--',[[7,4,'regx','Fundamentals of Computing - L1M…','Lecture (11:00 - 13:00)'],[12,4,'sub','Fundamentals of Computing - L1M…','Lecture (11:00 - 13:00)']]],
+    ['LT04 - Tridev Gurung','Tuesday',[]],
+    ['LT05 - Amir Khadka','Alumni Block',[[5,2,'reg','Financial Acco…','Tutorial (08:30…']]],
+    ['LT06 - Chhitesh Lal Shrestha','Alumni Block',[[1,4,'reg','Fundamentals of Computing - L1M…','Lecture (07:00 - 09:00)'],[10,2,'regx','Fundamentals…','Lecture (07:00…']]],
+    ['LT07 - Anila Shakya','Alumni Block',[]],
+    ['LT08 - Naresh Lamgade','Alumni Block',[[10,4,'reg','Fundamentals of Computing - L1M…','Lecture (07:00 AM - 09:00 AM)']]],
+    ['SR05 - Rotash Shrestha','Alumni Block',[[5,1,'regx','Three cancelled classes','Stacked as slivers in the design'],[6,3,'reg','Fundamentals of Computin…','Lecture (07:00 - 09:00)']]]];
+  var hrs=['07:00','07:30','08:00','08:30','09:00','09:30','10:00','10:30','11:00','11:30','12:00','12:00','01:00','01:30','02:00','02:30','03:00','03:30','04:00','04:30','05:00','05:30'];
+  var tl=$('tl'),on={reg:1,sub:1,regx:1,subx:1},blocks=[];
+  tl.appendChild(el('div','tl-h','<span>Room</span><div class="hrs">'+hrs.map(function(h){return '<span>'+h+'</span>';}).join('')+'</div>'));
+  R.forEach(function(r){
+    var row=el('div','tl-r','<div>'+r[0]+'<small>'+r[1]+'</small></div>'),lane=el('div','lane');
+    r[2].forEach(function(b){
+      var k=el('button','blk','<b>'+b[3]+'</b>'+b[4]);k.type='button';k.setAttribute('aria-pressed','false');
+      k.style.cssText='grid-row:1;grid-column:'+(b[0]+1)+' / span '+b[1]+';--c:'+S[b[2]][1];
+      k.setAttribute('aria-label',S[b[2]][0]+': '+b[3]+', '+r[0]);
+      k.addEventListener('click',function(){blocks.forEach(function(x){x.el.setAttribute('aria-pressed',String(x.el===k));});show(b,r);});
+      blocks.push({el:k,st:b[2]});lane.appendChild(k);
+    });
+    row.appendChild(lane);tl.appendChild(row);
+  });
+  var now=el('div','now','<span>03:15 PM</span>');now.style.left='calc(150px + (100% - 150px) * '+(16.5/22)+')';tl.appendChild(now);
+  var lg=$('legend');
+  Object.keys(S).forEach(function(k){var b=el('button','btn','<i style="background:'+S[k][1]+'"></i>'+S[k][0]);b.type='button';b.setAttribute('aria-pressed','true');
+    b.addEventListener('click',function(){on[k]=!on[k];b.setAttribute('aria-pressed',String(!!on[k]));blocks.forEach(function(x){x.el.classList.toggle('off',!on[x.st]);});});lg.appendChild(b);});
+  function show(b,r){
+    var p=$('pop');
+    if(b[5]){p.innerHTML='<h4>CH1(2023) - Chemistry</h4><dt>Teacher</dt><dd>Mr.Aadesh tandukar</dd><dt>Time</dt><dd>10:00 - 11:00</dd><dt>Course</dt><dd>BSc (Hons) Computer Networking And IT Security</dd><dt>Group</dt><dd>Y1C2</dd><dt>Room</dt><dd>SR02 - Trafalgar Square (London Block)</dd><dt>Participation</dt><dd>80%</dd><p>The one block with its popover open in the design, with a View Report button below.</p>';return;}
+    p.innerHTML='<h4>'+b[3]+'</h4><dt>State</dt><dd>'+S[b[2]][0]+'</dd><dt>Label</dt><dd>'+b[4]+'</dd><dt>Room row</dt><dd>'+r[0]+'</dd><dt>Sits at</dt><dd>'+hrs[b[0]]+(b[0]+b[1]<22?' to '+hrs[b[0]+b[1]]:'')+'</dd><p>The design only opens the popover for one block, so this panel shows what the block itself says.</p>';
+  }
+  show(R[0][2][0],R[0]);blocks[0].el.setAttribute('aria-pressed','true');
+
+  // ---- planner: day, time stepper, hours
+  var D=['SUN','MON','TUE','WED','THU','FRI'],dy=$('days');
+  D.forEach(function(d,i){var b=el('button','',d);b.type='button';b.setAttribute('aria-pressed',String(i===0));b.addEventListener('click',function(){press(dy,b);});dy.appendChild(b);});
+  var T=[[7,30],[9,0]];
+  function clock(i,title){
+    var c=$('c'+i);c.innerHTML='<h5>'+title+'</h5>';
+    [['+',0,1],['+',1,15]].forEach(function(a){var b=el('button','',a[0]);b.type='button';b.setAttribute('aria-label','Add '+(a[1]?'15 minutes':'an hour')+' to '+title);b.addEventListener('click',function(){bump(i,a[1],a[2],b.getAttribute('aria-label'));});c.appendChild(b);});
+    c.appendChild(el('output','',pad(T[i][0])));c.appendChild(el('output','',pad(T[i][1])));
+    c.appendChild(el('small','','hour'));c.appendChild(el('small','','min'));
+    [['−',0,-1],['−',1,-15]].forEach(function(a){var b=el('button','',a[0]);b.type='button';b.setAttribute('aria-label','Take '+(a[1]?'15 minutes':'an hour')+' from '+title);b.addEventListener('click',function(){bump(i,a[1],a[2],b.getAttribute('aria-label'));});c.appendChild(b);});
+  }
+  function bump(i,unit,d,lab){var m=T[i][0]*60+T[i][1]+(unit?d:d*60);m=Math.max(360,Math.min(1200,m));T[i]=[Math.floor(m/60),m%60];draw();var f=document.querySelector('[aria-label="'+lab+'"]');if(f)f.focus();}
+  function draw(){
+    clock(0,'Start Time');clock(1,'End Time');
+    var h=(T[1][0]*60+T[1][1]-T[0][0]*60-T[0][1])/60;
+    $('hrs').textContent=h>0?String(+h.toFixed(2)):'--';
+  }
+  draw();
+  var AC=['C','N','AI','M','MAD'],SE=['S1','S2','S3','S4','SUM'],picked=['C [S1]','N [S1]'];
+  function boxes(id,list,name){var f=$(id);list.forEach(function(v,i){f.appendChild(el('label','','<input type="checkbox" name="'+name+'" value="'+v+'"'+(i===0?' checked':'')+'> '+v));});}
+  boxes('ac',AC,'ac');boxes('se',SE,'se');
+  function tags(){$('tags').innerHTML=picked.length?picked.map(function(t){return '<span>'+t+'</span>';}).join(''):'<em>Nothing picked</em>';}
+  $('addspec').addEventListener('click',function(){
+    var a=[].filter.call(document.getElementsByName('ac'),function(x){return x.checked;}),s=[].filter.call(document.getElementsByName('se'),function(x){return x.checked;});
+    a.forEach(function(x){s.forEach(function(y){var t=x.value+' ['+y.value+']';if(picked.indexOf(t)<0)picked.push(t);});});tags();
+  });
+  tags();
+
+  // ---- import flow
+  var F=[['Routine','routine-list','The live timetable: 239 rows, with tabs for Regular Routine, Substitute Routine and a Substitute Routine Log. Each row is tagged Regular or Temporary. Above it sit Import Routine, Export Template, Merge Routine, Swap Routine, Bulk Class Cancel and Bulk Class End.'],
+    ['Terms','import-terms','Before any upload comes an agreement. The uploader confirms they are authorised and that the routine is the approved one, and is told that attendance records and reports depend on it. Agree & Continue sits under a confirm checkbox.'],
+    ['Upload','import-upload','Drag and drop, or browse. Only .xlsx files are accepted, and the file name and size show before Next.'],
+    ['Wrong format','import-failed','If the headers don\'t match, the upload stops here: "Failed to Upload!", with the column headers the system needs.',1],
+    ['Review','review-collisions','A sheet that passes lands in review: 250 rows detected, 240 ready, 08 warnings, 02 collisions. Here the collisions count is selected, with Re-Import Routine and Export Updated Excel at the top.'],
+    ['Someone else','import-lock','If another admin is already importing, the page says who and locks every action until they finish.',2],
+    ['Edit a row','update-modal','Any row opens in Update Routine, with every field from course and specialisation to room, day and class time.'],
+    ['Resolve','resolve-full','Problems are fixed one at a time in the Resolve Issues dialog, covered below.'],
+    ['Conflicts','conflicts-full','A collision opens Conflicting Routines, with the imported row beside what it clashes with.'],
+    ['Dates','dates-full','Every row gets an effective date: defaults per level, plus custom dates for rows picked in bulk.'],
+    ['Preview','dates-preview-full','All the dates in one list, ending in Confirm Dates & Import.'],
+    ['Done','import-success','"Routine Updated Successfully", with a count of what changed: 7 rows were affected when the module name for Network Operating Systems was updated.']];
+  var fl=$('flow');
+  var fn=0;
+  F.forEach(function(f,i){var b=el('button',f[3]?'bad':'','<span>'+(f[3]?(f[3]===2?'!':'×'):++fn)+'</span>'+f[0]);b.type='button';b.setAttribute('aria-pressed',String(i===0));b.addEventListener('click',function(){press(fl,b);fv(i);});fl.appendChild(b);});
+  function fv(i){var f=F[i];$('fimg').src='attendease-admin/'+f[1]+'.webp';$('fimg').alt=f[0]+' screen';$('fcap').innerHTML='<b>'+f[0]+'.</b> '+f[2];}
+  fv(0);
+
+  // ---- header check
+  var HD=['Day','Start Time','End Time','Hours','Class Type','Year','Course','Specialisation','Module Code','Module Title','Lecturer','Group','Block','Room'],hd=$('hdrs');
+  HD.forEach(function(h){hd.appendChild(el('label','','<input type="checkbox" checked value="'+h+'"> '+h));});
+  function hc(){var miss=[].filter.call(hd.querySelectorAll('input'),function(x){return !x.checked;}).map(function(x){return x.value;}),m=$('hmsg');
+    m.className='hmsg'+(miss.length?' no':' ok');
+    m.innerHTML=miss.length?'<b>Failed to Upload!</b> Could not import the excel file as the following column headers are missing: '+miss.join(', ')+'.':'<b>All 14 headers found.</b> On to review.';}
+  hd.addEventListener('change',hc);hc();
+
+  // ---- resolve issues wizard (crops of the design's dialogs)
+  var Wz=[['Course','fix-1-course',383,'Row 04 has no course. Pick a valid one from the list.'],
+    ['Year','fix-2-year',383,'Row 04 is missing its level. Pick the correct one.'],
+    ['Module','fix-3-module',505,'"Advanced Database" isn\'t in the system and is missing in 06 rows. Add it as a new module, or replace it with an existing one.'],
+    ['Group','fix-4-group',523,'Group L1C24 doesn\'t exist and is missing in 08 rows. Create it, or pick a level and an existing group.'],
+    ['Class Type','fix-5-classtype',383,'The class type is missing. Pick a valid one.'],
+    ['Specialization','fix-6-spec',383,'Specialisation is missing. Pick a course, then one or more specialisations.'],
+    ['Room','fix-7-room',473,'Row 15 has no room. Create one, or pick an existing room.'],
+    ['Teacher','fix-8-teacher',473,'A teacher who isn\'t in the system yet, missing in 20 rows. Create them, or replace them with an existing teacher. The email is blurred here.'],
+    ['New teacher form','fix-8-teacher-add',365,'Create New Teacher opens a short form: biometric ID, full name, work email and employment type are required, and work and personal phone numbers are optional.'],
+    ['Teacher, created','fix-8-teacher-created',473,'After Create New Teacher, the dialog says the new teacher "will only be added to the system after applying the fix", and the button becomes Update Teacher. Nothing is written until Apply Fix.'],
+    ['Time','fix-9-time',478,'Row 04 has a missing or invalid time. Set start and end with the same stepper as Update Routine, and apply it to all 20 similar rows if they share the problem.']];
+  var ws=$('wsteps');
+  Wz.forEach(function(w,i){var n=i<8?pad(i+1):i<10?'08':'09';var b=el('button',w[1]?'':'gone','<span>'+n+'</span>'+w[0]);b.type='button';b.setAttribute('aria-pressed',String(i===0));b.addEventListener('click',function(){press(ws,b);wv(i);});ws.appendChild(b);});
+  function wv(i){var w=Wz[i],im=$('wimg');if(w[1]){im.hidden=false;im.src='attendease-admin/'+w[1]+'.webp';im.width=w[1]==='fix-8-teacher-add'?1114:w[1]==='fix-9-time'?483:600;im.height=w[2];im.alt='Resolve Issues dialog, '+w[0]+' step';}else im.hidden=true;$('wcap').textContent=w[3];}
+  wv(0);
+
+  // ---- swap, rebuilt from the Regular Routine Swap pair
+  var SW=[['Class Duration','08:30 - 10:30','09:30 - 11:30'],['Class Day','Thursday','Sunday'],['Class Room','Level 2 - Lab 03 Rupesh Dangol (Skill Block)','Level 3 - Lab 04 Kriti Dangol (Skill Block)']],sw=$('swap'),flip=[0,0,0];
+  function swd(){
+    sw.innerHTML='<h5><span>Routine 1</span>MSc IT - Computer Networking &amp; Cyber Security</h5><i></i><h5><span>Routine 2</span>MSc IT - Big Data &amp; Cloud Networking</h5>';
+    SW.forEach(function(r,k){var a=flip[k]?r[2]:r[1],b=flip[k]?r[1]:r[2],c=flip[k]?' chg':'';
+      sw.appendChild(el('div','f'+c,'<small>'+r[0]+':</small><b>'+a+'</b>'));
+      var x=el('button','sx','⇆');x.type='button';x.setAttribute('aria-label','Swap '+r[0]);x.addEventListener('click',function(){flip[k]=1-flip[k];swd();sw.querySelectorAll('.sx')[k].focus();});sw.appendChild(x);
+      sw.appendChild(el('div','f'+c,'<small>'+r[0]+':</small><b>'+b+'</b>'));});
+    var n=flip.filter(Boolean).length;$('swapmsg').textContent=n?n+' of 3 fields will change. Green marks them, as the verify step does.':'Nothing swapped yet.';
+  }
+  swd();
+
+  // ---- merge steps
+  var MG=[['Preview','merge-1',1000,430,'Preview Merging Regular Routine: the two classes side by side'],['Update details','merge-2',600,705,'Regular Routine Details: the merged class, with a required remark'],['Verify','merge-3',700,430,'Verify Regular Routine Merge: the result, with new values in green']],mf=$('mflow');
+  MG.forEach(function(m,i){var b=el('button','','<span>'+(i+1)+'</span>'+m[0]);b.type='button';b.setAttribute('aria-pressed',String(i===0));b.addEventListener('click',function(){press(mf,b);var im=$('mimg');im.src='attendease-admin/'+m[1]+'.webp';im.width=m[2];im.height=m[3];im.alt=m[4];});mf.appendChild(b);});
+  $('mimg').alt=MG[0][4];
+
+  // ---- student grid tabs
+  var G=['Unsorted','IT1','IT2','IT2','IT3','BBA1','BBA2','BBA3','MSc IT 1','MSc IT 2','MBA1','MBA2','|','Graduation','Withdrawn','Intermission','Force Withdrawn'];
+  var gt=$('gtabs'),gv=$('gview');
+  G.forEach(function(g,i){
+    if(g==='|'){gt.appendChild(el('span','sep'));return;}
+    var b=el('button',i>12?'st':'',g);b.type='button';b.setAttribute('aria-pressed',String(i===0));
+    b.addEventListener('click',function(){press(gt,b);view(i);});gt.appendChild(b);
+  });
+  function view(i){
+    if(i===0)gv.innerHTML='<img class="shot" src="attendease-admin/grid-unsorted.webp" alt="Unsorted list of students with Assign Groups and Transfer Group" width="1600" height="900">';
+    else if(i===1)gv.innerHTML='<img class="shot" src="attendease-admin/grid-groups.webp" alt="BSc (Hons) Computing Year 1, groups L1C1 to L1C3 side by side, with the group menu open" width="1600" height="900">';
+    else gv.innerHTML='<div class="none">The '+G[i]+' tab is in the strip, but its contents aren\'t drawn in the file.<br>Unsorted and IT1 are.</div>';
+  }
+  view(0);
+
+  // ---- record: actions append system notes
+  var st={s:'Intermission',g:'L1C2'},col={Active:'#2F8049',Intermission:'#B86A0C',Withdrawn:'#C2343A'};
+  var feed=$('feed');
+  function cmt(n,t){feed.appendChild(el('div','cmt','<b>'+n+'</b><small>Jan 15, 2025 10:25 AM</small><p>'+t+'</p>'));}
+  function sys(h,isNew){feed.appendChild(el('div','sys'+(isNew?' new':''),h));if(isNew)feed.scrollTop=feed.scrollHeight;}
+  cmt('Narayan Rajkarnikar','A staff comment. The design uses filler text here.');
+  sys('<strong>Sarbesh Lal Amatya</strong> sent this student to <strong>Intermission</strong> (June 21, 2023 at 11:13 A.M)');
+  cmt('Oshriya Manandhar','Another staff comment.');
+  sys('The student was transferred from <strong>L1C1</strong> to <strong>L1C2</strong> by <strong>Sarbesh Lal Amatya</strong> (November 11, 2024, 13:12)');
+  function stamp(){var d=new Date();return d.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})+', '+pad(d.getHours())+':'+pad(d.getMinutes());}
+  function paint(){$('badge').textContent=st.s;$('badge').style.background=col[st.s];$('grp').textContent=st.g;}
+  var A=[['Transfer Group',function(){var to=st.g==='L1C2'?'L1C3':'L1C2';sys('The student was transferred from <strong>'+st.g+'</strong> to <strong>'+to+'</strong> by <strong>Sarbesh Lal Amatya</strong> ('+stamp()+')',1);st.g=to;}],
+    ['Send Student to Intermission',function(){if(st.s==='Intermission')return;st.s='Intermission';sys('<strong>Sarbesh Lal Amatya</strong> sent this student to <strong>Intermission</strong> ('+stamp()+')',1);}],
+    ['Withdraw Student',function(){if(st.s==='Withdrawn')return;st.s='Withdrawn';sys('<strong>Sarbesh Lal Amatya</strong> withdrew this student ('+stamp()+')',1);}],
+    ['Back to Active',function(){if(st.s==='Active')return;st.s='Active';sys('<strong>Sarbesh Lal Amatya</strong> set this student back to <strong>Active</strong> ('+stamp()+')',1);}]];
+  A.forEach(function(a){var b=el('button','',a[0]);b.type='button';b.addEventListener('click',function(){a[1]();paint();});$('menu').appendChild(b);});
+  paint();
+
+  // ---- 14 sessions, as listed on the attendance tab
+  var C={P:['Present','#3E9A57'],L:['Late','#E8A317'],VL:['Very Late','#E8A317'],A:['Absent','#E2405A'],E:['Early Punch-In','#E2405A'],LP:['Late Punch-In','#E2405A']};
+  var X=[['P','Lecture'],['P','Tutorial'],['P','Lecture'],['L','Tutorial'],['A','Lecture'],['VL','Lecture'],['P','Lab'],['P','Lab'],['E','Lab'],['A','Lab'],['LP','Lab'],['A','Lab'],['A','Lab'],['A','Lab']];
+  $('sess').innerHTML=X.map(function(x){return '<div style="--c:'+C[x[0]][1]+'">'+C[x[0]][0]+'<span>'+x[1]+'</span></div>';}).join('');
+  function maths(){var late=$('latesw').checked,n=late?7:5;$('pct').textContent=Math.round(n/14*100)+'%';
+    $('sum').innerHTML=late?'<span style="background:#E7F7EC">5 present</span> + <span style="background:#FFF1DE">2 late</span> = 7 of 14':'<span style="background:#E7F7EC">5 present</span> of 14, late left out';}
+  $('latesw').addEventListener('change',maths);maths();
+
+  // ---- report tabs
+  var RT=[['Attendance Summary Report','report-summary','report-summary-grid','Summary report form','Summary grid: totals per module'],['Attendance Detail Report','report-detail','report-detail-grid','Detail report form','Detail grid: one column per class day']];
+  var rt=$('rtabs');
+  RT.forEach(function(r,i){var b=el('button','',r[0]);b.type='button';b.setAttribute('aria-pressed',String(i===0));b.addEventListener('click',function(){press(rt,b);rep(i);});rt.appendChild(b);});
+  function rep(i){var r=RT[i];$('r0').src='attendease-admin/'+r[1]+'.webp';$('r0').alt=r[3];$('r1').src='attendease-admin/'+r[2]+'.webp';$('r1').alt=r[4];}
+  rep(0);
+
+  // ---- range filter, group L3MAD12 from the detail grid (S. No. order kept)
+  var Rw=[['002',13,7,6,0,53],['009',7,1,6,0,14],['004',13,7,6,0,53],['012',13,5,7,1,46],['028',13,6,6,1,53],['006',13,3,8,2,30],['003',13,1,12,0,7],['014',8,1,7,0,12],['008',13,5,7,1,46],['023',13,7,6,0,53],['025',7,1,6,0,14],['013',13,7,6,0,53],['011',13,5,7,1,46],['001',13,6,6,1,53],['031',13,3,8,2,30],['034',8,1,12,0,7]];
+  function filt(){var a=+$('rf').value||0,b=$('rt').value===''?100:+$('rt').value,n=0;
+    $('rows').innerHTML=Rw.map(function(r,i){if(r[5]<a||r[5]>b)return '';n++;return '<tr><td>'+pad(i+1)+'</td><td>NP01AF4S240'+r[0]+'</td><td>'+pad(r[1])+'</td><td>'+pad(r[2])+'</td><td>'+pad(r[3])+'</td><td>'+pad(r[4])+'</td><td class="p" style="color:'+(r[5]<50?'#C2343A':'#2F8049')+'">'+r[5]+'%</td></tr>';}).join('');
+    $('rcount').textContent='Total Number of Students: '+n;}
+  $('rf').addEventListener('input',filt);$('rt').addEventListener('input',filt);
+  $('u50').addEventListener('click',function(){$('rf').value=0;$('rt').value=49;filt();});
+  $('rall').addEventListener('click',function(){$('rf').value=0;$('rt').value=100;filt();});
+  filt();
+
+  // ---- codes: 1 = matches a status spelled out in the student portal, 2 = my guess, 0 = unknown
+  var K={P:['Present','#DDF7E6',1],A:['Absent','#FBD9DB',1],L:['Late','#FCEBC4',1],VL:['Very Late','#FCEBC4',1],CC:['Class Canceled','#FBD9DB',1],ES:['Exam Scheduled','#FBD9DB',1],GC:['Group Changed','#FBD9DB',1],H:['Holiday','#FBD9DB',1],EP:['Early Punch-In?','#FBD9DB',2],LA:['Not spelled out','#FCEBC4',0]};
+  var note={1:'In the student portal',2:'My guess, from the student record',0:'Not in the files'};
+  $('codes').innerHTML=Object.keys(K).map(function(k){var v=K[k];return '<div class="code'+(v[2]===1?'':' q')+'"><b style="--bg:'+v[1]+'">'+k+'</b><span>'+v[0]+'<small>'+note[v[2]]+'</small></span></div>';}).join('');
+  var row=['P','P','P','P','P','P','A','P','P','A','A','A','P','A','ES','H','H','H','H'];
+  $('strip').innerHTML=row.map(function(c){return '<span style="--bg:'+K[c][1]+'" title="'+K[c][0]+'">'+c+'</span>';}).join('');
+
+  // rise: content stays visible; below-the-fold blocks lift into place
+  if(!matchMedia('(prefers-reduced-motion: reduce)').matches && 'IntersectionObserver' in window){
+    var els=[].slice.call(document.querySelectorAll('.rise')).filter(function(e){return e.getBoundingClientRect().top>innerHeight;});
+    els.forEach(function(e){e.classList.add('pre');});
+    var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.remove('pre');io.unobserve(e.target);}});},{rootMargin:'0px 0px -8% 0px'});
+    els.forEach(function(e){io.observe(e);});
+  }
+})();
+</script>
+</body>
+</html>

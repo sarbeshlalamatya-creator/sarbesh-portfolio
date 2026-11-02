@@ -4,11 +4,18 @@
     ['ticketing.html', 'TicketING'], ['tasq.html', 'TasQ Design System'], ['certify.html', 'Certify'], ['trisara.html', 'Trisara'],
     ['swimming-everyday.html', 'Swimming Everyday'], ['drukair.html', 'Drukair Holidays'], ['hippie-stay.html', 'Hippie Stay'],
     ['aura.html', 'Aura Fashion'], ['itdurbar.html', 'IT Durbar'], ['ing-tech.html', 'ING Tech Design System'], ['clms.html', 'CLMS'],
-    ['locomo.html', 'Locomo'], ['attendease.html', 'AttendEase'], ['nmst.html', 'NMST'], ['kavya.html', 'Kavya School'],
+    ['locomo.html', 'Locomo'], ['attendease.html', 'AttendEase'], ['attendease-admin.html', 'AttendEase Staff'], ['admission.html', 'Admission System'], ['nmst.html', 'NMST'], ['kavya.html', 'Kavya School'],
     ['herald.html', 'Herald College'], ['iic.html', 'Itahari International College'], ['icp.html', 'Informatics College Pokhara'],
     ['quickr.html', 'Quikr'], ['womens-day.html', "Women's Day"], ['bigmart.html', 'Big Mart'],
     ['yuemi.html', 'YueMi Ecosystem'], ['dayworks.html', 'Dayworks'], ['gyalpo-losar.html', 'Gyalpo Losar'], ['maghe-sankranti.html', 'Maghe Sankranti'], ['medfirst.html', 'MedFirst']
   ];
+  // A fresh visit starts at the top (the artifact viewer can carry the last page's scroll over); back/forward keeps the browser's restore.
+  var navType = ((performance.getEntriesByType && performance.getEntriesByType('navigation')[0]) || {}).type;
+  if (navType !== 'back_forward' && !location.hash) {
+    var t0 = Date.now(), moved = false, stop = function () { moved = true; };
+    ['wheel', 'touchstart', 'keydown'].forEach(function (e) { addEventListener(e, stop, { once: true, passive: true }); });
+    (function top() { if (moved) return; if (scrollY) scrollTo({ top: 0, behavior: 'instant' }); if (Date.now() - t0 < 1200) requestAnimationFrame(top); })();
+  }
   var file = location.pathname.split('/').pop();
   var i = -1;
   C.forEach(function (c, k) { if (c[0] === file) i = k; });
